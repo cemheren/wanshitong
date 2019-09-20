@@ -54,7 +54,13 @@ int main(int argc, const char *argv[]) {
 
 // The following callback method is invoked on every keypress.
 CGEventRef CGEventCallback(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void *refcon) {
-    if (type != kCGEventKeyDown && type != kCGEventFlagsChanged && type != kCGEventKeyUp) { return event; }
+    if (type != kCGEventKeyDown && type != kCGEventFlagsChanged && type != kCGEventKeyUp) 
+    { 
+        return event; 
+    }
+
+    int processIdTarget = CGEventGetIntegerValueField(event, kCGEventTargetUnixProcessID);
+    // printf("%d\n", processIdTarget);
 
     // Retrieve the incoming keycode.
     CGKeyCode keyCode = (CGKeyCode) CGEventGetIntegerValueField(event, kCGKeyboardEventKeycode);
@@ -63,7 +69,7 @@ CGEventRef CGEventCallback(CGEventTapProxy proxy, CGEventType type, CGEventRef e
     //fprintf(logfile, "%s", convertKeyCode(keyCode));
     //fflush(logfile);
 
-    printf("%s\n", convertKeyCode(keyCode));
+    printf("%s,%d\n", convertKeyCode(keyCode), processIdTarget);
     fflush(stdout);
     
     return event;

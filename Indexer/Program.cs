@@ -4,6 +4,8 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using wanshitong.KeyAggregation;
+using wanshitong.Common.Lucene;
+using System.Linq;
 
 namespace wanshitong
 {
@@ -13,8 +15,12 @@ namespace wanshitong
 
         private static ConcurrentDictionary<int, string> processIdMap = new ConcurrentDictionary<int, string>();
 
+        private static LuceneTools m_luceneTools = new LuceneTools();
+
         static void Main(string[] args)
         {
+            m_luceneTools.InitializeIndex();
+            
             Task.Run(() => CreateProcessIdMapping());
             Task.Run(() => CreateKeyLoggerThread());
             Task.Run(() => RecurringPrinter());
@@ -41,6 +47,7 @@ namespace wanshitong
                 if(current != "" && current != lastClipboard)
                 {
                     System.Console.WriteLine(current);
+                    m_luceneTools.AddAndCommit("clipboard", current);
                     lastClipboard = current;
                 }
                 Task.Delay(2000).Wait();
@@ -50,9 +57,14 @@ namespace wanshitong
 
         private static void PrintQueue()
         {
-            var current = KeyQueue.Flush();
-                if(current != "")
-                    System.Console.WriteLine(current);
+            var currentList = KeyQueue.Flush();
+            if(currentList.Any()){
+                foreach (var pair in currentList)
+                {
+                    System.Console.WriteLine($"{pair.Item1}, {pair.Item2}");
+                    m_luceneTools.AddAndCommit(pair.Item1, pair.Item2);
+                }
+            }
         }
 
         private static void CreateProcessIdMapping()

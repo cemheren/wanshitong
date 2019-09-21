@@ -59,9 +59,11 @@ namespace wanshitong.KeyAggregation
             }
         }
 
-        public string Flush()
+        public List<(string, string)> Flush()
         {
-            var resultBuilder = new StringBuilder();
+            var result = new List<(string, string)>();
+
+            var localBuilder = new StringBuilder();
             lock (this.queue_lock)
             {
                 var lastGroup = "";
@@ -71,22 +73,28 @@ namespace wanshitong.KeyAggregation
                     if (lastGroup == "") 
                     {
                         lastGroup = current.Group;
-                        resultBuilder.AppendLine(lastGroup);
                     }
 
                     if(current.Group == lastGroup)
                     {
-                        resultBuilder.Append(current.Key);
+                        localBuilder.Append(current.Key);
                     }
                     else
                     {
+                        result.Add((lastGroup, localBuilder.ToString()));
+
                         lastGroup = "";
                         m_queue.AddBack(current);
                     }
                 }
+
+                if(lastGroup != "")
+                {
+                    result.Add((lastGroup, localBuilder.ToString()));
+                }
             }
 
-            return resultBuilder.ToString();
+            return result;
         }
     }
 }

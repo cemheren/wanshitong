@@ -8,9 +8,17 @@
     <title>Librarian</title>
   </head>
   <body>
-    <input id="input" class="main_query"></input>
+    <div id="leftpanel" class="left_panel">
+        <input id="input" class="main_query"></input>
 
-    <textarea id="results" class="main_results">Placeholder</textarea>
+        <div id="results" class="main_results">
+          <span id="placeholder">Placeholder</span>
+        </div>
+    </div>
+
+    <div id="rightpanel" class="right_panel">
+        
+    </div>
 
     <!-- You can also require other files to run in this process -->
     <script src="./renderer.js"></script>

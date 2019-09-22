@@ -3,6 +3,7 @@ using System.IO;
 using Lucene.Net.Analysis.Standard;
 using Lucene.Net.Documents;
 using Lucene.Net.Index;
+using Lucene.Net.QueryParsers.Classic;
 using Lucene.Net.Search;
 using Lucene.Net.Store;
 using Lucene.Net.Util;
@@ -51,10 +52,25 @@ namespace wanshitong.Common.Lucene
             }
         }
 
-        public List<(string group, string text)> Search(params string[] s)
+        public List<(string group, string text)> Search(string s)
         {
-            var phrase = new MultiPhraseQuery();
-            phrase.Add(new Term("text", s[0]));
+            Query phrase;
+            if(s.Contains("*") || s.Contains("?"))
+            {
+                phrase = new WildcardQuery(new Term("text", s));
+            }else //if(s.Length > 1)
+            {
+                var parser = new QueryParser(LuceneVersion.LUCENE_48, "text", new StandardAnalyzer(LuceneVersion.LUCENE_48));
+                try
+                {
+                    phrase = parser.Parse(s);                    
+                }
+                catch (System.Exception)
+                {
+                    return new List<(string, string)>();
+                } 
+            }
+
             var results = new List<(string group, string text)>();
 
             using (var reader = DirectoryReader.Open(this.dir))

@@ -78,6 +78,11 @@ namespace wanshitong
             if(currentList.Any()){
                 foreach (var pair in currentList)
                 {
+                    // filter noisy documents;
+                    var spaces = pair.Item2.Split(' ', 10, StringSplitOptions.RemoveEmptyEntries);
+                    if(spaces.Length < 2)
+                        continue;
+
                     System.Console.WriteLine($"{pair.Item1}, {pair.Item2}");
                     m_luceneTools.AddAndCommit(pair.Item1, pair.Item2);
                 }

@@ -10,6 +10,7 @@
     <PackageReference Include="Lucene.Net" Version="4.8.0-beta00006" />
     <PackageReference Include="Lucene.Net.Analysis.Common" Version="4.8.0-beta00006" />
     <PackageReference Include="Lucene.Net.Queries" Version="4.8.0-beta00006" />
+    <PackageReference Include="Lucene.Net.QueryParser" Version="4.8.0-beta00006" />
     
     <PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="5.2.7" />
     <PackageReference Include="Microsoft.AspNetCore" Version="2.2.0" />

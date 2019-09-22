@@ -13,6 +13,9 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 
+using Keystroke.API;
+using System.Runtime.InteropServices;
+
 namespace wanshitong
 {
     class Program
@@ -60,7 +63,17 @@ namespace wanshitong
         {
             while (true)
             {    
-                var current = OsxClipboard.GetText();
+                bool isWindows = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+                string current;
+
+                if(isWindows)
+                {
+                    current = WindowsClipboard.GetText();
+                }else
+                {
+                    current = OsxClipboard.GetText();
+                }
+
                 if(!string.IsNullOrEmpty(current) && current != lastClipboard)
                 {
                     System.Console.WriteLine(current);
@@ -105,30 +118,48 @@ namespace wanshitong
 
         private static void CreateKeyLoggerThread()
         {
-            var proc = new Process 
-            {
-                StartInfo = new ProcessStartInfo
-                {
-                    FileName = "keylogger/keylogger",
-                    Arguments = "",
-                    UseShellExecute = false,
-                    RedirectStandardOutput = true,
-                    CreateNoWindow = true
-                }
-            };
+            bool isWindows = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
 
-            proc.Start();
-            while (!proc.StandardOutput.EndOfStream)
+            if (isWindows)
             {
-                string line = proc.StandardOutput.ReadLine();
-                // do something with line 
-                //System.Console.WriteLine(line);
-                var key = line.Split(',')[0];
-                var processId = line.Split(',')[1];
-                
-                if(int.TryParse(processId, out var pid) && processIdMap.TryGetValue(pid, out var processName))
+                using (var api = new KeystrokeAPI())
                 {
-                    KeyQueue.Add(key, processName);
+                    // Doesn't work on a VM might be fine on metal
+                    
+                    // api.CreateKeyboardHook((character) => 
+                    // { 
+                    //     //Console.Write(character); 
+                    //     KeyQueue.Add(character.ToString(), character.CurrentWindow);
+                    // });
+                    Task.Delay(Timeout.Infinite).Wait();
+                }
+            }else
+            {
+                var proc = new Process
+                {
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = "keylogger/keylogger",
+                        Arguments = "",
+                        UseShellExecute = false,
+                        RedirectStandardOutput = true,
+                        CreateNoWindow = true
+                    }
+                };
+
+                proc.Start();
+                while (!proc.StandardOutput.EndOfStream)
+                {
+                    string line = proc.StandardOutput.ReadLine();
+                    // do something with line 
+                    //System.Console.WriteLine(line);
+                    var key = line.Split(',')[0];
+                    var processId = line.Split(',')[1];
+                    
+                    if(int.TryParse(processId, out var pid) && processIdMap.TryGetValue(pid, out var processName))
+                    {
+                        KeyQueue.Add(key, processName);
+                    }
                 }
             }
         }

@@ -12,9 +12,10 @@ namespace Querier
         static int Main(string[] args)
         {
             m_luceneTools.InitializeIndex();
-            
+
             var rootCommand = new RootCommand();
             rootCommand.AddCommand(GetQueryCommand());
+            rootCommand.AddCommand(GetListCommand());
 
             return rootCommand.InvokeAsync(args).Result;
         }
@@ -28,6 +29,20 @@ namespace Querier
             listCommand.Handler = CommandHandler.Create<string>((query) =>
             {
                 m_luceneTools.Search(query);
+            });
+
+            return listCommand;  
+        }
+
+        private static Command GetListCommand()
+        {
+            var listCommand = new Command("list");
+            listCommand.Description = "Seek list information";
+            listCommand.Argument = new Argument<string>();
+
+            listCommand.Handler = CommandHandler.Create<string>((list) =>
+            {
+                m_luceneTools.SearchGroup(list);
             });
 
             return listCommand;  

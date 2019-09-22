@@ -1,0 +1,12 @@
+.main_query{
+    width: 500px;
+    height: 40px;
+    font-size: x-large;
+}
+
+.main_results{
+    width: 500px;
+    height: 500px;
+    font-size: normal;
+    margin-top: 10px;
+}

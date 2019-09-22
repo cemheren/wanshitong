@@ -6,6 +6,12 @@ using System.Threading.Tasks;
 using wanshitong.KeyAggregation;
 using wanshitong.Common.Lucene;
 using System.Linq;
+using Microsoft.AspNetCore;
+using Querier;
+
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 
 namespace wanshitong
 {
@@ -15,7 +21,7 @@ namespace wanshitong
 
         private static ConcurrentDictionary<int, string> processIdMap = new ConcurrentDictionary<int, string>();
 
-        private static LuceneTools m_luceneTools = new LuceneTools();
+        internal static LuceneTools m_luceneTools = new LuceneTools();
 
         static void Main(string[] args)
         {
@@ -26,7 +32,18 @@ namespace wanshitong
             Task.Run(() => RecurringPrinter());
             Task.Run(() => ClipboardListener());
 
+            Task.Run(() => StartWebHost(args));
+
             Task.Delay(Timeout.Infinite).Wait();
+        }
+
+        private static void StartWebHost(string[] args)
+        {
+             var host = WebHost.CreateDefaultBuilder(args)
+                .UseStartup<Startup>()
+                .Build();
+
+            host.Run();
         }
 
         private static void RecurringPrinter()
@@ -44,7 +61,7 @@ namespace wanshitong
             while (true)
             {    
                 var current = OsxClipboard.GetText();
-                if(current != "" && current != lastClipboard)
+                if(!string.IsNullOrEmpty(current) && current != lastClipboard)
                 {
                     System.Console.WriteLine(current);
                     m_luceneTools.AddAndCommit("clipboard", current);
@@ -103,8 +120,11 @@ namespace wanshitong
                 //System.Console.WriteLine(line);
                 var key = line.Split(',')[0];
                 var processId = line.Split(',')[1];
-                processIdMap.TryGetValue(int.Parse(processId), out var processName);
-                KeyQueue.Add(key, processName);
+                
+                if(int.TryParse(processId, out var pid) && processIdMap.TryGetValue(pid, out var processName))
+                {
+                    KeyQueue.Add(key, processName);
+                }
             }
         }
     }

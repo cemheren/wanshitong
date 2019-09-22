@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.IO;
 using Lucene.Net.Analysis.Standard;
 using Lucene.Net.Documents;
@@ -10,8 +11,6 @@ namespace wanshitong.Common.Lucene
 {
     public class LuceneTools
     {
-        internal IndexWriter m_writer;
-        internal IndexReader m_reader;
         private FSDirectory dir;
         private StandardAnalyzer analyzer;
         private LuceneVersion appLuceneVersion;
@@ -52,12 +51,51 @@ namespace wanshitong.Common.Lucene
             }
         }
 
-        public void Search(params string[] s)
+        public List<(string group, string text)> Search(params string[] s)
         {
             var phrase = new MultiPhraseQuery();
             phrase.Add(new Term("text", s[0]));
-//            phrase.Add(new Term("favouritePhrase", "fox"));
-            // m_writer.GetReader(applyAllDeletes: true)
+            var results = new List<(string group, string text)>();
+
+            using (var reader = DirectoryReader.Open(this.dir))
+            {
+                var searcher = new IndexSearcher(reader);
+                var hits = searcher.Search(phrase, 20).ScoreDocs;
+                foreach (var hit in hits)
+                {
+                    var foundDoc = searcher.Doc(hit.Doc);
+                    System.Console.WriteLine($"{foundDoc.Get("group")}: {foundDoc.Get("text")}");
+                    results.Add((group: foundDoc.Get("group"), text: foundDoc.Get("text")));
+                }
+            }
+
+            return results;
+        }
+
+        public List<(string group, string text)> GetAll()
+        {
+            var query = new MatchAllDocsQuery();
+            var results = new List<(string group, string text)>();
+
+            using (var reader = DirectoryReader.Open(this.dir))
+            {
+                var searcher = new IndexSearcher(reader);
+                var hits = searcher.Search(query, 1000).ScoreDocs;
+                foreach (var hit in hits)
+                {
+                    var foundDoc = searcher.Doc(hit.Doc);
+                    System.Console.WriteLine($"{foundDoc.Get("group")}: {foundDoc.Get("text")}");
+                    results.Add((group: foundDoc.Get("group"), text: foundDoc.Get("text")));
+                }
+            }
+
+            return results;
+        }
+
+        public void SearchGroup(params string[] s)
+        {
+            var phrase = new MultiPhraseQuery();
+            phrase.Add(new Term("group", s[0]));
 
             using (var reader = DirectoryReader.Open(this.dir))
             {
@@ -67,9 +105,6 @@ namespace wanshitong.Common.Lucene
                 {
                     var foundDoc = searcher.Doc(hit.Doc);
                     System.Console.WriteLine($"{foundDoc.Get("group")}: {foundDoc.Get("text")}");
-                    // hit.Score.Dump("Score");
-                    // foundDoc.Get("name").Dump("Name");
-                    // foundDoc.Get("favouritePhrase").Dump("Favourite Phrase");
                 }
             }
         }

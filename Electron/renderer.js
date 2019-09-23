@@ -4,9 +4,17 @@
 
 var inputElement = document.getElementById("input");
 var resultsElement = document.getElementById("results");
-var rightPanelElement = document.getElementById("rightpanel");
+var rightPanelElement = document.getElementById("editorjs");
+var deleteElement = document.getElementById("delete");
 
-function CreateResultRow(group, text)
+// var Quill = require("quill");
+// var editor = new Quill('#editor', {
+//     modules: { toolbar: '#toolbar' },
+//     theme: 'snow'
+//   });
+var selectedElementMetadata = {};
+
+function CreateResultRow(docId, group, text)
 {
     const div = document.createElement('div');
     div.className = 'result_row';
@@ -19,12 +27,17 @@ function CreateResultRow(group, text)
     div.innerHTML = `
         <div class="result_row_text" onClick="onRowTextClick(this)">${text}</div>
         <div class="result_row_group">${group}</div>
+        <div class="result_row_id">${docId}</div>
     `;
     return div;
 }
 
 function onRowTextClick(event)
 {
+    // editor.setText(event.textContent);
+
+    selectedElementMetadata.docId = event.parentElement.querySelector('.result_row_id').textContent;
+    selectedElementMetadata.text = event.textContent;
     rightPanelElement.textContent = event.textContent;
 }
 
@@ -35,27 +48,34 @@ function RemoveAllChildren(node)
     }
 }
 
-inputElement.onkeyup = function(event){
+var refreshList = function(event){
     var text = document.getElementById("input").value;
 
     RemoveAllChildren(resultsElement);
-    var response = httpGet("http://localhost:5000/query/" + text);
+    var response = http("GET", "http://localhost:5000/query/" + text);
 
     if(response == "" || response == undefined){
         return "No result found";
     }
 
-    var text = "";
     var json = JSON.parse(response);
     json.forEach(e => {
-        resultsElement.appendChild(CreateResultRow(e.group, e.text));
-        text += e.group + ": " + e.text + "\n";
+        resultsElement.appendChild(CreateResultRow(e.docId, e.group, e.text));
     });
 }
+inputElement.onkeyup = refreshList;
 
-function httpGet(theUrl) {
+deleteElement.onclick = function(event){
+    var response = http("DELETE", "http://localhost:5000/delete/" + selectedElementMetadata.docId);
+    
+    refreshList();
+
+    rightPanelElement.textContent = "Deleted.";
+}
+
+function http(method, theUrl) {
     var xmlHttp = new XMLHttpRequest();
-    xmlHttp.open("GET", theUrl, false); // false for synchronous request
+    xmlHttp.open(method, theUrl, false); // false for synchronous request
     xmlHttp.send(null);
 
     return xmlHttp.responseText;

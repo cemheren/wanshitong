@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using Indexer.LuceneTools;
 using Lucene.Net.Analysis.Standard;
 using Lucene.Net.Documents;
 using Lucene.Net.Index;
@@ -52,8 +53,20 @@ namespace wanshitong.Common.Lucene
             }
         }
 
-        public List<(string group, string text)> Search(string s)
+        public void Delete(int docID)
         {
+            using (var writer = new IndexWriter(dir, new IndexWriterConfig(appLuceneVersion, analyzer)))
+            {
+                var isDeleted = writer.TryDeleteDocument(writer.GetReader(false), docID);
+                writer.Commit();
+                writer.Flush(triggerMerge: false, applyAllDeletes: true);
+            }
+        }
+
+        public List<SearchModel> Search(string s)
+        {
+            var results = new List<SearchModel>();
+
             Query phrase;
             if(s.Contains("*") || s.Contains("?"))
             {
@@ -67,31 +80,35 @@ namespace wanshitong.Common.Lucene
                 }
                 catch (System.Exception)
                 {
-                    return new List<(string, string)>();
+                    return results;
                 } 
             }
-
-            var results = new List<(string group, string text)>();
 
             using (var reader = DirectoryReader.Open(this.dir))
             {
                 var searcher = new IndexSearcher(reader);
-                var hits = searcher.Search(phrase, 20).ScoreDocs;
+                var hits = searcher.Search(phrase, 50).ScoreDocs;
                 foreach (var hit in hits)
                 {
                     var foundDoc = searcher.Doc(hit.Doc);
                     System.Console.WriteLine($"{foundDoc.Get("group")}: {foundDoc.Get("text")}");
-                    results.Add((group: foundDoc.Get("group"), text: foundDoc.Get("text")));
+                    results.Add(
+                        new SearchModel
+                        {
+                            Group = foundDoc.Get("group"),
+                            Text = foundDoc.Get("text"),
+                            DocId = hit.Doc
+                        });
                 }
             }
 
             return results;
         }
 
-        public List<(string group, string text)> GetAll()
+        public List<SearchModel> GetAll()
         {
             var query = new MatchAllDocsQuery();
-            var results = new List<(string group, string text)>();
+            var results = new List<SearchModel>();
 
             using (var reader = DirectoryReader.Open(this.dir))
             {
@@ -101,7 +118,12 @@ namespace wanshitong.Common.Lucene
                 {
                     var foundDoc = searcher.Doc(hit.Doc);
                     System.Console.WriteLine($"{foundDoc.Get("group")}: {foundDoc.Get("text")}");
-                    results.Add((group: foundDoc.Get("group"), text: foundDoc.Get("text")));
+                    results.Add(
+                        new SearchModel
+                        {
+                            Group = foundDoc.Get("group"),
+                            Text = foundDoc.Get("text")
+                        });
                 }
             }
 

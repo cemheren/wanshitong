@@ -11,20 +11,20 @@ static class WindowsClipboard
         OpenClipboard();
 
         EmptyClipboard();
-        IntPtr hGlobal = default;
+        IntPtr hGlobal = default(IntPtr);
         try
         {
             var bytes = (text.Length + 1) * 2;
             hGlobal = Marshal.AllocHGlobal(bytes);
 
-            if (hGlobal == default)
+            if (hGlobal == default(IntPtr))
             {
                 ThrowWin32();
             }
 
             var target = GlobalLock(hGlobal);
 
-            if (target == default)
+            if (target == default(IntPtr))
             {
                 ThrowWin32();
             }
@@ -38,16 +38,16 @@ static class WindowsClipboard
                 GlobalUnlock(target);
             }
 
-            if (SetClipboardData(cfUnicodeText, hGlobal) == default)
+            if (SetClipboardData(cfUnicodeText, hGlobal) == default(IntPtr))
             {
                 ThrowWin32();
             }
 
-            hGlobal = default;
+            hGlobal = default(IntPtr);
         }
         finally
         {
-            if (hGlobal != default)
+            if (hGlobal != default(IntPtr))
             {
                 Marshal.FreeHGlobal(hGlobal);
             }
@@ -61,7 +61,7 @@ static class WindowsClipboard
         var num = 10;
         while (true)
         {
-            if (OpenClipboard(default))
+            if (OpenClipboard(default(IntPtr)))
             {
                 break;
             }
@@ -82,20 +82,19 @@ static class WindowsClipboard
             return null;
         }
 
-        IntPtr handle = default;
-
-        IntPtr pointer = default;
+        IntPtr handle = default(IntPtr);
+        IntPtr pointer = default(IntPtr);
         try
         {
             OpenClipboard();
             handle = GetClipboardData(cfUnicodeText);
-            if (handle == default)
+            if (handle == default(IntPtr))
             {
                 return null;
             }
 
             pointer = GlobalLock(handle);
-            if (pointer == default)
+            if (pointer == default(IntPtr))
             {
                 return null;
             }
@@ -109,7 +108,7 @@ static class WindowsClipboard
         }
         finally
         {
-            if (pointer != default)
+            if (pointer != default(IntPtr))
             {
                 GlobalUnlock(handle);
             }

@@ -15,7 +15,7 @@ namespace wanshitong.Common.Lucene
     public class LuceneTools
     {
         private FSDirectory dir;
-        private StandardAnalyzer analyzer;
+        private CodeAwareAnalyzer analyzer;
         private LuceneVersion appLuceneVersion;
 
         public LuceneTools()
@@ -35,7 +35,7 @@ namespace wanshitong.Common.Lucene
             this.dir = FSDirectory.Open(dirInfo);
 
             //create an analyzer to process the text
-            this.analyzer = new StandardAnalyzer(appLuceneVersion);
+            this.analyzer = new CodeAwareAnalyzer(appLuceneVersion);
         }
 
         public void AddAndCommit(string group, string text, int processId)
@@ -127,7 +127,7 @@ namespace wanshitong.Common.Lucene
                 phrase = new WildcardQuery(new Term("text", s));
             }else //if(s.Length > 1)
             {
-                var parser = new QueryParser(LuceneVersion.LUCENE_48, "text", new StandardAnalyzer(LuceneVersion.LUCENE_48));
+                var parser = new QueryParser(LuceneVersion.LUCENE_48, "text", this.analyzer);
                 try
                 {
                     phrase = parser.Parse(s);                    

@@ -53,7 +53,7 @@ namespace wanshitong
         {
             while (true)
             {
-                Task.Delay(10000).Wait();
+                Task.Delay(60000).Wait();
                 PrintQueue();
             }
         }
@@ -77,7 +77,7 @@ namespace wanshitong
                 if(!string.IsNullOrEmpty(current) && current != lastClipboard)
                 {
                     System.Console.WriteLine(current);
-                    m_luceneTools.AddAndCommit("clipboard", current);
+                    m_luceneTools.AddAndCommit("clipboard", current, -1);
                     lastClipboard = current;
                 }
                 Task.Delay(2000).Wait();
@@ -87,17 +87,28 @@ namespace wanshitong
 
         private static void PrintQueue()
         {
-            var currentList = KeyQueue.Flush();
-            if(currentList.Any()){
+             var currentList = KeyQueue.Flush();
+             {
                 foreach (var pair in currentList)
                 {
                     // filter noisy documents;
-                    var spaces = pair.Item2.Split(' ', 10, StringSplitOptions.RemoveEmptyEntries);
-                    if(spaces.Length < 2)
-                        continue;
+                    // var spaces = pair.Item2.Split(' ', 10, StringSplitOptions.RemoveEmptyEntries);
+                    // if(spaces.Length < 2)
+                    //     continue;
 
-                    System.Console.WriteLine($"{pair.Item1}, {pair.Item2}");
-                    m_luceneTools.AddAndCommit(pair.Item1, pair.Item2);
+                    processIdMap.TryGetValue(pair.Item1, out var processName);
+
+                    var existing = m_luceneTools.SearchWithProcessId(pair.Item1, processName);
+
+                    if(existing != null)
+                    {
+                        existing.Text += "\n" + pair.Item2;
+                        m_luceneTools.UpdateDocument(existing);    
+                    }
+                    else
+                    {
+                        m_luceneTools.AddAndCommit(processName, pair.Item2, pair.Item1);
+                    }
                 }
             }
         }
@@ -153,12 +164,12 @@ namespace wanshitong
                     string line = proc.StandardOutput.ReadLine();
                     // do something with line 
                     //System.Console.WriteLine(line);
-                    var key = line.Split(',')[0];
+                    var keyboardKey = line.Split(',')[0];
                     var processId = line.Split(',')[1];
                     
-                    if(int.TryParse(processId, out var pid) && processIdMap.TryGetValue(pid, out var processName))
+                    if(int.TryParse(processId, out var pid))
                     {
-                        KeyQueue.Add(key, processName);
+                        KeyQueue.Add(keyboardKey, pid);
                     }
                 }
             }

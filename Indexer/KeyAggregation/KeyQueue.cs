@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,17 +10,17 @@ namespace wanshitong.KeyAggregation
     {
         private class KeyGroup
         {
-            public KeyGroup(string key, string group)
+            public KeyGroup(string key, int group)
             {
                 this.Key = key;
                 this.Group = group;
 
             }
             public string Key { get; set; }
-            public string Group { get; set; }
+            public int Group { get; set; }
         }
 
-        private Deque<KeyGroup> m_queue;
+        private ConcurrentDictionary<int, Deque<KeyGroup>> m_queues;
 
         private Action m_flushCallback;
 
@@ -29,21 +30,31 @@ namespace wanshitong.KeyAggregation
 
         public KeyQueue(Action flushCallback)
         {
-            m_queue = new Deque<KeyGroup>();
+            m_queues = new ConcurrentDictionary<int, Deque<KeyGroup>>();
             m_flushCallback = flushCallback;
         }
 
-        public void Add(string s, string group)
+        public void Add(string s, int group)
         {
+            if (this.flushing)
+            {
+                lock (this.queue_lock)
+                {
+                    // wait the lock.
+                }
+            }
+
             if (s == "[return]")
             {
                 m_flushCallback();
                 return;
             }
 
-            if (s == "[del]" && m_queue.Count > 0)
+            var queue = m_queues.GetOrAdd(group, new Deque<KeyGroup>());
+
+            if (s == "[del]" && queue.Count > 0)
             {
-                m_queue.RemoveFront();
+                queue.RemoveFront();
                 return;
             }
 
@@ -53,45 +64,48 @@ namespace wanshitong.KeyAggregation
                 return;
             }
 
-            lock (this.queue_lock)
-            {
-                m_queue.AddFront(new KeyGroup(s, group));
-            }
+            queue.AddFront(new KeyGroup(s, group));
         }
 
-        public List<(string, string)> Flush()
+        public List<(int, string)> Flush()
         {
-            var result = new List<(string, string)>();
+            var result = new List<(int, string)>();
 
-            var localBuilder = new StringBuilder();
             lock (this.queue_lock)
             {
-                var lastGroup = "";
-                while (this.m_queue.Count > 0)
+                this.flushing = true;
+
+                var localBuilder = new StringBuilder();
+                foreach (var kvp in this.m_queues)
                 {
-                    var current = m_queue.RemoveBack();
-                    if (lastGroup == "") 
-                    {
-                        lastGroup = current.Group;
-                    }
+                    localBuilder.Clear();
+                    var queue = kvp.Value;
+                    while (queue.Count > 0)
+                    {   
+                        var currentKey = queue.RemoveBack().Key;
+                        var cmdOrCtrl = currentKey[0] == '[' && (currentKey.Contains("ctrl") || currentKey.Contains("cmd"));
+                        if (cmdOrCtrl && queue.Count > 1)
+                        {
+                            var middleKey = queue.RemoveBack().Key;
+                            var rightKey = queue.RemoveBack().Key;
 
-                    if(current.Group == lastGroup)
+                            //discard everything if keys are like [ctrl]a[ctrl]
+                            if(currentKey == rightKey)
+                            {
+                                continue;
+                            }
+                        }
+                        localBuilder.Append(currentKey);
+                    }                
+                    var str = localBuilder.ToString();
+                    if (string.IsNullOrEmpty(str) == false)
                     {
-                        localBuilder.Append(current.Key);
+                        result.Add((kvp.Key, str));                            
                     }
-                    else
-                    {
-                        result.Add((lastGroup, localBuilder.ToString()));
-
-                        lastGroup = "";
-                        m_queue.AddBack(current);
-                    }
+                    // maybe delete queues from m_queue after they are empty. This might create a memory leak.
                 }
 
-                if(lastGroup != "")
-                {
-                    result.Add((lastGroup, localBuilder.ToString()));
-                }
+                this.flushing = false;
             }
 
             return result;

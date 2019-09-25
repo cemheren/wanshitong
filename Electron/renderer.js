@@ -4,7 +4,7 @@
 
 var inputElement = document.getElementById("input");
 var resultsElement = document.getElementById("results");
-var rightPanelElement = document.getElementById("editorjs");
+var rightPanelElement = document.getElementById("righttextpanel");
 var deleteElement = document.getElementById("delete");
 
 // var Quill = require("quill");

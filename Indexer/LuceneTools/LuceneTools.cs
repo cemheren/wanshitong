@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using Indexer.LuceneTools;
@@ -37,7 +38,7 @@ namespace wanshitong.Common.Lucene
             this.analyzer = new StandardAnalyzer(appLuceneVersion);
         }
 
-        public void AddAndCommit(string group, string text)
+        public void AddAndCommit(string group, string text, int processId)
         {
             using (var writer = new IndexWriter(dir, new IndexWriterConfig(appLuceneVersion, analyzer)))
             {
@@ -45,11 +46,36 @@ namespace wanshitong.Common.Lucene
 
                 // StringField indexes but doesn't tokenise
                 doc.Add(new StringField("group", group, Field.Store.YES));
+                doc.Add(new StringField("processId", processId.ToString(), Field.Store.YES));
                 doc.Add(new TextField("text", text, Field.Store.YES));
+
+                doc.Add(new StringField("ingestionTime",
+                     DateTools.DateToString(DateTime.UtcNow, DateTools.Resolution.SECOND), Field.Store.YES));
 
                 writer.AddDocument(doc);
                 writer.Commit();
                 writer.Flush(triggerMerge: false, applyAllDeletes: false);
+            }
+        }
+
+        public void UpdateDocument(SearchModel updatedDocument)
+        {
+            using (var writer = new IndexWriter(dir, new IndexWriterConfig(appLuceneVersion, analyzer)))
+            {
+                var doc = new Document();
+
+                var isDeleted = writer.TryDeleteDocument(writer.GetReader(false), updatedDocument.DocId);
+                // StringField indexes but doesn't tokenise
+                doc.Add(new StringField("group", updatedDocument.Group, Field.Store.YES));
+                doc.Add(new StringField("processId", updatedDocument.ProcessId, Field.Store.YES));
+                doc.Add(new TextField("text", updatedDocument.Text, Field.Store.YES));
+
+                doc.Add(new StringField("ingestionTime",
+                     DateTools.DateToString(DateTime.UtcNow, DateTools.Resolution.SECOND), Field.Store.YES));
+
+                writer.AddDocument(doc);
+                writer.Commit();
+                writer.Flush(triggerMerge: false, applyAllDeletes: true);
             }
         }
 
@@ -61,6 +87,34 @@ namespace wanshitong.Common.Lucene
                 writer.Commit();
                 writer.Flush(triggerMerge: false, applyAllDeletes: true);
             }
+        }
+
+        public SearchModel SearchWithProcessId(int processId, string group)
+        {
+            var result = default(SearchModel);
+
+            var booleanQuery = new BooleanQuery() {
+                new BooleanClause(new TermQuery(new Term("processId", processId.ToString())), Occur.SHOULD),
+                new BooleanClause(new TermQuery(new Term("group", group)), Occur.SHOULD)
+            };
+
+            using (var reader = DirectoryReader.Open(this.dir))
+            {
+                var searcher = new IndexSearcher(reader);
+                var hits = searcher.Search(booleanQuery, 5).ScoreDocs;
+                foreach (var hit in hits)
+                {
+                    var foundDoc = searcher.Doc(hit.Doc);
+                    var searchModel = SearchModel.FromDoc(foundDoc, hit.Doc);
+
+                    if (searchModel.IngestionTime > DateTime.UtcNow.AddHours(-2))
+                    {
+                        return searchModel;
+                    }
+                }
+            }
+
+            return result;
         }
 
         public List<SearchModel> Search(string s)
@@ -91,14 +145,8 @@ namespace wanshitong.Common.Lucene
                 foreach (var hit in hits)
                 {
                     var foundDoc = searcher.Doc(hit.Doc);
-                    System.Console.WriteLine($"{foundDoc.Get("group")}: {foundDoc.Get("text")}");
-                    results.Add(
-                        new SearchModel
-                        {
-                            Group = foundDoc.Get("group"),
-                            Text = foundDoc.Get("text"),
-                            DocId = hit.Doc
-                        });
+                    //System.Console.WriteLine($"{foundDoc.Get("group")}: {foundDoc.Get("text")}");
+                    results.Add(SearchModel.FromDoc(foundDoc, hit.Doc));
                 }
             }
 

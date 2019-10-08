@@ -31,7 +31,7 @@ namespace wanshitong
             m_luceneTools.InitializeIndex();
             
             Task.Run(() => CreateProcessIdMapping());
-            Task.Run(() => CreateKeyLoggerThread());
+            //Task.Run(() => CreateKeyLoggerThread());
             Task.Run(() => RecurringPrinter());
             Task.Run(() => ClipboardListener());
 

@@ -26,7 +26,7 @@ namespace wanshitong.Common.Lucene
         {
             this.appLuceneVersion = LuceneVersion.LUCENE_48;
             
-            var currentDir = "/Users/cemheren";
+            var currentDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
 
             var dirInfo = new DirectoryInfo(Path.Combine(currentDir, "Index"));
 

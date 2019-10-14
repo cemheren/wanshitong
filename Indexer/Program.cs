@@ -13,8 +13,10 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 
-using Keystroke.API;
 using System.Runtime.InteropServices;
+using System.Drawing.Imaging;
+
+//using System.Windows.Forms;
 
 namespace wanshitong
 {
@@ -26,16 +28,18 @@ namespace wanshitong
 
         internal static LuceneTools m_luceneTools = new LuceneTools();
 
+        // private static KeystrokeAPI keystrokeAPI = new KeystrokeAPI();
+
         static void Main(string[] args)
         {
             m_luceneTools.InitializeIndex();
             
-            Task.Run(() => CreateProcessIdMapping());
-            //Task.Run(() => CreateKeyLoggerThread());
-            Task.Run(() => RecurringPrinter());
-            Task.Run(() => ClipboardListener());
+            //Task.Run(() => CreateProcessIdMapping());
+            Task.Run(() => CreateKeyLoggerThread());
+            //Task.Run(() => RecurringPrinter());
+            //Task.Run(() => ClipboardListener());
 
-            Task.Run(() => StartWebHost(args));
+            //Task.Run(() => StartWebHost(args));
 
             Task.Delay(Timeout.Infinite).Wait();
         }
@@ -61,6 +65,7 @@ namespace wanshitong
         private static string lastClipboard = ""; 
         private static void ClipboardListener()
         {
+            var x = 0;
             while (true)
             {    
                 bool isWindows = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
@@ -80,6 +85,10 @@ namespace wanshitong
                     m_luceneTools.AddAndCommit("clipboard", current, -1);
                     lastClipboard = current;
                 }
+
+                var image = ScreenCapture.CaptureActiveWindow();
+                image.Save($@"C:\Users\cemheren\wanshitong\Indexer\Screenshots\{x++}.jpeg", ImageFormat.Jpeg);
+
                 Task.Delay(2000).Wait();
                 
             }
@@ -133,17 +142,10 @@ namespace wanshitong
 
             if (isWindows)
             {
-                using (var api = new KeystrokeAPI())
-                {
-                    // Doesn't work on a VM might be fine on metal
-                    
-                    // api.CreateKeyboardHook((character) => 
-                    // { 
-                    //     //Console.Write(character); 
-                    //     KeyQueue.Add(character.ToString(), character.CurrentWindow);
-                    // });
-                    Task.Delay(Timeout.Infinite).Wait();
-                }
+                Keylogger.SetHook(() => {});
+                
+
+                Task.Delay(Timeout.Infinite).Wait();
             }else
             {
                 var proc = new Process

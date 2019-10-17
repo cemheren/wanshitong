@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Http;
 
 using System.Runtime.InteropServices;
 using System.Drawing.Imaging;
+using System.IO;
 
 //using System.Windows.Forms;
 
@@ -28,18 +29,16 @@ namespace wanshitong
 
         internal static LuceneTools m_luceneTools = new LuceneTools();
 
-        // private static KeystrokeAPI keystrokeAPI = new KeystrokeAPI();
-
         static void Main(string[] args)
         {
             m_luceneTools.InitializeIndex();
             
             //Task.Run(() => CreateProcessIdMapping());
-            Task.Run(() => CreateKeyLoggerThread());
+            Task.Run(() => CreateHotKeyThread());
             //Task.Run(() => RecurringPrinter());
             //Task.Run(() => ClipboardListener());
 
-            //Task.Run(() => StartWebHost(args));
+            Task.Run(() => StartWebHost(args));
 
             Task.Delay(Timeout.Infinite).Wait();
         }
@@ -65,7 +64,6 @@ namespace wanshitong
         private static string lastClipboard = ""; 
         private static void ClipboardListener()
         {
-            var x = 0;
             while (true)
             {    
                 bool isWindows = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
@@ -85,9 +83,6 @@ namespace wanshitong
                     m_luceneTools.AddAndCommit("clipboard", current, -1);
                     lastClipboard = current;
                 }
-
-                var image = ScreenCapture.CaptureActiveWindow();
-                image.Save($@"C:\Users\cemheren\wanshitong\Indexer\Screenshots\{x++}.jpeg", ImageFormat.Jpeg);
 
                 Task.Delay(2000).Wait();
                 
@@ -136,16 +131,42 @@ namespace wanshitong
             }
         }
 
-        private static void CreateKeyLoggerThread()
+        private static void CreateHotKeyThread()
         {
             bool isWindows = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
 
             if (isWindows)
             {
-                Keylogger.SetHook(() => {});
+                var proc = new Process
+                {
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = "Windows/Hotkey/KeyLogger",
+                        Arguments = "",
+                        UseShellExecute = false,
+                        RedirectStandardOutput = true,
+                        CreateNoWindow = true
+                    }
+                };
                 
-
-                Task.Delay(Timeout.Infinite).Wait();
+                proc.Start();
+                var x = 0;
+                while (!proc.StandardOutput.EndOfStream)
+                {
+                    string line = proc.StandardOutput.ReadLine();
+                    
+                    if (line == "alt-A")
+                    {
+                        var image = ScreenCapture.CaptureActiveWindow();
+                        MemoryStream memoryStream = new MemoryStream();
+                        image.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Jpeg);
+                        //image.Save($@"C:\Users\cemheren\wanshitong\Indexer\Screenshots\{x++}.jpeg", ImageFormat.Jpeg);
+                    
+                        var result = OCRClient.MakeRequest(memoryStream.ToArray()).Result;
+                        var str = result.GetString();
+                        m_luceneTools.AddAndCommit("screenshot", str, -1);
+                    }
+                }
             }else
             {
                 var proc = new Process

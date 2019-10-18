@@ -49,6 +49,8 @@ namespace wanshitong.Common.Lucene
                 doc.Add(new StringField("processId", processId.ToString(), Field.Store.YES));
                 doc.Add(new TextField("text", text, Field.Store.YES));
 
+                // add a non-searchable metadata field
+
                 doc.Add(new StringField("ingestionTime",
                      DateTools.DateToString(DateTime.UtcNow, DateTools.Resolution.SECOND), Field.Store.YES));
 

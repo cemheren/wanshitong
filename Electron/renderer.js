@@ -14,7 +14,7 @@ var deleteElement = document.getElementById("delete");
 //   });
 var selectedElementMetadata = {};
 
-function CreateResultRow(docId, group, text)
+function CreateResultRow(docId, group, text, ingestionTime, category)
 {
     const div = document.createElement('div');
     div.className = 'result_row';
@@ -24,11 +24,22 @@ function CreateResultRow(docId, group, text)
         //text = text.substring(0, 100) + "...";
     }
 
-    div.innerHTML = `
-        <div class="result_row_text" onClick="onRowTextClick(this)">${text}</div>
-        <div class="result_row_group">${group}</div>
-        <div class="result_row_id">${docId}</div>
+    var textClass = "result_row_text";
+    if(category == -10)
+    {
+        div.innerHTML += `<img class="result_row_img" src="${group}">`;
+        textClass = "result_row_short_text";
+    }
+
+    div.innerHTML += `
+        <div class="${textClass}" onClick="onRowTextClick(this)">${text}</div>
     `;
+
+    div.innerHTML += `
+        <div class="result_row_group">${ingestionTime}</div>
+        <div class="result_row_id">${docId}</div>
+    `
+
     return div;
 }
 
@@ -39,6 +50,12 @@ function onRowTextClick(event)
     selectedElementMetadata.docId = event.parentElement.querySelector('.result_row_id').textContent;
     selectedElementMetadata.text = event.textContent;
     rightPanelElement.textContent = event.textContent;
+
+    //create image
+    var img = document.createElement('img');
+    img.src = event.parentElement.querySelector('.result_row_img').src;
+    img.className = 'right_panel';
+    rightPanelElement.appendChild(img);
 }
 
 function RemoveAllChildren(node)
@@ -60,7 +77,7 @@ var refreshList = function(event){
 
     var json = JSON.parse(response);
     json.forEach(e => {
-        resultsElement.appendChild(CreateResultRow(e.docId, e.group, e.text));
+        resultsElement.appendChild(CreateResultRow(e.docId, e.group, e.text, e.ingestionTime, e.processId));
     });
 }
 inputElement.onkeyup = refreshList;

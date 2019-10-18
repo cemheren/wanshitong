@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Threading;
+using System.IO;
 using System.Threading.Tasks;
 using wanshitong.KeyAggregation;
 using wanshitong.Common.Lucene;
@@ -28,6 +29,8 @@ namespace wanshitong
         private static ConcurrentDictionary<int, string> processIdMap = new ConcurrentDictionary<int, string>();
 
         internal static LuceneTools m_luceneTools = new LuceneTools();
+
+        private static Process hotkeyCaptureProces;
 
         static void Main(string[] args)
         {
@@ -137,7 +140,7 @@ namespace wanshitong
 
             if (isWindows)
             {
-                var proc = new Process
+                hotkeyCaptureProces = new Process
                 {
                     StartInfo = new ProcessStartInfo
                     {
@@ -149,27 +152,34 @@ namespace wanshitong
                     }
                 };
                 
-                proc.Start();
+                hotkeyCaptureProces.Start();
                 var x = 0;
-                while (!proc.StandardOutput.EndOfStream)
+                while (!hotkeyCaptureProces.StandardOutput.EndOfStream)
                 {
-                    string line = proc.StandardOutput.ReadLine();
+                    string line = hotkeyCaptureProces.StandardOutput.ReadLine();
                     System.Console.WriteLine("capture event");
                     if (line == "alt-A")
                     {
                         var image = ScreenCapture.CaptureActiveWindow();
                         MemoryStream memoryStream = new MemoryStream();
                         image.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Jpeg);
-                        //image.Save($@"C:\Users\cemheren\wanshitong\Indexer\Screenshots\{x++}.jpeg", ImageFormat.Jpeg);
-                    
+
+                        var currentDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+                        var dirInfo = new DirectoryInfo(Path.Combine(currentDir, "Screenshots"));
+
                         try
                         {
+                            var address = $@"{dirInfo}\{x++}.jpeg";
+                            image.Save(address, ImageFormat.Jpeg);
+                        
                             var result = OCRClient.MakeRequest(memoryStream.ToArray()).Result;
                             var str = result.GetString();
-                            m_luceneTools.AddAndCommit("screenshot", str, -1);
+                            m_luceneTools.AddAndCommit(address, str, -10);
+                            System.Console.WriteLine("capture done...");
                         }
                         catch (System.Exception e)
                         {
+                            System.Console.WriteLine("capture failed...");
                             System.Console.WriteLine(e.Message);
                         }
                     }

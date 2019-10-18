@@ -47,6 +47,28 @@ body{
     overflow:hidden;
 }
 
+.result_row_short_text{
+    margin-top: 3px;
+    margin-left: 5px;
+    width: 90%;
+    cursor: pointer;
+    font-family: monospace;
+    white-space: pre;
+    max-height: 100px;
+    word-wrap: break-word;
+    overflow:hidden;
+}
+
+.result_row_img{
+    margin-top: 4px;
+    margin-bottom: 2px;
+    max-height: 100px;
+    font-size: x-small;
+    font-family: monospace;
+    border-bottom: inset;
+    text-align: right;
+}
+
 .right_panel{
     color: black;
     /* width: 55%; */

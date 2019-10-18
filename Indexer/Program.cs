@@ -36,7 +36,7 @@ namespace wanshitong
             //Task.Run(() => CreateProcessIdMapping());
             Task.Run(() => CreateHotKeyThread());
             //Task.Run(() => RecurringPrinter());
-            //Task.Run(() => ClipboardListener());
+            Task.Run(() => ClipboardListener());
 
             Task.Run(() => StartWebHost(args));
 
@@ -154,7 +154,7 @@ namespace wanshitong
                 while (!proc.StandardOutput.EndOfStream)
                 {
                     string line = proc.StandardOutput.ReadLine();
-                    
+                    System.Console.WriteLine("capture event");
                     if (line == "alt-A")
                     {
                         var image = ScreenCapture.CaptureActiveWindow();
@@ -162,9 +162,16 @@ namespace wanshitong
                         image.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Jpeg);
                         //image.Save($@"C:\Users\cemheren\wanshitong\Indexer\Screenshots\{x++}.jpeg", ImageFormat.Jpeg);
                     
-                        var result = OCRClient.MakeRequest(memoryStream.ToArray()).Result;
-                        var str = result.GetString();
-                        m_luceneTools.AddAndCommit("screenshot", str, -1);
+                        try
+                        {
+                            var result = OCRClient.MakeRequest(memoryStream.ToArray()).Result;
+                            var str = result.GetString();
+                            m_luceneTools.AddAndCommit("screenshot", str, -1);
+                        }
+                        catch (System.Exception e)
+                        {
+                            System.Console.WriteLine(e.Message);
+                        }
                     }
                 }
             }else

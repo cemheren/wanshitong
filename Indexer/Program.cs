@@ -17,6 +17,9 @@ using Microsoft.AspNetCore.Http;
 using System.Runtime.InteropServices;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Runtime.Loader;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Console;
 
 //using System.Windows.Forms;
 
@@ -30,10 +33,16 @@ namespace wanshitong
 
         internal static LuceneTools m_luceneTools = new LuceneTools();
 
-        private static Process hotkeyCaptureProces;
+        private static Process hotkeyCaptureProcess;
+
+        private static readonly AutoResetEvent _closing = new AutoResetEvent(false);
 
         static void Main(string[] args)
         {
+            AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
+            Console.CancelKeyPress += CurrentDomain_ProcessExit;
+            AssemblyLoadContext.Default.Unloading += Default_Unloading;
+
             m_luceneTools.InitializeIndex();
             
             //Task.Run(() => CreateProcessIdMapping());
@@ -46,10 +55,43 @@ namespace wanshitong
             Task.Delay(Timeout.Infinite).Wait();
         }
 
+        private static void Default_Unloading(AssemblyLoadContext obj)
+        {
+            Console.WriteLine("unload");
+        }
+
+        private static void CurrentDomain_ProcessExit(object sender, EventArgs e)
+        {
+            hotkeyCaptureProcess.CloseMainWindow();
+            hotkeyCaptureProcess.Close();
+            //hotkeyCaptureProcess.Kill();
+            
+            Console.WriteLine("process exit");
+            System.Environment.Exit(0);
+        }
+
+        protected static void OnExit(object sender, ConsoleCancelEventArgs args)
+        {
+            Console.WriteLine("Exit");
+            hotkeyCaptureProcess.CloseMainWindow();
+            hotkeyCaptureProcess.Close();
+            //hotkeyCaptureProcess.Kill();
+
+            _closing.Set();
+            System.Environment.Exit(0);
+        }
+
         private static void StartWebHost(string[] args)
         {
              var host = WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>()
+                .ConfigureLogging((loggingBuilder) => 
+                    {
+                        loggingBuilder
+                            .AddFilter<ConsoleLoggerProvider>(logLevel => logLevel >= LogLevel.Critical)
+                            .AddConsole()
+                            .AddDebug();
+                    })
                 .Build();
 
             host.Run();
@@ -140,23 +182,24 @@ namespace wanshitong
 
             if (isWindows)
             {
-                hotkeyCaptureProces = new Process
-                {
-                    StartInfo = new ProcessStartInfo
+                hotkeyCaptureProcess = Process.Start(
+                    new ProcessStartInfo
                     {
                         FileName = "Windows/Hotkey/KeyLogger",
                         Arguments = "",
                         UseShellExecute = false,
                         RedirectStandardOutput = true,
-                        CreateNoWindow = true
-                    }
-                };
+                        CreateNoWindow = false
+                    });
                 
-                hotkeyCaptureProces.Start();
+                Task.Run(() => {
+                    hotkeyCaptureProcess.WaitForExit();
+                });
+
                 var x = 0;
-                while (!hotkeyCaptureProces.StandardOutput.EndOfStream)
+                while (!hotkeyCaptureProcess.StandardOutput.EndOfStream)
                 {
-                    string line = hotkeyCaptureProces.StandardOutput.ReadLine();
+                    string line = hotkeyCaptureProcess.StandardOutput.ReadLine();
                     System.Console.WriteLine("capture event");
                     if (line == "alt-A")
                     {
@@ -166,6 +209,7 @@ namespace wanshitong
 
                         var currentDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
                         var dirInfo = new DirectoryInfo(Path.Combine(currentDir, "Screenshots"));
+                        dirInfo.Create();
 
                         try
                         {

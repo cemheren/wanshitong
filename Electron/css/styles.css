@@ -10,7 +10,7 @@ body{
     margin-top: 4px;
     width: 300px;
     font-size: x-large;
-    font-family: monospace;
+    font: message-box;
 }
 
 .main_results{
@@ -20,7 +20,7 @@ body{
     height: 90vh;
     font-size: normal;
     margin-top: 10px;
-    font-family: monospace;
+    font: menu;
     overflow-y: scroll;
     overflow-x: hidden;
 }
@@ -30,7 +30,7 @@ body{
     margin-bottom: 30px;
     width: 90%;
     font-size: x-small;
-    font-family: monospace;
+    font: menu;
     border-bottom: inset;
     text-align: right;
 }
@@ -40,7 +40,7 @@ body{
     margin-left: 5px;
     width: 90%;
     cursor: pointer;
-    font-family: monospace;
+    font: menu;
     white-space: pre;
     max-height: 200px;
     word-wrap: break-word;
@@ -52,7 +52,7 @@ body{
     margin-left: 5px;
     width: 90%;
     cursor: pointer;
-    font-family: monospace;
+    font: menu;
     white-space: pre;
     max-height: 100px;
     word-wrap: break-word;
@@ -64,7 +64,7 @@ body{
     margin-bottom: 2px;
     max-height: 100px;
     font-size: x-small;
-    font-family: monospace;
+    font: menu;
     border-bottom: inset;
     text-align: right;
 }
@@ -81,7 +81,7 @@ body{
     margin-top: 30px;
     float: left;
     white-space: pre-wrap;
-    font-family: monospace;
+    font: message-box;
 }
 
 .left_panel{
@@ -102,4 +102,20 @@ body{
 .edit{
     cursor: pointer;
     color: green;
+}
+
+.similarity_row{
+    width: 100%;
+    overflow-x: scroll;
+    height: 200px;
+    overflow-y: hidden;
+}
+
+.similarity_row_item{
+    height: 90%;
+    width: 100px;
+    float: left;
+    clear: left;
+    display: block;
+    overflow: hidden;
 }

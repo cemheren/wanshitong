@@ -5,6 +5,7 @@
 var inputElement = document.getElementById("input");
 var resultsElement = document.getElementById("results");
 var rightPanelElement = document.getElementById("righttextpanel");
+var relatedDocumentsElement = document.getElementById("similarityrow");
 var deleteElement = document.getElementById("delete");
 
 // var Quill = require("quill");
@@ -43,12 +44,25 @@ function CreateResultRow(docId, group, text, ingestionTime, category)
     return div;
 }
 
+function CreateRelatedRowElement(docId, group, text, ingestionTime, category) {
+    const li = document.createElement('li');
+    li.className = 'similarity_row_item';
+    
+    var textClass = "similarity_row_text";
+    li.innerHTML += `
+        <div class="${textClass}" onClick="onRowTextClick(this)">${text}</div>
+    `;
+
+    return li;
+}
+
 function onRowTextClick(event)
 {
     // editor.setText(event.textContent);
 
     selectedElementMetadata.docId = event.parentElement.querySelector('.result_row_id').textContent;
     selectedElementMetadata.text = event.textContent;
+    selectedElementMetadata.ingestionTime = event.parentElement.querySelector('.result_row_group').textContent;
     rightPanelElement.textContent = event.textContent;
 
     //create image
@@ -56,6 +70,23 @@ function onRowTextClick(event)
     img.src = event.parentElement.querySelector('.result_row_img').src;
     img.className = 'right_panel';
     rightPanelElement.appendChild(img);
+
+    var documentDateStart = new Date(Date.parse(selectedElementMetadata.ingestionTime));
+    var documentDateEnd = new Date(Date.parse(selectedElementMetadata.ingestionTime));
+    documentDateStart.setHours(documentDateStart.getHours() - 5);
+    documentDateEnd.setHours(documentDateEnd.getHours() + 5);
+
+    var response = http("GET", "http://localhost:5000/timerange/" + 
+        documentDateStart.toISOString() + "/" + documentDateEnd.toISOString());
+
+    if(response == "" || response == undefined){
+        return "No result found";
+    }
+
+    var json = JSON.parse(response);
+    json.forEach(e => {
+        relatedDocumentsElement.appendChild(CreateRelatedRowElement(e.docId, e.group, e.text, e.ingestionTime, e.processId));
+    });
 }
 
 function RemoveAllChildren(node)

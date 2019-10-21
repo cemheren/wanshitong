@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Indexer.LuceneTools;
 using Lucene.Net.Analysis.Standard;
 using Lucene.Net.Documents;
@@ -117,6 +118,33 @@ namespace wanshitong.Common.Lucene
             }
 
             return result;
+        }
+
+        public List<SearchModel> SearchWithIngestionTime(DateTime start, DateTime end)
+        {
+            var results = new List<SearchModel>();
+
+            var query = new MatchAllDocsQuery();
+            var filter = FieldCacheRangeFilter.NewStringRange("ingestionTime", 
+                lowerVal: DateTools.DateToString(start, DateTools.Resolution.SECOND), 
+                includeLower: true, 
+                upperVal: DateTools.DateToString(end, DateTools.Resolution.SECOND),
+                includeUpper: true);
+
+            using (var reader = DirectoryReader.Open(this.dir))
+            {
+                var searcher = new IndexSearcher(reader);
+                var hits = searcher.Search(query, filter, 10).ScoreDocs;
+                foreach (var hit in hits)
+                {
+                    var foundDoc = searcher.Doc(hit.Doc);
+                    var searchModel = SearchModel.FromDoc(foundDoc, hit.Doc);
+
+                    results.Add(SearchModel.FromDoc(foundDoc, hit.Doc));                    
+                }
+            }
+
+            return results.OrderBy(r => r.IngestionTime).ToList();
         }
 
         public List<SearchModel> Search(string s)

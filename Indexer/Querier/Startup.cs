@@ -38,6 +38,12 @@ namespace Querier
                     constraints: new { httpMethod = new HttpMethodRouteConstraint(HttpMethod.Get.ToString()) });
 
                 routes.MapRoute(
+                    name: "ExecuteQuery",
+                    template: "timerange/{start}/{end}",
+                    defaults: new { controller = "Query", action = "SearchWithDates" },
+                    constraints: new { httpMethod = new HttpMethodRouteConstraint(HttpMethod.Get.ToString()) });
+
+                routes.MapRoute(
                     name: "GetAll",
                     template: "getAll",
                     defaults: new { controller = "Query", action = "GetAll" },

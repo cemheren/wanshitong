@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using wanshitong;
 using System.Linq;
 using Indexer.LuceneTools;
+using System;
 
 namespace Indexer.Querier.Controllers
 {
@@ -14,6 +15,16 @@ namespace Indexer.Querier.Controllers
             var searchResults = Program
                 .m_luceneTools
                 .Search(text);
+
+            return searchResults;            
+        }
+
+        [HttpGet]
+        public List<SearchModel> SearchWithDates(DateTime start, DateTime end)
+        {
+            var searchResults = Program
+                .m_luceneTools
+                .SearchWithIngestionTime(start, end);
 
             return searchResults;            
         }

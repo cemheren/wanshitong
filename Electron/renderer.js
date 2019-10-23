@@ -48,9 +48,20 @@ function CreateRelatedRowElement(docId, group, text, ingestionTime, category) {
     const li = document.createElement('li');
     li.className = 'similarity_row_item';
     
+    li.innerHTML += `
+        <div class="similarity_row_time">${ingestionTime}</div>
+    `
+
+    if(category == -10)
+    {
+        li.innerHTML += `<img class="result_row_img" src="${group}">`;
+    }
+
     var textClass = "similarity_row_text";
     li.innerHTML += `
         <div class="${textClass}" onClick="onRowTextClick(this)">${text}</div>
+        <div class="result_row_id">${docId}</div>
+        <div class="result_row_group">${ingestionTime}</div>
     `;
 
     return li;
@@ -58,23 +69,30 @@ function CreateRelatedRowElement(docId, group, text, ingestionTime, category) {
 
 function onRowTextClick(event)
 {
-    // editor.setText(event.textContent);
-
     selectedElementMetadata.docId = event.parentElement.querySelector('.result_row_id').textContent;
     selectedElementMetadata.text = event.textContent;
     selectedElementMetadata.ingestionTime = event.parentElement.querySelector('.result_row_group').textContent;
-    rightPanelElement.textContent = event.textContent;
+    
+    RemoveAllChildren(rightPanelElement);
 
     //create image
     var img = document.createElement('img');
-    img.src = event.parentElement.querySelector('.result_row_img').src;
-    img.className = 'right_panel';
-    rightPanelElement.appendChild(img);
+    var imgElement = event.parentElement.querySelector('.result_row_img');
+    if (imgElement !== null) {
+        img.src = imgElement.src;
+        img.className = 'right_panel_image';
+        rightPanelElement.appendChild(img);
+    }
+
+    var textDiv = document.createElement('div');
+    textDiv.textContent = event.textContent;
+    textDiv.className = "max_width";
+    rightPanelElement.appendChild(textDiv);
 
     var documentDateStart = new Date(Date.parse(selectedElementMetadata.ingestionTime));
     var documentDateEnd = new Date(Date.parse(selectedElementMetadata.ingestionTime));
-    documentDateStart.setHours(documentDateStart.getHours() - 5);
-    documentDateEnd.setHours(documentDateEnd.getHours() + 5);
+    documentDateStart.setHours(documentDateStart.getHours() - 1);
+    documentDateEnd.setHours(documentDateEnd.getHours() + 1);
 
     var response = http("GET", "http://localhost:5000/timerange/" + 
         documentDateStart.toISOString() + "/" + documentDateEnd.toISOString());
@@ -82,6 +100,8 @@ function onRowTextClick(event)
     if(response == "" || response == undefined){
         return "No result found";
     }
+
+    RemoveAllChildren(relatedDocumentsElement);
 
     var json = JSON.parse(response);
     json.forEach(e => {

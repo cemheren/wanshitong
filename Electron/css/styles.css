@@ -70,18 +70,37 @@ body{
 }
 
 .right_panel{
+    /* border: solid; */
+    height: 98vh;
+    flex-grow: 1;
+    overflow: hidden;
+    float: left;
+}
+
+.right_panel_text{
     color: black;
     /* width: 55%; */
     flex-grow: 1;
-    height: 90vh;
+    height: 70vh;
     overflow-y: scroll;
     /* height: 400px; */
     /* max-width: 1000px; */
-    margin-left: 30px;
-    margin-top: 30px;
-    float: left;
     white-space: pre-wrap;
     font: message-box;
+    margin-left: 30px;
+    margin-top: 30px;
+}
+
+.max_width{
+    width: 100%;
+    display: flex;
+}
+
+.right_panel_image{
+    max-width: 100%;
+    height: 98vh;
+    overflow: hidden;
+    float: left;
 }
 
 .left_panel{
@@ -104,18 +123,36 @@ body{
     color: green;
 }
 
-.similarity_row{
+.related_documents{
     width: 100%;
     overflow-x: scroll;
-    height: 200px;
+    height: 30vh;
     overflow-y: hidden;
+}
+
+.similarity_row{
+    width: 2000px;
+    height: 100%;
 }
 
 .similarity_row_item{
     height: 90%;
-    width: 100px;
+    width: 150px;
     float: left;
-    clear: left;
     display: block;
     overflow: hidden;
+    margin: 10px;
+}
+
+.similarity_row_text{
+    cursor: pointer;
+    font-size: small;
+}
+
+.similarity_row_time{
+    font-size: x-small;
+}
+
+.similarity_row_item > .result_row_group{
+    display: none;
 }

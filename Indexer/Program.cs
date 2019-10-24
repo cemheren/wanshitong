@@ -196,7 +196,6 @@ namespace wanshitong
                     hotkeyCaptureProcess.WaitForExit();
                 });
 
-                var x = 0;
                 while (!hotkeyCaptureProcess.StandardOutput.EndOfStream)
                 {
                     string line = hotkeyCaptureProcess.StandardOutput.ReadLine();
@@ -213,7 +212,8 @@ namespace wanshitong
 
                         try
                         {
-                            var address = $@"{dirInfo}\{x++}.jpeg";
+                            var name = Guid.NewGuid();
+                            var address = $@"{dirInfo}\{name}.jpeg";
                             image.Save(address, ImageFormat.Jpeg);
                         
                             var result = OCRClient.MakeRequest(memoryStream.ToArray()).Result;

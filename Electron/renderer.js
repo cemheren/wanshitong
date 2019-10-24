@@ -67,6 +67,10 @@ function CreateRelatedRowElement(docId, group, text, ingestionTime, category) {
     return li;
 }
 
+function onImageDoubleClick(event) {
+    window.open(event.target.currentSrc);
+}
+
 function onRowTextClick(event)
 {
     selectedElementMetadata.docId = event.parentElement.querySelector('.result_row_id').textContent;
@@ -80,6 +84,7 @@ function onRowTextClick(event)
     var imgElement = event.parentElement.querySelector('.result_row_img');
     if (imgElement !== null) {
         img.src = imgElement.src;
+        img.ondblclick = onImageDoubleClick;
         img.className = 'right_panel_image';
         rightPanelElement.appendChild(img);
     }

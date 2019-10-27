@@ -25,7 +25,7 @@ steps:
   inputs:
     command: 'publish'
     publishWebProjects: false
-    arguments: '-c Release --framework netcoreapp2.2 --runtime win10-x64'
+    arguments: '-c Release --framework netcoreapp2.2 --runtime win10-x64 --self-contained'
     feedsToUse: 'select'
     versioningScheme: 'byBuildNumber'
     workingDirectory: 'Indexer'
@@ -34,4 +34,4 @@ steps:
 - task: PublishPipelineArtifact@0
   inputs:
     artifactName: 'drop'
-    targetPath: 'Indexer'
+    targetPath: 'Indexer/bin/Release/netcoreapp2.2/win10-x64/publish'

@@ -65,3 +65,8 @@ steps:
     archiveType: 'zip'
     archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
     replaceExistingArchive: true
+
+- task: PublishPipelineArtifact@1
+  inputs:
+    artifactName: 'ZIP'
+    targetPath: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'

@@ -1,0 +1,47 @@
+trigger:
+- master
+
+pool:
+  vmImage: 'windows-latest'
+
+variables:
+  buildConfiguration: 'Release'
+
+steps:
+- task: NuGetToolInstaller@0
+
+- task: NuGetCommand@2
+  inputs:
+    restoreSolution: '$(solution)'
+
+- task: DotNetCoreCLI@2
+  inputs:
+    workingDirectory: Indexer
+    command: 'build'
+    feedsToUse: 'select'
+    versioningScheme: 'off'
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'publish'
+    publishWebProjects: false
+    arguments: '-c Release --framework netcoreapp2.2 --runtime win10-x64 --self-contained'
+    feedsToUse: 'select'
+    versioningScheme: 'byBuildNumber'
+    workingDirectory: 'Indexer'
+    zipAfterPublish: false
+
+- task: PublishPipelineArtifact@0
+  inputs:
+    artifactName: 'drop/Indexer'
+    targetPath: 'Indexer/bin/Release/netcoreapp2.2/win10-x64/publish'
+
+- task: Npm@1
+  inputs:
+    command: 'install'
+    workingDir: 'Electron'
+
+- task: PublishPipelineArtifact@1
+  inputs:
+    artifactName: 'drop/UI'
+    targetPath: 'Electron'

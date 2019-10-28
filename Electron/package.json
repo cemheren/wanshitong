@@ -17,7 +17,10 @@
     "appId": "librarian",
     "win": {
       "target": "NSIS"
-    }
+    },
+    "extraFiles": [
+      "server"
+    ]
   },
   "author": "Akif C Heren",
   "license": "CC0-1.0",

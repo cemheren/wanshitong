@@ -6,8 +6,8 @@
   "scripts": {
     "postinstall": "install-app-deps",
     "start": "npm install && electron .",
-    "pack": "electron-builder --dir",
-    "dist": "electron-builder"
+    "pack": "electron-builder --dir --publish never",
+    "dist": "electron-builder --publish never"
   },
   "repository": "https://github.com/cemheren/wanshitong",
   "keywords": [

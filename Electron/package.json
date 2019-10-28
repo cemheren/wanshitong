@@ -1,16 +1,25 @@
 {
-  "name": "librarianUI",
+  "name": "librarian",
   "version": "1.0.0",
   "description": "wanshitong",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "postinstall": "install-app-deps",
+    "start": "npm install && electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
   },
   "repository": "https://github.com/cemheren/wanshitong",
   "keywords": [
     "10000"
   ],
-  "author": "GitHub",
+  "build": {
+    "appId": "librarian",
+    "win": {
+      "target": "NSIS"
+    }
+  },
+  "author": "Akif C Heren",
   "license": "CC0-1.0",
   "devDependencies": {
     "electron": "^6.0.10",

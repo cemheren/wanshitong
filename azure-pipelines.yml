@@ -41,7 +41,19 @@ steps:
     command: 'install'
     workingDir: 'Electron'
 
+- task: Npm@1
+  inputs:
+    command: 'custom'
+    workingDir: 'Electron'
+    customCommand: 'install electron-builder --dev'
+
+- task: Npm@1
+  inputs:
+    command: 'custom'
+    workingDir: 'Electron'
+    customCommand: 'run dist'
+
 - task: PublishPipelineArtifact@1
   inputs:
     artifactName: 'drop/UI'
-    targetPath: 'Electron'
+    targetPath: 'Electron/dist'

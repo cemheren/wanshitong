@@ -1,6 +1,6 @@
 {
   "name": "librarian",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "wanshitong",
   "main": "main.js",
   "scripts": {
@@ -20,6 +20,12 @@
     },
     "extraFiles": [
       "server"
+    ],
+    "publish": [
+      {
+        "provider": "generic",
+        "url": "https://allbuilds.blob.core.windows.net/wanshitong/downloads"
+      }
     ]
   },
   "author": "Akif C Heren",

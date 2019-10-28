@@ -25,16 +25,16 @@ steps:
   inputs:
     command: 'publish'
     publishWebProjects: false
-    arguments: '-c Release --framework netcoreapp2.2 --runtime win10-x64 --self-contained'
+    arguments: '-c Release --framework netcoreapp2.2 --runtime win10-x64 --self-contained true --output "../Electron/server"'
     feedsToUse: 'select'
     versioningScheme: 'byBuildNumber'
     workingDirectory: 'Indexer'
     zipAfterPublish: false
 
-- task: PublishPipelineArtifact@0
-  inputs:
-    artifactName: 'Indexer'
-    targetPath: 'Indexer/bin/Release/netcoreapp2.2/win10-x64/publish'
+# - task: PublishPipelineArtifact@0
+#   inputs:
+#     artifactName: 'Indexer'
+#     targetPath: 'Indexer/bin/Release/netcoreapp2.2/win10-x64/publish'
 
 - task: Npm@1
   inputs:
@@ -58,15 +58,15 @@ steps:
     artifactName: 'Electron'
     targetPath: 'Electron/dist'
 
-- task: ArchiveFiles@2
-  inputs:
-    rootFolderOrFile: '.'
-    includeRootFolder: false
-    archiveType: 'zip'
-    archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
-    replaceExistingArchive: true
+# - task: ArchiveFiles@2
+#   inputs:
+#     rootFolderOrFile: '.'
+#     includeRootFolder: false
+#     archiveType: 'zip'
+#     archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+#     replaceExistingArchive: true
 
-- task: PublishPipelineArtifact@1
-  inputs:
-    artifactName: 'ZIP'
-    targetPath: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+# - task: PublishPipelineArtifact@1
+#   inputs:
+#     artifactName: 'ZIP'
+#     targetPath: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'

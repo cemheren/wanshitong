@@ -33,5 +33,15 @@ steps:
 
 - task: PublishPipelineArtifact@0
   inputs:
-    artifactName: 'drop'
+    artifactName: 'drop/Indexer'
     targetPath: 'Indexer/bin/Release/netcoreapp2.2/win10-x64/publish'
+
+- task: Npm@1
+  inputs:
+    command: 'install'
+    workingDir: 'Electron'
+
+- task: PublishPipelineArtifact@1
+  inputs:
+    artifactName: 'drop/UI'
+    targetPath: 'Electron'

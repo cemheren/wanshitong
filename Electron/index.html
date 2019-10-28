@@ -10,6 +10,8 @@
   </head>
   <body>
     <div id="leftpanel" class="left_panel">
+        
+        <div id="version"></div>
         <input id="input" class="main_query"></input>
 
         <div id="results" class="main_results">
@@ -26,16 +28,25 @@
             Related documents:
             <ul id="similarityrow" class="similarity_row"></ul>
         </div>
+        
     </div>
 
+    <div id="notification" class="hidden">
+      <p id="message"></p>
+      <button id="close-button" onClick="closeNotification()">
+        Close
+      </button>
+      <button id="restart-button" onClick="restartApp()" class="hidden">
+        Restart
+      </button>
+    </div>
+    
     <script src="./renderer.js"></script>
+    <script src="./notifications.js"></script>
 
     <!-- You can also require other files to run in this process -->
-    <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+    <script>
 
-    <!-- normal script imports etc  -->
-    
-    <!-- Insert this line after script imports -->
-    <script>if (window.module) module = window.module;</script>
+    </script>
   </body>
 </html>

@@ -1,8 +1,10 @@
 // Modules to control application life and create native browser window
-const {app, BrowserWindow, ipcMain} = require('electron')
+const {app, BrowserWindow, ipcMain, globalShortcut} = require('electron')
 const path = require('path')
 const child_process = require('child_process').execFile;
 const { autoUpdater } = require('electron-updater');
+
+const request = require("request");
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -19,15 +21,8 @@ function createWindow () {
     }
   })
 
-  var serverPath = "server/indexer.exe";
-  var serverProcess = child_process(serverPath, function(err, data) {
-      if(err){
-        console.error(err);
-        return;
-      }
-  
-      console.log(data.toString());
-  });
+  createServerProcess();
+  registerShortcuts();
 
   // and load the index.html of the app.
   mainWindow.loadFile('index.html')
@@ -44,6 +39,40 @@ function createWindow () {
     // when you should delete the corresponding element.
     mainWindow = null
   })
+}
+
+function createServerProcess() {
+  var serverPath = "server/indexer.exe";
+  var serverProcess = child_process(serverPath, function(err, data) {
+      if(err){
+        console.error(err);
+        return;
+      }
+  
+      console.log(data.toString());
+  });
+}
+
+function registerShortcuts() {
+  const ret = globalShortcut.register('alt+a', () => {
+    
+    mainWindow.webContents.send('screenshot');
+    request.get(
+        "http://localhost:5000/actions/screenshot",
+        function (error, response, body) {
+            if (!error && response.statusCode == 200) {
+            }
+        }
+    );
+  })
+
+  if (!ret) {
+    console.log('registration failed');
+  }
+
+  // Check whether a shortcut is registered.
+  console.log(globalShortcut.isRegistered('alt+a'))
+
 }
 
 // This method will be called when Electron has finished

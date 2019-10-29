@@ -46,7 +46,7 @@ namespace wanshitong
             m_luceneTools.InitializeIndex();
             
             //Task.Run(() => CreateProcessIdMapping());
-            Task.Run(() => CreateHotKeyThread());
+
             //Task.Run(() => RecurringPrinter());
             Task.Run(() => ClipboardListener());
 
@@ -173,89 +173,6 @@ namespace wanshitong
                 }
 
                 Task.Delay(60000).Wait();
-            }
-        }
-
-        private static void CreateHotKeyThread()
-        {
-            bool isWindows = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-
-            if (isWindows)
-            {
-                hotkeyCaptureProcess = Process.Start(
-                    new ProcessStartInfo
-                    {
-                        FileName = "Windows/Hotkey/KeyLogger",
-                        Arguments = "",
-                        UseShellExecute = false,
-                        RedirectStandardOutput = true,
-                        CreateNoWindow = false
-                    });
-                
-                Task.Run(() => {
-                    hotkeyCaptureProcess.WaitForExit();
-                });
-
-                while (!hotkeyCaptureProcess.StandardOutput.EndOfStream)
-                {
-                    string line = hotkeyCaptureProcess.StandardOutput.ReadLine();
-                    System.Console.WriteLine("capture event");
-                    if (line == "alt-A")
-                    {
-                        var image = ScreenCapture.CaptureActiveWindow();
-                        MemoryStream memoryStream = new MemoryStream();
-                        image.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Jpeg);
-
-                        var currentDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-                        var dirInfo = new DirectoryInfo(Path.Combine(currentDir, "Screenshots"));
-                        dirInfo.Create();
-
-                        try
-                        {
-                            var name = Guid.NewGuid();
-                            var address = $@"{dirInfo}\{name}.jpeg";
-                            image.Save(address, ImageFormat.Jpeg);
-                        
-                            var result = OCRClient.MakeRequest(memoryStream.ToArray()).Result;
-                            var str = result.GetString();
-                            m_luceneTools.AddAndCommit(address, str, -10);
-                            System.Console.WriteLine("capture done...");
-                        }
-                        catch (System.Exception e)
-                        {
-                            System.Console.WriteLine("capture failed...");
-                            System.Console.WriteLine(e.Message);
-                        }
-                    }
-                }
-            }else
-            {
-                var proc = new Process
-                {
-                    StartInfo = new ProcessStartInfo
-                    {
-                        FileName = "keylogger/keylogger",
-                        Arguments = "",
-                        UseShellExecute = false,
-                        RedirectStandardOutput = true,
-                        CreateNoWindow = true
-                    }
-                };
-
-                proc.Start();
-                while (!proc.StandardOutput.EndOfStream)
-                {
-                    string line = proc.StandardOutput.ReadLine();
-                    // do something with line 
-                    //System.Console.WriteLine(line);
-                    var keyboardKey = line.Split(',')[0];
-                    var processId = line.Split(',')[1];
-                    
-                    if(int.TryParse(processId, out var pid))
-                    {
-                        KeyQueue.Add(keyboardKey, pid);
-                    }
-                }
             }
         }
     }

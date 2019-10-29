@@ -24,6 +24,11 @@ ipcRenderer.on('update_downloaded', () => {
     notification.classList.remove('hidden');
 });
 
+ipcRenderer.on('screenshot', () => {
+    message.innerText = 'Screenshot taken.';
+    notification.classList.remove('hidden');
+});
+
 function closeNotification() {
     notification.classList.add('hidden');
 }

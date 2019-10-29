@@ -32,6 +32,12 @@ namespace Querier
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
+                    name: "Screenshot",
+                    template: "actions/screenshot",
+                    defaults: new { controller = "Actions", action = "Screenshot" },
+                    constraints: new { httpMethod = new HttpMethodRouteConstraint(HttpMethod.Get.ToString()) });
+
+                routes.MapRoute(
                     name: "ExecuteQuery",
                     template: "query/{text}",
                     defaults: new { controller = "Query", action = "SearchText" },

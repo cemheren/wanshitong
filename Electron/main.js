@@ -19,7 +19,7 @@ function createWindow () {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: true
     },
-    icon: __dirname + '/icon.ico'
+    icon: __dirname + '/icon.png'
   })
 
   createServerProcess();

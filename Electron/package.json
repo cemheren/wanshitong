@@ -1,6 +1,6 @@
 {
   "name": "librarian",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "wanshitong",
   "main": "main.js",
   "scripts": {
@@ -16,7 +16,8 @@
   "build": {
     "appId": "librarian",
     "win": {
-      "target": "NSIS"
+      "target": "NSIS",
+      "icon": "./icon.ico"
     },
     "extraFiles": [
       "server"

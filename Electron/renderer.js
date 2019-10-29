@@ -7,6 +7,7 @@ var resultsElement = document.getElementById("results");
 var rightPanelElement = document.getElementById("righttextpanel");
 var relatedDocumentsElement = document.getElementById("similarityrow");
 var deleteElement = document.getElementById("delete");
+var toggleElement = document.getElementById("toggle");
 
 // var Quill = require("quill");
 // var editor = new Quill('#editor', {
@@ -71,6 +72,24 @@ function onImageDoubleClick(event) {
     window.open(event.target.currentSrc);
 }
 
+function swapTextImage(event)
+{
+    var rightPanelText = rightPanelElement.querySelector("#right_panel_text");
+    var rightPanelImage = rightPanelElement.querySelector("#right_panel_image");
+
+    if (rightPanelImage == null) {
+        return;
+    }
+
+    if (rightPanelText.className == "hidden") {
+        rightPanelText.className = "max_width";
+        rightPanelImage.className = "hidden";
+    }else{
+        rightPanelText.className = "hidden";
+        rightPanelImage.className = "right_panel_image";  
+    }
+}
+
 function onRowTextClick(event)
 {
     selectedElementMetadata.docId = event.parentElement.querySelector('.result_row_id').textContent;
@@ -79,20 +98,24 @@ function onRowTextClick(event)
     
     RemoveAllChildren(rightPanelElement);
 
+    var textDiv = document.createElement('div');
+    textDiv.textContent = event.textContent;
+    textDiv.id = "right_panel_text";
+    textDiv.className = "max_width";
+    rightPanelElement.appendChild(textDiv);
+
     //create image
     var img = document.createElement('img');
     var imgElement = event.parentElement.querySelector('.result_row_img');
     if (imgElement !== null) {
         img.src = imgElement.src;
         img.ondblclick = onImageDoubleClick;
+        img.id = 'right_panel_image';
         img.className = 'right_panel_image';
         rightPanelElement.appendChild(img);
-    }
 
-    var textDiv = document.createElement('div');
-    textDiv.textContent = event.textContent;
-    textDiv.className = "max_width";
-    rightPanelElement.appendChild(textDiv);
+        textDiv.className = "hidden";
+    }
 
     var documentDateStart = new Date(Date.parse(selectedElementMetadata.ingestionTime));
     var documentDateEnd = new Date(Date.parse(selectedElementMetadata.ingestionTime));
@@ -145,6 +168,8 @@ deleteElement.onclick = function(event){
 
     rightPanelElement.textContent = "Deleted.";
 }
+
+toggleElement.onclick = swapTextImage;
 
 function http(method, theUrl) {
     var xmlHttp = new XMLHttpRequest();

@@ -33,8 +33,6 @@ namespace wanshitong
 
         internal static LuceneTools m_luceneTools = new LuceneTools();
 
-        private static Process hotkeyCaptureProcess;
-
         private static readonly AutoResetEvent _closing = new AutoResetEvent(false);
 
         static void Main(string[] args)
@@ -45,9 +43,6 @@ namespace wanshitong
 
             m_luceneTools.InitializeIndex();
             
-            //Task.Run(() => CreateProcessIdMapping());
-
-            //Task.Run(() => RecurringPrinter());
             Task.Run(() => ClipboardListener());
 
             Task.Run(() => StartWebHost(args));
@@ -62,21 +57,12 @@ namespace wanshitong
 
         private static void CurrentDomain_ProcessExit(object sender, EventArgs e)
         {
-            hotkeyCaptureProcess.CloseMainWindow();
-            hotkeyCaptureProcess.Close();
-            //hotkeyCaptureProcess.Kill();
-            
             Console.WriteLine("process exit");
             System.Environment.Exit(0);
         }
 
         protected static void OnExit(object sender, ConsoleCancelEventArgs args)
         {
-            Console.WriteLine("Exit");
-            hotkeyCaptureProcess.CloseMainWindow();
-            hotkeyCaptureProcess.Close();
-            //hotkeyCaptureProcess.Kill();
-
             _closing.Set();
             System.Environment.Exit(0);
         }

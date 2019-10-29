@@ -122,7 +122,7 @@ function onRowTextClick(event)
     documentDateStart.setHours(documentDateStart.getHours() - 1);
     documentDateEnd.setHours(documentDateEnd.getHours() + 1);
 
-    var response = http("GET", "http://localhost:5000/timerange/" + 
+    var response = http("GET", "http://localhost:4153/timerange/" + 
         documentDateStart.toISOString() + "/" + documentDateEnd.toISOString());
 
     if(response == "" || response == undefined){
@@ -148,7 +148,7 @@ var refreshList = function(event){
     var text = document.getElementById("input").value;
 
     RemoveAllChildren(resultsElement);
-    var response = http("GET", "http://localhost:5000/query/" + text);
+    var response = http("GET", "http://localhost:4153/query/" + text);
 
     if(response == "" || response == undefined){
         return "No result found";
@@ -162,7 +162,7 @@ var refreshList = function(event){
 inputElement.onkeyup = refreshList;
 
 deleteElement.onclick = function(event){
-    var response = http("DELETE", "http://localhost:5000/delete/" + selectedElementMetadata.docId);
+    var response = http("DELETE", "http://localhost:4153/delete/" + selectedElementMetadata.docId);
     
     refreshList();
 

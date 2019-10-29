@@ -59,7 +59,7 @@ function registerShortcuts() {
     
     mainWindow.webContents.send('screenshot');
     request.get(
-        "http://localhost:5000/actions/screenshot",
+        "http://localhost:4153/actions/screenshot",
         function (error, response, body) {
             if (!error && response.statusCode == 200) {
             }

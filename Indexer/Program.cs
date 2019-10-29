@@ -71,6 +71,7 @@ namespace wanshitong
         {
              var host = WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>()
+                .UseUrls("http://localhost:4153")
                 .ConfigureLogging((loggingBuilder) => 
                     {
                         loggingBuilder

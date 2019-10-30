@@ -175,7 +175,7 @@ namespace wanshitong.Common.Lucene
                 var searcher = new IndexSearcher(reader);
                 var hits = searcher.Search(phrase, 50).ScoreDocs;
 
-                var formatter = new SimpleHTMLFormatter("<span style=\"background:yellow;\">","</span>");
+                var formatter = new SimpleHTMLFormatter("<span style=\"background:darkgoldenrod;\">","</span>");
                 var fragmenter = new SimpleFragmenter(250);
                 var scorer = new QueryScorer(phrase);
                 var highlighter = new Highlighter(formatter, scorer);

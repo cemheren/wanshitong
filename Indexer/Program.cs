@@ -14,7 +14,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 
-using System.Runtime.InteropServices;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Runtime.Loader;
@@ -43,11 +42,7 @@ namespace wanshitong
 
             m_luceneTools.InitializeIndex();
             
-            Task.Run(() => ClipboardListener());
-
-            Task.Run(() => StartWebHost(args));
-
-            Task.Delay(Timeout.Infinite).Wait();
+            StartWebHost(args);
         }
 
         private static void Default_Unloading(AssemblyLoadContext obj)
@@ -90,34 +85,6 @@ namespace wanshitong
             {
                 Task.Delay(60000).Wait();
                 PrintQueue();
-            }
-        }
-
-        private static string lastClipboard = ""; 
-        private static void ClipboardListener()
-        {
-            while (true)
-            {    
-                bool isWindows = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-                string current;
-
-                if(isWindows)
-                {
-                    current = WindowsClipboard.GetText();
-                }else
-                {
-                    current = OsxClipboard.GetText();
-                }
-
-                if(!string.IsNullOrEmpty(current) && current != lastClipboard)
-                {
-                    System.Console.WriteLine(current);
-                    m_luceneTools.AddAndCommit("clipboard", current, -1);
-                    lastClipboard = current;
-                }
-
-                Task.Delay(2000).Wait();
-                
             }
         }
 

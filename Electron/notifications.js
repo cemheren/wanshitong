@@ -29,6 +29,11 @@ ipcRenderer.on('screenshot', () => {
     notification.classList.remove('hidden');
 });
 
+ipcRenderer.on('clipboard', () => {
+    message.innerText = 'Clipboard copied.';
+    notification.classList.remove('hidden');
+});
+
 function closeNotification() {
     notification.classList.add('hidden');
 }

@@ -6,9 +6,12 @@ using Indexer.LuceneTools;
 using System;
 using System.IO;
 using System.Drawing.Imaging;
+using System.Runtime.InteropServices;
 
 namespace Indexer.Querier.Controllers
 {
+ 
+
     public class ActionsController : ApiController
     {
         [HttpGet]
@@ -39,6 +42,31 @@ namespace Indexer.Querier.Controllers
                 System.Console.WriteLine(e.Message);
             
                 return false;
+            }
+
+            return true;
+        }
+
+        private static string lastClipboard;
+
+        [HttpGet]
+        public bool CopyClipboard()
+        {
+            bool isWindows = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+            string current;
+            if(isWindows)
+            {
+                current = WindowsClipboard.GetText();
+            }else
+            {
+                current = OsxClipboard.GetText();
+            }
+
+            if(!string.IsNullOrEmpty(current) && current != lastClipboard)
+            {
+                System.Console.WriteLine(current);
+                Program.m_luceneTools.AddAndCommit("clipboard", current, -1);
+                lastClipboard = current;
             }
 
             return true;

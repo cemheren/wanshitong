@@ -21,6 +21,8 @@ namespace Indexer.LuceneTools
 
         public string Text { get; set; }
         
+        public string HighlightedText { get; set; }
+        
         public int DocId { get; set; }
 
         public string ProcessId { get; set; }

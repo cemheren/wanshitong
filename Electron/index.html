@@ -8,21 +8,21 @@
     <meta charset="UTF-8">
     <title>Librarian</title>
   </head>
-  <body>
-    <div id="leftpanel" class="left_panel">
-        
-        <div id="version"></div>
-        <input id="input" class="main_query"></input>
+  <body id="body">
+    <div id="title"></div>
+      <div id="leftpanel" class="left_panel">
+      
+      <div id="version"></div>
+      <input id="input" class="main_query"></input>
 
-        <div id="results" class="main_results">
-          <span id="placeholder">Placeholder</span>
-        </div>
+      <div id="results" class="main_results">
+      </div>
     </div>
 
     <div id="rightpanel" class="right_panel">
-        <div id="button_row">
-            <button id="delete" class="delete">Delete</button>
-            <button id="toggle" class="toggle">Toggle</button>
+        <div class="button_row">
+            <button id="delete" class="delete right">Delete</button>
+            <button id="toggle" class="toggle right">Toggle</button>
         </div>
         <!-- <div id="edit" class="edit">Edit</div> -->
         <div id="righttextpanel" class="right_panel_text"></div>
@@ -46,6 +46,7 @@
     
     <script src="./renderer.js"></script>
     <script src="./notifications.js"></script>
+    <script src="./titlebar.js"></script>
 
     <!-- You can also require other files to run in this process -->
     <script>

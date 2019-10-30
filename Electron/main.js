@@ -15,12 +15,14 @@ function createWindow () {
   mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
+    frame: false, 
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: true
     },
-    icon: __dirname + '/icon.ico'
-  })
+    icon: __dirname + '/icon.ico',
+    
+  });
 
   createServerProcess();
   registerShortcuts();
@@ -109,6 +111,24 @@ ipcMain.on('restart_app', () => {
 ipcMain.on('app_version', (event) => {
   event.sender.send('app_version', { version: app.getVersion() });
 });
+
+ipcMain.on('app_close', () => { app.quit() })
+ipcMain.on('app_minimize', () => { mainWindow.minimize() })
+ipcMain.on('app_maximize', () => { 
+  var is = mainWindow.isMaximized(); 
+  if(is)
+    mainWindow.unmaximize();
+  else
+    mainWindow.maximize();
+})
+ipcMain.on('app_fullscreen', () => 
+{
+  var is = mainWindow.isMaximized(); 
+  if(is)
+    mainWindow.unmaximize();
+  else
+    mainWindow.maximize();
+})
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.

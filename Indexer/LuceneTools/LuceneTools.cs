@@ -9,6 +9,7 @@ using Lucene.Net.Index;
 using Lucene.Net.QueryParsers.Classic;
 using Lucene.Net.Search;
 using Lucene.Net.Store;
+using Lucene.Net.Search.Highlight;
 using Lucene.Net.Util;
 
 namespace wanshitong.Common.Lucene
@@ -150,9 +151,10 @@ namespace wanshitong.Common.Lucene
         public List<SearchModel> Search(string s)
         {
             var results = new List<SearchModel>();
-
+            var wildcard = s.Contains("*") || s.Contains("?");
+            
             Query phrase;
-            if(s.Contains("*") || s.Contains("?"))
+            if(wildcard)
             {
                 phrase = new WildcardQuery(new Term("text", s));
             }else //if(s.Length > 1)
@@ -172,11 +174,26 @@ namespace wanshitong.Common.Lucene
             {
                 var searcher = new IndexSearcher(reader);
                 var hits = searcher.Search(phrase, 50).ScoreDocs;
+
+                var formatter = new SimpleHTMLFormatter("<span style=\"background:yellow;\">","</span>");
+                var fragmenter = new SimpleFragmenter(250);
+                var scorer = new QueryScorer(phrase);
+                var highlighter = new Highlighter(formatter, scorer);
+                highlighter.TextFragmenter = fragmenter;    
+
                 foreach (var hit in hits)
                 {
                     var foundDoc = searcher.Doc(hit.Doc);
-                    //System.Console.WriteLine($"{foundDoc.Get("group")}: {foundDoc.Get("text")}");
-                    results.Add(SearchModel.FromDoc(foundDoc, hit.Doc));
+                    var result = SearchModel.FromDoc(foundDoc, hit.Doc);
+                    
+                    if (!wildcard)
+                    {
+                         var stream = analyzer.GetTokenStream("", new StringReader(result.Text));
+                        string highlightedText = highlighter.GetBestFragments(stream, result.Text, 1, "...");
+                        result.HighlightedText = highlightedText;
+                    }
+
+                    results.Add(result);
                 }
             }
 

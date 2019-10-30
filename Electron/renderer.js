@@ -1,7 +1,6 @@
 // This file is required by the index.html file and will
 // be executed in the renderer process for that window.
 // All of the Node.js APIs are available in this process.
-
 var inputElement = document.getElementById("input");
 var resultsElement = document.getElementById("results");
 var rightPanelElement = document.getElementById("righttextpanel");
@@ -16,10 +15,11 @@ var toggleElement = document.getElementById("toggle");
 //   });
 var selectedElementMetadata = {};
 
-function CreateResultRow(docId, group, text, ingestionTime, category)
+function CreateResultRow(docId, group, text, ingestionTime, category, highlightedText)
 {
     const div = document.createElement('div');
     div.className = 'result_row';
+    div.onclick = onRowTextClick;
 
     if(text.length > 100)
     {
@@ -33,9 +33,16 @@ function CreateResultRow(docId, group, text, ingestionTime, category)
         textClass = "result_row_short_text";
     }
 
-    div.innerHTML += `
-        <div class="${textClass}" onClick="onRowTextClick(this)">${text}</div>
-    `;
+    if (highlightedText) {
+        div.innerHTML += `
+            <div class="${textClass}">${highlightedText}</div>
+            <div id="textcontent" class="hidden">${text}</div>
+        `;
+    }else{
+        div.innerHTML += `
+            <div id="textcontent" class="${textClass}">${text}</div>
+        `;
+    }
 
     div.innerHTML += `
         <div class="result_row_group">${ingestionTime}</div>
@@ -49,6 +56,8 @@ function CreateRelatedRowElement(docId, group, text, ingestionTime, category) {
     const li = document.createElement('li');
     li.className = 'similarity_row_item';
     
+    li.onclick = onRowTextClick;
+
     li.innerHTML += `
         <div class="similarity_row_time">${ingestionTime}</div>
     `
@@ -60,7 +69,7 @@ function CreateRelatedRowElement(docId, group, text, ingestionTime, category) {
 
     var textClass = "similarity_row_text";
     li.innerHTML += `
-        <div class="${textClass}" onClick="onRowTextClick(this)">${text}</div>
+        <div id="textcontent" class="${textClass}">${text}</div>
         <div class="result_row_id">${docId}</div>
         <div class="result_row_group">${ingestionTime}</div>
     `;
@@ -92,21 +101,21 @@ function swapTextImage(event)
 
 function onRowTextClick(event)
 {
-    selectedElementMetadata.docId = event.parentElement.querySelector('.result_row_id').textContent;
-    selectedElementMetadata.text = event.textContent;
-    selectedElementMetadata.ingestionTime = event.parentElement.querySelector('.result_row_group').textContent;
+    selectedElementMetadata.docId = event.currentTarget.querySelector('.result_row_id').textContent;
+    selectedElementMetadata.text = event.currentTarget.querySelector('#textcontent').textContent;
+    selectedElementMetadata.ingestionTime = event.currentTarget.querySelector('.result_row_group').textContent;
     
     RemoveAllChildren(rightPanelElement);
 
     var textDiv = document.createElement('div');
-    textDiv.textContent = event.textContent;
+    textDiv.textContent = selectedElementMetadata.text;
     textDiv.id = "right_panel_text";
     textDiv.className = "max_width";
     rightPanelElement.appendChild(textDiv);
 
     //create image
     var img = document.createElement('img');
-    var imgElement = event.parentElement.querySelector('.result_row_img');
+    var imgElement = event.currentTarget.querySelector('.result_row_img');
     if (imgElement !== null) {
         img.src = imgElement.src;
         img.ondblclick = onImageDoubleClick;
@@ -156,7 +165,7 @@ var refreshList = function(event){
 
     var json = JSON.parse(response);
     json.forEach(e => {
-        resultsElement.appendChild(CreateResultRow(e.docId, e.group, e.text, e.ingestionTime, e.processId));
+        resultsElement.appendChild(CreateResultRow(e.docId, e.group, e.text, e.ingestionTime, e.processId, e.highlightedText));
     });
 }
 inputElement.onkeyup = refreshList;

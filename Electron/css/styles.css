@@ -3,7 +3,7 @@ body{
     width: auto !important;  /* Firefox will set width as auto */
     width:1000px; 
     padding: 0px;
-    background-color: slategray;
+    background-color: #313333;
     color: aliceblue;
     font: menu;
     font-size: normal;
@@ -41,9 +41,11 @@ body{
     width: 85%;
     font-size: x-large;
     font: message-box;
-    background-color: aliceblue;
+    background-color: #3e4348;
     padding: 8px;
     margin-left: 4px;
+    color: aliceblue;
+    border: none;
 }
 
 .main_results{
@@ -112,7 +114,7 @@ body{
     height: 94vh;
     flex-grow: 1;
     overflow: hidden;
-    background-color: lightslategray
+    background-color: #3e4348
 }
 
 .right_panel_text{

@@ -7,6 +7,7 @@ body{
     color: aliceblue;
     font: menu;
     font-size: normal;
+    margin-left: 0px !important;
 }
 
 #titlebar{
@@ -34,6 +35,10 @@ body{
 
 .right{
     float: right;
+}
+
+.search_label{
+    padding: 4px;
 }
 
 .main_query{
@@ -147,6 +152,25 @@ body{
     float: left;
 }
 
+.sidebar{
+    width: 35px;
+    float: left;
+    background-color: #282b2b;
+    height: 94vh;
+    position: relative;
+    margin-right: 4px;
+    padding: 4px;
+}
+
+.bottombar{
+    width: 100%;
+    background-color: #5a5a5a;
+    height: 1vh;
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+}
+
 .left_panel{
     width: 35%;
     max-width: 320px;
@@ -157,20 +181,18 @@ body{
     display: none;
 }
 
-.delete{
+.icon{
+    padding: 5px;
+    padding-top: 10px;
     cursor: pointer;
+    color: aliceblue;
+}
+
+.delete{
     color: red;
-    padding-right: 5px;
 }
 
 .toggle{
-    padding-right: 5px;
-    cursor: pointer;
-}
-
-.edit{
-    cursor: pointer;
-    color: green;
 }
 
 .related_documents{
@@ -205,6 +227,13 @@ body{
 
 .similarity_row_item > .result_row_group{
     display: none;
+}
+
+#version{
+    position: absolute;
+    bottom: 2px;
+    right: 3px;
+    z-index: 1000;
 }
 
 .icon-white {

@@ -9,6 +9,8 @@ var deleteElement = document.getElementById("delete");
 var toggleOffElement = document.getElementById("toggle-off");
 var toggleOnElement = document.getElementById("toggle-on");
 
+const moment = require("moment");
+
 // var Quill = require("quill");
 // var editor = new Quill('#editor', {
 //     modules: { toolbar: '#toolbar' },
@@ -44,9 +46,9 @@ function CreateResultRow(docId, group, text, ingestionTime, category, highlighte
             <div id="textcontent" class="${textClass}">${text}</div>
         `;
     }
-
     div.innerHTML += `
-        <div class="result_row_group">${ingestionTime}</div>
+        <div class="result_row_group">${moment(ingestionTime).fromNow()}</div>
+        <div id="result_row_group" class="hidden">${ingestionTime}</div>
         <div class="result_row_id">${docId}</div>
     `
 
@@ -60,7 +62,7 @@ function CreateRelatedRowElement(docId, group, text, ingestionTime, category) {
     li.onclick = onRowTextClick;
 
     li.innerHTML += `
-        <div class="similarity_row_time">${ingestionTime}</div>
+        <div class="similarity_row_time">${moment(ingestionTime).fromNow()}</div>
     `
 
     if(category == -10)
@@ -72,7 +74,7 @@ function CreateRelatedRowElement(docId, group, text, ingestionTime, category) {
     li.innerHTML += `
         <div id="textcontent" class="${textClass}">${text}</div>
         <div class="result_row_id">${docId}</div>
-        <div class="result_row_group">${ingestionTime}</div>
+        <div id="result_row_group" class="hidden">${ingestionTime}</div>
     `;
 
     return li;
@@ -108,7 +110,7 @@ function onRowTextClick(event)
 {
     selectedElementMetadata.docId = event.currentTarget.querySelector('.result_row_id').textContent;
     selectedElementMetadata.text = event.currentTarget.querySelector('#textcontent').textContent;
-    selectedElementMetadata.ingestionTime = event.currentTarget.querySelector('.result_row_group').textContent;
+    selectedElementMetadata.ingestionTime = event.currentTarget.querySelector('#result_row_group').textContent;
     
     RemoveAllChildren(rightPanelElement);
 

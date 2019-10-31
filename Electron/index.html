@@ -11,20 +11,27 @@
   </head>
   <body id="body">
     <div id="title"></div>
-      <div id="leftpanel" class="left_panel">
-      
-      <div id="version"></div>
+    <div id="version"></div>
+
+    <div id="sidebar" class="sidebar">
+        <i id="search" class="material-icons icon">search</i>
+        <i id="stories" class="material-icons icon">view_quilt</i>
+    </div>
+    <div id="leftpanel" class="left_panel">
+    
+      <div class="search_label">Search:</div>
       <input id="input" class="main_query"></input>
 
-      <div id="results" class="main_results">
-      </div>
+      <div id="results" class="main_results"></div>
+      <div id="bottombar" class="bottombar"></div>
+
     </div>
 
     <div id="rightpanel" class="right_panel">
         <div class="button_row">
-            <i id="delete" class="delete right material-icons">delete</i>
-            <i id="toggle-off" class="toggle right material-icons">toggle_off</i>
-            <i id="toggle-on" class="toggle right material-icons hidden">toggle_on</i>
+            <i id="delete" class="delete right material-icons icon">delete</i>
+            <i id="toggle-off" class="icon right material-icons">toggle_off</i>
+            <i id="toggle-on" class="icon right material-icons hidden">toggle_on</i>
             <!-- <button id="delete" class="delete right">Delete</button> -->
             <!-- <button id="toggle" class="toggle right">Toggle</button> -->
         </div>

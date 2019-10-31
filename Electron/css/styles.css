@@ -24,7 +24,7 @@ body{
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
 }
 .hidden {
-    display: none;
+    display: none !important;
 }
 
 .button_row{
@@ -161,6 +161,10 @@ body{
     color: red;
 }
 
+.toggle{
+    cursor: pointer;
+}
+
 .edit{
     cursor: pointer;
     color: green;
@@ -198,4 +202,12 @@ body{
 
 .similarity_row_item > .result_row_group{
     display: none;
+}
+
+.icon-white {
+    webkit-filter: contrast(4) invert(1);
+    -moz-filter: contrast(4) invert(1);
+    -o-filter: contrast(4) invert(1);
+    -ms-filter: contrast(4) invert(1);
+    filter: contrast(4) invert(1);
 }

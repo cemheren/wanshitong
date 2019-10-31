@@ -6,7 +6,8 @@ var resultsElement = document.getElementById("results");
 var rightPanelElement = document.getElementById("righttextpanel");
 var relatedDocumentsElement = document.getElementById("similarityrow");
 var deleteElement = document.getElementById("delete");
-var toggleElement = document.getElementById("toggle");
+var toggleOffElement = document.getElementById("toggle-off");
+var toggleOnElement = document.getElementById("toggle-on");
 
 // var Quill = require("quill");
 // var editor = new Quill('#editor', {
@@ -93,9 +94,13 @@ function swapTextImage(event)
     if (rightPanelText.className == "hidden") {
         rightPanelText.className = "max_width";
         rightPanelImage.className = "hidden";
+        toggleOffElement.classList.add("hidden");
+        toggleOnElement.classList.remove("hidden");
     }else{
         rightPanelText.className = "hidden";
         rightPanelImage.className = "right_panel_image";  
+        toggleOnElement.classList.add("hidden");
+        toggleOffElement.classList.remove("hidden");
     }
 }
 
@@ -123,6 +128,8 @@ function onRowTextClick(event)
         img.className = 'right_panel_image';
         rightPanelElement.appendChild(img);
 
+        toggleOnElement.classList.add("hidden");
+        toggleOffElement.classList.remove("hidden");
         textDiv.className = "hidden";
     }
 
@@ -178,7 +185,8 @@ deleteElement.onclick = function(event){
     rightPanelElement.textContent = "Deleted.";
 }
 
-toggleElement.onclick = swapTextImage;
+toggleOffElement.onclick = swapTextImage;
+toggleOnElement.onclick = swapTextImage;
 
 function http(method, theUrl) {
     var xmlHttp = new XMLHttpRequest();

@@ -76,6 +76,7 @@ body{
 
 .result_row{
     cursor: pointer;
+    margin-right: calc(-1 * (310px - 100%));
 }
 
 .result_row_text{
@@ -120,16 +121,16 @@ body{
 
 .right_panel_text{
     color: whitesmoke;
-    /* width: 55%; */
-    flex-grow: 1;
+    width: 97%;
     height: 70vh;
-    overflow-y: hidden;
+    overflow-y: scroll;
     /* height: 400px; */
     /* max-width: 1000px; */
     white-space: pre-wrap;
     font: message-box;
     margin-left: 30px;
     margin-top: 30px;
+    /* margin-right: calc(-1 * (97% - 100%)); */
 }
 .right_panel_text:hover{
     overflow-y: scroll;
@@ -137,7 +138,6 @@ body{
 
 .max_width{
     width: 100%;
-    display: flex;
 }
 
 .right_panel_image{
@@ -160,9 +160,11 @@ body{
 .delete{
     cursor: pointer;
     color: red;
+    padding-right: 5px;
 }
 
 .toggle{
+    padding-right: 5px;
     cursor: pointer;
 }
 

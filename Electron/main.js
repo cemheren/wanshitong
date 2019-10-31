@@ -57,11 +57,25 @@ function createServerProcess() {
 }
 
 function registerShortcuts() {
-  const ret = globalShortcut.register('alt+a', () => {
-    
+  var ret = globalShortcut.register('alt+a', () => {
     mainWindow.webContents.send('screenshot');
     request.get(
         "http://localhost:4153/actions/screenshot",
+        function (error, response, body) {
+            if (!error && response.statusCode == 200) {
+            }
+        }
+    );
+  })
+  
+  if (!ret) {
+    console.log('registration failed alt+a');
+  }
+
+  ret = globalShortcut.register('alt+c', () => {
+    mainWindow.webContents.send('clipboard');
+    request.get(
+        "http://localhost:4153/actions/clipboard",
         function (error, response, body) {
             if (!error && response.statusCode == 200) {
             }
@@ -72,10 +86,6 @@ function registerShortcuts() {
   if (!ret) {
     console.log('registration failed');
   }
-
-  // Check whether a shortcut is registered.
-  console.log(globalShortcut.isRegistered('alt+a'))
-
 }
 
 // This method will be called when Electron has finished

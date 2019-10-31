@@ -38,6 +38,12 @@ namespace Querier
                     constraints: new { httpMethod = new HttpMethodRouteConstraint(HttpMethod.Get.ToString()) });
 
                 routes.MapRoute(
+                    name: "Clipboard",
+                    template: "actions/clipboard",
+                    defaults: new { controller = "Actions", action = "CopyClipboard" },
+                    constraints: new { httpMethod = new HttpMethodRouteConstraint(HttpMethod.Get.ToString()) });
+
+                routes.MapRoute(
                     name: "ExecuteQuery",
                     template: "query/{text}",
                     defaults: new { controller = "Query", action = "SearchText" },

@@ -11,6 +11,8 @@ using Lucene.Net.Search;
 using Lucene.Net.Store;
 using Lucene.Net.Search.Highlight;
 using Lucene.Net.Util;
+using Lucene.Net.Facet;
+using Newtonsoft.Json;
 
 namespace wanshitong.Common.Lucene
 {
@@ -46,7 +48,7 @@ namespace wanshitong.Common.Lucene
             {
                 var doc = new Document();
 
-                // StringField indexes but doesn't tokenise
+                doc.Add(new StringField("ID", Guid.NewGuid().ToString(), Field.Store.YES));
                 doc.Add(new StringField("group", group, Field.Store.YES));
                 doc.Add(new StringField("processId", processId.ToString(), Field.Store.YES));
                 doc.Add(new TextField("text", text, Field.Store.YES));
@@ -62,24 +64,73 @@ namespace wanshitong.Common.Lucene
             }
         }
 
-        public void UpdateDocument(SearchModel updatedDocument)
+        public void MigrateDocuments(List<SearchModel> migratedDocuments)
+        {
+            using (var writer = new IndexWriter(dir, new IndexWriterConfig(appLuceneVersion, analyzer)))
+            {
+                foreach (var migratedDocument in migratedDocuments)
+                {
+                    if (migratedDocument.MyId == null)
+                    {
+                        var doc = new Document();
+                        var isDeleted = writer.TryDeleteDocument(writer.GetReader(false), migratedDocument.DocId);
+                        
+                        migratedDocument.MyId = migratedDocument.MyId ?? Guid.NewGuid().ToString();
+
+                        doc.Add(new StringField("ID", migratedDocument.MyId, Field.Store.YES));
+                        doc.Add(new StringField("group", migratedDocument.Group, Field.Store.YES));
+                        doc.Add(new StringField("processId", migratedDocument.ProcessId, Field.Store.YES));
+                        doc.Add(new TextField("text", migratedDocument.Text, Field.Store.YES));
+
+                        doc.Add(new StringField("metadata", JsonConvert.SerializeObject(migratedDocument.Metadata), Field.Store.YES));
+
+                        foreach (var tag in migratedDocument.Tags)
+                        {
+                            doc.Add(new StringField("tags", tag, Field.Store.YES));
+                        }
+
+                        doc.Add(new StringField("ingestionTime",
+                            DateTools.DateToString(migratedDocument.IngestionTime, DateTools.Resolution.SECOND), Field.Store.YES));
+
+                        writer.AddDocument(doc);
+                    }
+                }
+                
+                writer.Commit();
+                writer.Flush(triggerMerge: false, applyAllDeletes: true);
+            }
+        }
+
+        public string UpdateDocument(SearchModel updatedDocument)
         {
             using (var writer = new IndexWriter(dir, new IndexWriterConfig(appLuceneVersion, analyzer)))
             {
                 var doc = new Document();
 
                 var isDeleted = writer.TryDeleteDocument(writer.GetReader(false), updatedDocument.DocId);
-                // StringField indexes but doesn't tokenise
+                
+                updatedDocument.MyId = updatedDocument.MyId ?? Guid.NewGuid().ToString();
+
+                doc.Add(new StringField("ID", updatedDocument.MyId, Field.Store.YES));
                 doc.Add(new StringField("group", updatedDocument.Group, Field.Store.YES));
                 doc.Add(new StringField("processId", updatedDocument.ProcessId, Field.Store.YES));
                 doc.Add(new TextField("text", updatedDocument.Text, Field.Store.YES));
 
+                doc.Add(new StringField("metadata", JsonConvert.SerializeObject(updatedDocument.Metadata), Field.Store.YES));
+
+                foreach (var tag in updatedDocument.Tags)
+                {
+                    doc.Add(new StringField("tags", tag, Field.Store.YES));
+                }
+
                 doc.Add(new StringField("ingestionTime",
-                     DateTools.DateToString(DateTime.UtcNow, DateTools.Resolution.SECOND), Field.Store.YES));
+                     DateTools.DateToString(updatedDocument.IngestionTime, DateTools.Resolution.SECOND), Field.Store.YES));
 
                 writer.AddDocument(doc);
                 writer.Commit();
                 writer.Flush(triggerMerge: false, applyAllDeletes: true);
+            
+                return updatedDocument.MyId;
             }
         }
 
@@ -93,28 +144,24 @@ namespace wanshitong.Common.Lucene
             }
         }
 
-        public SearchModel SearchWithProcessId(int processId, string group)
+        public SearchModel SearchWithMyId(String ID)
         {
             var result = default(SearchModel);
 
             var booleanQuery = new BooleanQuery() {
-                new BooleanClause(new TermQuery(new Term("processId", processId.ToString())), Occur.SHOULD),
-                new BooleanClause(new TermQuery(new Term("group", group)), Occur.SHOULD)
+                new BooleanClause(new TermQuery(new Term("ID", ID.ToString())), Occur.SHOULD)
             };
 
             using (var reader = DirectoryReader.Open(this.dir))
             {
                 var searcher = new IndexSearcher(reader);
-                var hits = searcher.Search(booleanQuery, 5).ScoreDocs;
+                var hits = searcher.Search(booleanQuery, 1).ScoreDocs;
                 foreach (var hit in hits)
                 {
                     var foundDoc = searcher.Doc(hit.Doc);
                     var searchModel = SearchModel.FromDoc(foundDoc, hit.Doc);
-
-                    if (searchModel.IngestionTime > DateTime.UtcNow.AddHours(-2))
-                    {
-                        return searchModel;
-                    }
+                        
+                    return searchModel;
                 }
             }
 
@@ -144,6 +191,9 @@ namespace wanshitong.Common.Lucene
                     results.Add(SearchModel.FromDoc(foundDoc, hit.Doc));                    
                 }
             }
+
+            // migrate
+            this.MigrateDocuments(results);
 
             return results.OrderBy(r => r.IngestionTime).ToList();
         }
@@ -196,6 +246,9 @@ namespace wanshitong.Common.Lucene
                     results.Add(result);
                 }
             }
+
+            // migrate
+            this.MigrateDocuments(results);
 
             return results;
         }

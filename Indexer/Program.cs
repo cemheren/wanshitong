@@ -26,7 +26,6 @@ namespace wanshitong
 {
     class Program
     {
-        public static KeyQueue KeyQueue = new KeyQueue(PrintQueue);
 
         private static ConcurrentDictionary<int, string> processIdMap = new ConcurrentDictionary<int, string>();
 
@@ -77,43 +76,6 @@ namespace wanshitong
                 .Build();
 
             host.Run();
-        }
-
-        private static void RecurringPrinter()
-        {
-            while (true)
-            {
-                Task.Delay(60000).Wait();
-                PrintQueue();
-            }
-        }
-
-        private static void PrintQueue()
-        {
-             var currentList = KeyQueue.Flush();
-             {
-                foreach (var pair in currentList)
-                {
-                    // filter noisy documents;
-                    // var spaces = pair.Item2.Split(' ', 10, StringSplitOptions.RemoveEmptyEntries);
-                    // if(spaces.Length < 2)
-                    //     continue;
-
-                    processIdMap.TryGetValue(pair.Item1, out var processName);
-
-                    var existing = m_luceneTools.SearchWithProcessId(pair.Item1, processName);
-
-                    if(existing != null)
-                    {
-                        existing.Text += "\n" + pair.Item2;
-                        m_luceneTools.UpdateDocument(existing);    
-                    }
-                    else
-                    {
-                        m_luceneTools.AddAndCommit(processName, pair.Item2, pair.Item1);
-                    }
-                }
-            }
         }
 
         private static void CreateProcessIdMapping()

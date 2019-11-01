@@ -46,5 +46,26 @@ namespace Indexer.Querier.Controllers
                 .m_luceneTools
                 .Delete(docId);
         }
+
+        [HttpPost]
+        public void TagDocs([FromBody]TagDocModel tagDocModel)
+        {
+            foreach (var myId in tagDocModel.indexAndDocId.Values)
+            {
+                var currentDocument = Program
+                    .m_luceneTools
+                    .SearchWithMyId(myId);
+
+                var hs = currentDocument.Tags.ToHashSet();
+                hs.Add(tagDocModel.tag);
+
+                currentDocument.Tags = hs.ToArray();
+                currentDocument.Metadata.TagOrders = tagDocModel.indexAndDocId;
+
+                Program
+                    .m_luceneTools
+                    .UpdateDocument(currentDocument);
+            }
+        }
     } 
 }

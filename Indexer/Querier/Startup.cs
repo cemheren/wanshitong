@@ -66,6 +66,12 @@ namespace Querier
                     template: "delete/{docId}",
                     defaults: new { controller = "Query", action = "Delete" },
                     constraints: new { httpMethod = new HttpMethodRouteConstraint(HttpMethod.Delete.ToString()) });
+                    
+                routes.MapRoute(
+                    name: "TagDocument",
+                    template: "tag/{docId}",
+                    defaults: new { controller = "Query", action = "Delete" },
+                    constraints: new { httpMethod = new HttpMethodRouteConstraint(HttpMethod.Delete.ToString()) });
             });
         }
     }

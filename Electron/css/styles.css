@@ -207,9 +207,20 @@ body{
     height: 100%;
 }
 
+.similarity_row_item_parent{
+    height: 90%;
+    width: 180px;
+    float: left;
+    display: block;
+    overflow: hidden;
+    margin: 10px;
+    cursor: pointer;
+    padding-left: 20px;
+}
+
 .similarity_row_item{
     height: 90%;
-    width: 150px;
+    width: 140px;
     float: left;
     display: block;
     overflow: hidden;
@@ -227,6 +238,10 @@ body{
 
 .similarity_row_item > .result_row_group{
     display: none;
+}
+
+.similarity_select{
+    float: left;
 }
 
 #version{

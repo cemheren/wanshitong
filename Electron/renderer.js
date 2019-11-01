@@ -57,25 +57,36 @@ function CreateResultRow(docId, group, text, ingestionTime, category, highlighte
 
 function CreateRelatedRowElement(docId, group, text, ingestionTime, category) {
     const li = document.createElement('li');
-    li.className = 'similarity_row_item';
-    
-    li.onclick = onRowTextClick;
+    li.className = 'similarity_row_item_parent';
 
-    li.innerHTML += `
+    const select = document.createElement('input');
+    select.id = 'select';
+    select.type = 'checkbox';
+    select.className = 'similarity_select';
+
+    li.appendChild(select);
+
+    const div = document.createElement('div');
+    div.className = 'similarity_row_item';
+
+    div.onclick = onRowTextClick;
+    div.innerHTML += `
         <div class="similarity_row_time">${moment(ingestionTime).fromNow()}</div>
     `
 
     if(category == -10)
     {
-        li.innerHTML += `<img class="result_row_img" src="${group}">`;
+        div.innerHTML += `<img class="result_row_img" src="${group}">`;
     }
 
     var textClass = "similarity_row_text";
-    li.innerHTML += `
+    div.innerHTML += `
         <div id="textcontent" class="${textClass}">${text}</div>
         <div class="result_row_id">${docId}</div>
         <div id="result_row_group" class="hidden">${ingestionTime}</div>
     `;
+
+    li.appendChild(div);
 
     return li;
 }

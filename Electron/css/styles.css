@@ -127,7 +127,7 @@ body{
 .right_panel_text{
     color: whitesmoke;
     width: 97%;
-    height: 70vh;
+    height: 65vh;
     overflow-y: scroll;
     /* height: 400px; */
     /* max-width: 1000px; */
@@ -198,34 +198,44 @@ body{
 .related_documents{
     width: 100%;
     overflow-x: scroll;
-    height: 30vh;
+    height: 24vh;
     overflow-y: hidden;
 }
 
 .similarity_row{
     width: 2000px;
-    height: 100%;
+    height: 90%;
 }
 
 .similarity_row_item_parent{
-    height: 90%;
+    height: 96%;
     width: 180px;
     float: left;
     display: block;
     overflow: hidden;
-    margin: 10px;
     cursor: pointer;
-    padding-left: 20px;
+    /* padding-left: 20px; */
 }
 
 .similarity_row_item{
-    height: 90%;
+    height: 98%;
     width: 140px;
     float: left;
     display: block;
     overflow: hidden;
-    margin: 10px;
     cursor: pointer;
+    padding-left: 20px;
+    background-color: #3e4348;
+}
+.similarity_row_item_filler{
+    width: 20px;
+    float: left;
+    height: 98%;
+    display: block;
+    overflow: hidden;
+
+    background: linear-gradient(90deg, #3e4348 4px, transparent 1%) center, linear-gradient(#3e4348 4px, transparent 1%) center, #ccc;
+    background-size: 5px 5px;
 }
 
 .similarity_row_text{
@@ -258,3 +268,16 @@ body{
     -ms-filter: contrast(4) invert(1);
     filter: contrast(4) invert(1);
 }
+
+.ds-selected{
+    background-color: chartreuse;
+}
+
+.unselectable {
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+ 
+    -ms-user-select: none;
+    user-select: none;
+ }

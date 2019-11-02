@@ -4,18 +4,20 @@
 var inputElement = document.getElementById("input");
 var resultsElement = document.getElementById("results");
 var rightPanelElement = document.getElementById("righttextpanel");
-var relatedDocumentsElement = document.getElementById("similarityrow");
+var relatedDocumentsElement = document.getElementById("relateddocuments");
+var similarityRowElement = document.getElementById("similarityrow");
 var deleteElement = document.getElementById("delete");
 var toggleOffElement = document.getElementById("toggle-off");
 var toggleOnElement = document.getElementById("toggle-on");
 
 const moment = require("moment");
+const DragSelect = require("dragselect");
 
-// var Quill = require("quill");
-// var editor = new Quill('#editor', {
-//     modules: { toolbar: '#toolbar' },
-//     theme: 'snow'
-//   });
+var ds = new DragSelect({
+    selectables: document.getElementsByClassName('similarity_row_item'),
+    area: relatedDocumentsElement
+});
+
 var selectedElementMetadata = {};
 
 function CreateResultRow(docId, group, text, ingestionTime, category, highlightedText)
@@ -59,14 +61,14 @@ function CreateRelatedRowElement(docId, group, text, ingestionTime, category) {
     const li = document.createElement('li');
     li.className = 'similarity_row_item_parent';
 
-    const select = document.createElement('input');
-    select.id = 'select';
-    select.type = 'checkbox';
-    select.className = 'similarity_select';
+    // const select = document.createElement('input');
+    // select.id = 'select';
+    // select.type = 'checkbox';
+    // select.className = 'similarity_select';
 
-    li.appendChild(select);
+    // li.appendChild(select);
 
-    const div = document.createElement('div');
+    var div = document.createElement('div');
     div.className = 'similarity_row_item';
 
     div.onclick = onRowTextClick;
@@ -86,6 +88,10 @@ function CreateRelatedRowElement(docId, group, text, ingestionTime, category) {
         <div id="result_row_group" class="hidden">${ingestionTime}</div>
     `;
 
+    li.appendChild(div);
+
+    div = document.createElement('div');
+    div.className = "similarity_row_item_filler";
     li.appendChild(div);
 
     return li;
@@ -111,7 +117,7 @@ function swapTextImage(event)
         toggleOnElement.classList.remove("hidden");
     }else{
         rightPanelText.className = "hidden";
-        rightPanelImage.className = "right_panel_image";  
+        rightPanelImage.className = "right_panel_image";
         toggleOnElement.classList.add("hidden");
         toggleOffElement.classList.remove("hidden");
     }
@@ -122,7 +128,7 @@ function onRowTextClick(event)
     selectedElementMetadata.docId = event.currentTarget.querySelector('.result_row_id').textContent;
     selectedElementMetadata.text = event.currentTarget.querySelector('#textcontent').textContent;
     selectedElementMetadata.ingestionTime = event.currentTarget.querySelector('#result_row_group').textContent;
-    
+
     RemoveAllChildren(rightPanelElement);
 
     var textDiv = document.createElement('div');
@@ -151,19 +157,26 @@ function onRowTextClick(event)
     documentDateStart.setHours(documentDateStart.getHours() - 1);
     documentDateEnd.setHours(documentDateEnd.getHours() + 1);
 
-    var response = http("GET", "http://localhost:4153/timerange/" + 
+    var response = http("GET", "http://localhost:4153/timerange/" +
         documentDateStart.toISOString() + "/" + documentDateEnd.toISOString());
 
     if(response == "" || response == undefined){
         return "No result found";
     }
 
-    RemoveAllChildren(relatedDocumentsElement);
+    RemoveAllChildren(similarityRowElement);
+    ds.clearSelection();
 
     var json = JSON.parse(response);
     json.forEach(e => {
-        relatedDocumentsElement.appendChild(CreateRelatedRowElement(e.docId, e.group, e.text, e.ingestionTime, e.processId));
+        var newElement = CreateRelatedRowElement(e.docId, e.group, e.text, e.ingestionTime, e.processId);
+        ds.addSelectables(newElement);
+        similarityRowElement.appendChild(newElement);
     });
+}
+
+ds.onElementSelect = function (element) {
+    Console.log("asd");
 }
 
 function RemoveAllChildren(node)
@@ -192,7 +205,7 @@ inputElement.onkeyup = refreshList;
 
 deleteElement.onclick = function(event){
     var response = http("DELETE", "http://localhost:4153/delete/" + selectedElementMetadata.docId);
-    
+
     refreshList();
 
     rightPanelElement.textContent = "Deleted.";

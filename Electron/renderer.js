@@ -15,12 +15,13 @@ const DragSelect = require("dragselect");
 
 var ds = new DragSelect({
     selectables: document.getElementsByClassName('similarity_row_item'),
-    area: relatedDocumentsElement
+    area: relatedDocumentsElement,
+    onElementSelect: onElementSelect
 });
 
 var selectedElementMetadata = {};
 
-function CreateResultRow(docId, group, text, ingestionTime, category, highlightedText)
+function CreateResultRow(docId, group, text, ingestionTime, category, highlightedText, tags)
 {
     const div = document.createElement('div');
     div.className = 'result_row';
@@ -29,6 +30,12 @@ function CreateResultRow(docId, group, text, ingestionTime, category, highlighte
     if(text.length > 100)
     {
         //text = text.substring(0, 100) + "...";
+    }
+
+    if (tags) {
+        tags.forEach(tag => {
+            div.innerHTML += `<button class="result_row_tag" onClick="StartTagSearch(this)">${tag}</button>`;
+        });
     }
 
     var textClass = "result_row_text";
@@ -57,7 +64,7 @@ function CreateResultRow(docId, group, text, ingestionTime, category, highlighte
     return div;
 }
 
-function CreateRelatedRowElement(docId, group, text, ingestionTime, category) {
+function CreateRelatedRowElement(docId, group, text, ingestionTime, category, myId) {
     const li = document.createElement('li');
     li.className = 'similarity_row_item_parent';
 
@@ -84,7 +91,8 @@ function CreateRelatedRowElement(docId, group, text, ingestionTime, category) {
     var textClass = "similarity_row_text";
     div.innerHTML += `
         <div id="textcontent" class="${textClass}">${text}</div>
-        <div class="result_row_id">${docId}</div>
+        <div id="docId" class="result_row_id">${docId}</div>
+        <div id="myId" class="result_row_id">${myId}</div>
         <div id="result_row_group" class="hidden">${ingestionTime}</div>
     `;
 
@@ -169,14 +177,14 @@ function onRowTextClick(event)
 
     var json = JSON.parse(response);
     json.forEach(e => {
-        var newElement = CreateRelatedRowElement(e.docId, e.group, e.text, e.ingestionTime, e.processId);
+        var newElement = CreateRelatedRowElement(e.docId, e.group, e.text, e.ingestionTime, e.processId, e.myId);
         ds.addSelectables(newElement);
         similarityRowElement.appendChild(newElement);
     });
 }
 
-ds.onElementSelect = function (element) {
-    Console.log("asd");
+function onElementSelect(element) {
+    CreateContextMenu(element);
 }
 
 function RemoveAllChildren(node)
@@ -198,7 +206,15 @@ var refreshList = function(event){
 
     var json = JSON.parse(response);
     json.forEach(e => {
-        resultsElement.appendChild(CreateResultRow(e.docId, e.group, e.text, e.ingestionTime, e.processId, e.highlightedText));
+        resultsElement.appendChild(
+            CreateResultRow(
+                e.docId, 
+                e.group, 
+                e.text, 
+                e.ingestionTime, 
+                e.processId, 
+                e.highlightedText,
+                e.tags));
     });
 }
 inputElement.onkeyup = refreshList;
@@ -211,13 +227,20 @@ deleteElement.onclick = function(event){
     rightPanelElement.textContent = "Deleted.";
 }
 
+function StartTagSearch(element) {
+    inputElement.value = "tags:" + element.textContent;
+    refreshList();
+}
+
 toggleOffElement.onclick = swapTextImage;
 toggleOnElement.onclick = swapTextImage;
 
-function http(method, theUrl) {
+function http(method, theUrl, post) {
     var xmlHttp = new XMLHttpRequest();
     xmlHttp.open(method, theUrl, false); // false for synchronous request
-    xmlHttp.send(null);
+    xmlHttp.setRequestHeader('Content-type', "application/json");
+    xmlHttp.setRequestHeader('accept', "application/json")
+    xmlHttp.send(post);
 
     return xmlHttp.responseText;
 }

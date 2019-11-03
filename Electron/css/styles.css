@@ -114,6 +114,7 @@ body{
     font: menu;
     border-bottom: inset;
     text-align: right;
+    display: block;
 }
 
 .right_panel{
@@ -270,7 +271,7 @@ body{
 }
 
 .ds-selected{
-    background-color: chartreuse;
+    background-color: #435f4c;
 }
 
 .unselectable {

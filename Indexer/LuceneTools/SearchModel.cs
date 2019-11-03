@@ -8,7 +8,7 @@ namespace Indexer.LuceneTools
     public class Metadata
     {
         // (order, docid)
-        public Dictionary<int, string> TagOrders { get; set; }
+        public Dictionary<string, string> TagOrders { get; set; }
     }
 
     public class SearchModel
@@ -20,6 +20,9 @@ namespace Indexer.LuceneTools
             if(doc.Get("metadata") != null)
             {
                 jsonMetadata = JsonConvert.DeserializeObject<Metadata>(doc.Get("metadata"));
+            }else
+            {
+                jsonMetadata = new Metadata();
             }
 
             return new SearchModel

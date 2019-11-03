@@ -1,9 +1,13 @@
 
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 public class TagDocModel
 {
-    public Dictionary<int, string> indexAndDocId;
-    
-    public string tag;
+
+    [Required]
+    public Dictionary<string, string> IndexAndDocId;
+
+    [Required]
+    public string Tag;
 }

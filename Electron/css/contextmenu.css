@@ -1,0 +1,45 @@
+
+
+ .context_menu{
+    position: absolute;
+    width: 240px;
+    height: 100px;
+     
+    padding: 20px;
+    padding-top: 0px;
+    border-radius: 5px;
+    background-color:#435f4c;
+    color: aliceblue;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+ }
+ 
+ .context_menu_close{
+     position: relative;
+     top: 8px;
+     right: 2px;
+     padding-left: 230px;
+     cursor: pointer;
+ }
+
+ .context_menu_submit{
+    position: relative;
+    top: 8px;
+    left: 3px;
+}
+
+ .context_menu_label{
+    padding-left: 4px;
+}
+
+.context_menu_input{
+    height: 17px;
+    margin-top: 4px;
+    width: 85%;
+    font-size: x-small;
+    font: message-box;
+    background-color: aliceblue;
+    padding: 8px;
+    margin-left: 4px;
+    color: black;
+    border: none;
+}

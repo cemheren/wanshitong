@@ -138,7 +138,8 @@ function onRowTextClick(event)
     selectedElementMetadata.ingestionTime = event.currentTarget.querySelector('#result_row_group').textContent;
 
     RemoveAllChildren(rightPanelElement);
-
+    RemoveContextMenu();
+    
     var textDiv = document.createElement('div');
     textDiv.textContent = selectedElementMetadata.text;
     textDiv.id = "right_panel_text";

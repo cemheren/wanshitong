@@ -72,6 +72,18 @@ namespace Querier
                     template: "tag",
                     defaults: new { controller = "Query", action = "TagDocs" },
                     constraints: new { httpMethod = new HttpMethodRouteConstraint(HttpMethod.Post.ToString()) });
+                    
+                routes.MapRoute(
+                    name: "SearchTag",
+                    template: "tags/{text}",
+                    defaults: new { controller = "Tags", action = "Search" },
+                    constraints: new { httpMethod = new HttpMethodRouteConstraint(HttpMethod.Get.ToString()) });
+                    
+                routes.MapRoute(
+                    name: "AddTag",
+                    template: "addTag/{tag}/{color}",
+                    defaults: new { controller = "Tags", action = "AddTag" },
+                    constraints: new { httpMethod = new HttpMethodRouteConstraint(HttpMethod.Get.ToString()) });
             });
         }
     }

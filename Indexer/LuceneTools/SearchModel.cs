@@ -34,7 +34,8 @@ namespace Indexer.LuceneTools
                 ProcessId = doc.Get("processId"),
                 IngestionTime = DateTools.StringToDate(doc.Get("ingestionTime")), 
                 Tags = tags,
-                Metadata = jsonMetadata
+                Metadata = jsonMetadata,
+                Type = doc.Get("text")
             };
         }
 
@@ -42,6 +43,8 @@ namespace Indexer.LuceneTools
 
         public string Text { get; set; }
         
+        public string Type { get; set; }
+
         public string[] Tags { get; set; }
 
         public int DocId { get; set; }

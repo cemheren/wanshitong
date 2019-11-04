@@ -3,7 +3,7 @@
  .context_menu{
     position: absolute;
     width: 240px;
-    height: 100px;
+    height: 126px;
      
     padding: 20px;
     padding-top: 0px;
@@ -42,4 +42,12 @@
     margin-left: 4px;
     color: black;
     border: none;
+}
+
+.pickr{
+    top: 4px;
+    left: 4px;
+    position: relative;
+    overflow: visible;
+    transform: translateY(0);
 }

@@ -16,7 +16,7 @@ using Newtonsoft.Json;
 
 namespace wanshitong.Common.Lucene
 {
-    public class LuceneTools
+    public partial class LuceneTools
     {
         private FSDirectory dir;
         private CodeAwareAnalyzer analyzer;
@@ -48,6 +48,7 @@ namespace wanshitong.Common.Lucene
             {
                 var doc = new Document();
 
+                doc.Add(new StringField("type", "Document", Field.Store.YES));
                 doc.Add(new StringField("ID", Guid.NewGuid().ToString(), Field.Store.YES));
                 doc.Add(new StringField("group", group, Field.Store.YES));
                 doc.Add(new StringField("processId", processId.ToString(), Field.Store.YES));
@@ -70,14 +71,16 @@ namespace wanshitong.Common.Lucene
             {
                 foreach (var migratedDocument in migratedDocuments)
                 {
-                    if (migratedDocument.MyId == null)
+                    if (migratedDocument.MyId == null  || migratedDocument.Type == null)
                     {
                         var doc = new Document();
                         var isDeleted = writer.TryDeleteDocument(writer.GetReader(false), migratedDocument.DocId);
                         
                         migratedDocument.MyId = migratedDocument.MyId ?? Guid.NewGuid().ToString();
+                        migratedDocument.Type = "Document";
 
                         doc.Add(new StringField("ID", migratedDocument.MyId, Field.Store.YES));
+                        doc.Add(new StringField("type", migratedDocument.Type, Field.Store.YES));
                         doc.Add(new StringField("group", migratedDocument.Group, Field.Store.YES));
                         doc.Add(new StringField("processId", migratedDocument.ProcessId, Field.Store.YES));
                         doc.Add(new TextField("text", migratedDocument.Text, Field.Store.YES));
@@ -111,6 +114,7 @@ namespace wanshitong.Common.Lucene
                 
                 updatedDocument.MyId = updatedDocument.MyId ?? Guid.NewGuid().ToString();
 
+                doc.Add(new StringField("type", updatedDocument.Type, Field.Store.YES));
                 doc.Add(new StringField("ID", updatedDocument.MyId, Field.Store.YES));
                 doc.Add(new StringField("group", updatedDocument.Group, Field.Store.YES));
                 doc.Add(new StringField("processId", updatedDocument.ProcessId, Field.Store.YES));

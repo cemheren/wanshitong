@@ -205,7 +205,7 @@ var refreshList = function(event){
     var text = document.getElementById("input").value;
 
     RemoveAllChildren(resultsElement);
-    var response = http("GET", "http://localhost:4153/query/" + text);
+    var response = http("GET", "http://localhost:4153/query/" + encodeURIComponent(text));
 
     if(response == "" || response == undefined){
         return "No result found";
@@ -235,7 +235,7 @@ deleteElement.onclick = function(event){
 }
 
 function StartTagSearch(element) {
-    inputElement.value = "tags:" + element.textContent;
+    inputElement.value = "tags:" + element.textContent.split(' ').join('?');
     refreshList();
 }
 

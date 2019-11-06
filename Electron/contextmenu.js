@@ -27,7 +27,7 @@ function CreateContextMenu(e) {
     div.innerHTML += `
         <div class="context_menu_label">Add a tag:</div>
         <input id="context_menu_input" type="text" class="context_menu_input"/>
-        <button class="row_button context_menu_submit" onClick="SubmitContextMenu(this)">Add tag</button>
+        <button id="context_menu_submit" class="row_button context_menu_submit" onClick="SubmitContextMenu(this)">Add tag</button>
     `;
 
     document.body.appendChild(div);
@@ -63,6 +63,12 @@ function SubmitContextMenu(element) {
     }
 
     var response = http("POST", "http://localhost:4153/tag", JSON.stringify(tagDocModel));
+
+    var submitButton = document.getElementById("context_menu_submit");
+    submitButton.innerHTML = "Done";
+    submitButton.disabled = true;
+
+    refreshList();
 }
 
 function RemoveContextMenu(params) {

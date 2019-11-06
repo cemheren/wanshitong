@@ -193,9 +193,6 @@ body{
     color: red;
 }
 
-.toggle{
-}
-
 .related_documents{
     width: 100%;
     overflow-x: scroll;
@@ -227,6 +224,8 @@ body{
     cursor: pointer;
     padding-left: 20px;
     background-color: #3e4348;
+    top: 4px;
+    position: relative;
 }
 .similarity_row_item_filler{
     width: 20px;
@@ -237,6 +236,8 @@ body{
 
     background: linear-gradient(90deg, #3e4348 4px, transparent 1%) center, linear-gradient(#3e4348 4px, transparent 1%) center, #ccc;
     background-size: 5px 5px;
+    top: 4px;
+    position: relative;
 }
 
 .similarity_row_text{
@@ -271,7 +272,7 @@ body{
 }
 
 .ds-selected{
-    background-color: #435f4c;
+    background-color: #08bb41;
 }
 
 .unselectable {

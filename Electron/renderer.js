@@ -16,7 +16,8 @@ const DragSelect = require("dragselect");
 var ds = new DragSelect({
     selectables: document.getElementsByClassName('similarity_row_item'),
     area: relatedDocumentsElement,
-    onElementSelect: onElementSelect
+    callback: onElementSelect,
+    multiSelectMode: true
 });
 
 var selectedElementMetadata = {};
@@ -78,10 +79,15 @@ function CreateRelatedRowElement(docId, group, text, ingestionTime, category, my
     var div = document.createElement('div');
     div.className = 'similarity_row_item';
 
-    div.onclick = onRowTextClick;
-    div.innerHTML += `
-        <div class="similarity_row_time">${moment(ingestionTime).fromNow()}</div>
+    if (selectedElementMetadata.docId == docId) {
+        div.innerHTML += `
+        <div class="similarity_row_time">Selected document</div>
     `
+    }else{
+        div.innerHTML += `
+            <div class="similarity_row_time">${moment(ingestionTime).from(selectedElementMetadata.ingestionTime)}</div>
+        `
+    }
 
     if(category == -10)
     {
@@ -139,7 +145,7 @@ function onRowTextClick(event)
 
     RemoveAllChildren(rightPanelElement);
     RemoveContextMenu();
-    
+
     var textDiv = document.createElement('div');
     textDiv.textContent = selectedElementMetadata.text;
     textDiv.id = "right_panel_text";

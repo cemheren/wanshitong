@@ -4,7 +4,7 @@ function CreateContextMenu(e) {
     
     RemoveContextMenu();
 
-    var rect = e.getBoundingClientRect();
+    var rect = e[e.length-1].getBoundingClientRect();
 
     const div = document.createElement('div');
     div.className = 'context_menu';
@@ -14,13 +14,65 @@ function CreateContextMenu(e) {
 
     div.innerHTML += `
         <i class="material-icons context_menu_close" onClick="RemoveContextMenu(this)">close</i>
+    `;
+
+    var nodes = ds.getSelection();
+    if (nodes.length == 1) {
+        div.innerHTML += `
+         <button class="row_button context_menu_open" onClick="openDocumentFromContextMenu(this)">Open Document</button>
+         <div class="divider"></div>
+        `;
+    }
+
+    div.innerHTML += `
         <div class="context_menu_label">Add a tag:</div>
         <input id="context_menu_input" type="text" class="context_menu_input"/>
-        <div class="color-picker"></div>
-        <button class="button context_menu_submit" onClick="SubmitContextMenu(this)">Create</button>
-    `
+        <button class="row_button context_menu_submit" onClick="SubmitContextMenu(this)">Add tag</button>
+    `;
+
     document.body.appendChild(div);
 
+    //enablePickr();
+
+    return div;
+}
+
+function openDocumentFromContextMenu(element) {
+    var nodes = ds.getSelection();
+    var current = nodes[0];
+
+    onRowTextClick({
+        currentTarget: current,
+    })
+}
+
+function SubmitContextMenu(element) {
+
+    var nodes = ds.getSelection();
+    var indexAndDocId = new Object();
+
+    var i = 0;
+    nodes.forEach(node => {
+        indexAndDocId[i] = node.querySelector('#myId').textContent
+        i++;
+    });
+
+    var tagDocModel = {
+        IndexAndDocId: indexAndDocId,
+        Tag: element.parentElement.querySelector("#context_menu_input").value
+    }
+
+    var response = http("POST", "http://localhost:4153/tag", JSON.stringify(tagDocModel));
+}
+
+function RemoveContextMenu(params) {
+    var oldMenu = document.getElementById("contextMenu");
+    if (oldMenu && oldMenu.parentNode) {
+        oldMenu.parentNode.removeChild(oldMenu);
+    }
+}
+
+function enablePickr() {
     const pickr = Pickr.create({
         el: '.color-picker',
         theme: 'nano', // or 'monolith', or 'nano'
@@ -54,32 +106,4 @@ function CreateContextMenu(e) {
             node.style['backgroundColor'] = color.toHEXA(); 
         });
     });
-
-    return div;
-}
-
-function SubmitContextMenu(element) {
-
-    var nodes = ds.getSelection();
-    var indexAndDocId = new Object();
-
-    var i = 0;
-    nodes.forEach(node => {
-        indexAndDocId[i] = node.querySelector('#myId').textContent
-        i++;
-    });
-
-    var tagDocModel = {
-        IndexAndDocId: indexAndDocId,
-        Tag: element.parentElement.querySelector("#context_menu_input").value
-    }
-
-    var response = http("POST", "http://localhost:4153/tag", JSON.stringify(tagDocModel));
-}
-
-function RemoveContextMenu(params) {
-    var oldMenu = document.getElementById("contextMenu");
-    if (oldMenu && oldMenu.parentNode) {
-        oldMenu.parentNode.removeChild(oldMenu);
-    }
 }

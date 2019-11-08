@@ -193,69 +193,6 @@ body{
     color: red;
 }
 
-.related_documents{
-    width: 100%;
-    overflow-x: scroll;
-    height: 24vh;
-    overflow-y: hidden;
-}
-
-.similarity_row{
-    width: 2000px;
-    height: 90%;
-}
-
-.similarity_row_item_parent{
-    height: 96%;
-    width: 180px;
-    float: left;
-    display: block;
-    overflow: hidden;
-    cursor: pointer;
-    /* padding-left: 20px; */
-}
-
-.similarity_row_item{
-    height: 98%;
-    width: 140px;
-    float: left;
-    display: block;
-    overflow: hidden;
-    cursor: pointer;
-    padding-left: 20px;
-    background-color: #3e4348;
-    top: 4px;
-    position: relative;
-}
-.similarity_row_item_filler{
-    width: 20px;
-    float: left;
-    height: 98%;
-    display: block;
-    overflow: hidden;
-
-    background: linear-gradient(90deg, #3e4348 4px, transparent 1%) center, linear-gradient(#3e4348 4px, transparent 1%) center, #ccc;
-    background-size: 5px 5px;
-    top: 4px;
-    position: relative;
-}
-
-.similarity_row_text{
-    font-size: small;
-}
-
-.similarity_row_time{
-    font-size: x-small;
-}
-
-.similarity_row_item > .result_row_group{
-    display: none;
-}
-
-.similarity_select{
-    float: left;
-}
-
 #version{
     position: absolute;
     bottom: 2px;
@@ -270,16 +207,3 @@ body{
     -ms-filter: contrast(4) invert(1);
     filter: contrast(4) invert(1);
 }
-
-.ds-selected{
-    background-color: #08bb41;
-}
-
-.unselectable {
-    -moz-user-select: none;
-    -khtml-user-select: none;
-    -webkit-user-select: none;
- 
-    -ms-user-select: none;
-    user-select: none;
- }

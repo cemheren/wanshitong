@@ -1,6 +1,10 @@
 
 
- .context_menu{
+.ds-selected{
+    background-color: #ffa5a5;
+}
+
+.context_menu{
     position: absolute;
     width: 240px;
     height: 126px;
@@ -8,7 +12,7 @@
     padding: 20px;
     padding-top: 0px;
     border-radius: 5px;
-    background-color:#08bb41;
+    background-color:#6b6b6b;
     color: aliceblue;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
  }

@@ -17,7 +17,7 @@ var ds = new DragSelect({
     selectables: document.getElementsByClassName('similarity_row_item'),
     area: relatedDocumentsElement,
     callback: onElementSelect,
-    multiSelectMode: true
+    multiSelectMode: false
 });
 
 var selectedElementMetadata = {};

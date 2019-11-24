@@ -7,6 +7,7 @@ using System;
 using System.IO;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
+using Microsoft.ApplicationInsights.DataContracts;
 
 namespace Indexer.Querier.Controllers
 {
@@ -17,6 +18,8 @@ namespace Indexer.Querier.Controllers
         [HttpGet]
         public bool Screenshot()
         {
+            Telemetry.Instance.TrackEvent("ActionsController.Screenshot");
+
             var image = ScreenCapture.CaptureActiveWindow();
             MemoryStream memoryStream = new MemoryStream();
             image.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Jpeg);
@@ -35,12 +38,17 @@ namespace Indexer.Querier.Controllers
                 var str = result.GetString();
                 Program.m_luceneTools.AddAndCommit(address, str, -10);
                 System.Console.WriteLine("capture done...");
+
+                Telemetry.Instance.TrackTrace("Capture.Success", SeverityLevel.Verbose);
             }
             catch (System.Exception e)
             {
                 System.Console.WriteLine("capture failed...");
                 System.Console.WriteLine(e.Message);
-            
+
+                Telemetry.Instance.TrackTrace("Capture.Error", SeverityLevel.Error);
+                Telemetry.Instance.TrackException(e);
+
                 return false;
             }
 
@@ -52,6 +60,8 @@ namespace Indexer.Querier.Controllers
         [HttpGet]
         public bool CopyClipboard()
         {
+            Telemetry.Instance.TrackEvent("ActionsController.CopyClipboard");
+
             bool isWindows = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
             string current;
             if(isWindows)
@@ -67,6 +77,10 @@ namespace Indexer.Querier.Controllers
                 System.Console.WriteLine(current);
                 Program.m_luceneTools.AddAndCommit("clipboard", current, -1);
                 lastClipboard = current;
+
+                var d = new Dictionary<string, string>();
+                d.Add("content", current);
+                Telemetry.Instance.TrackTrace("CopyClipboard", severityLevel: SeverityLevel.Verbose, properties: d);
             }
 
             return true;

@@ -41,6 +41,8 @@ namespace wanshitong
 
             m_luceneTools.InitializeIndex();
             
+            Telemetry.Instance.TrackEvent("ProgramStart");
+
             StartWebHost(args);
         }
 
@@ -52,6 +54,7 @@ namespace wanshitong
         private static void CurrentDomain_ProcessExit(object sender, EventArgs e)
         {
             Console.WriteLine("process exit");
+            Telemetry.Instance.TrackEvent("ProgramExit");
             System.Environment.Exit(0);
         }
 

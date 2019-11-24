@@ -13,6 +13,8 @@ namespace Indexer.Querier.Controllers
         [Microsoft.AspNetCore.Mvc.HttpGet]
         public List<SearchModel> SearchText(string text)
         {
+            Telemetry.Instance.TrackEvent("QueryController.SearchText");
+
             var searchResults = Program
                 .m_luceneTools
                 .Search(text);
@@ -23,6 +25,8 @@ namespace Indexer.Querier.Controllers
         [Microsoft.AspNetCore.Mvc.HttpGet]
         public List<SearchModel> SearchWithDates(DateTime start, DateTime end)
         {
+            Telemetry.Instance.TrackEvent("QueryController.SearchWithDates");
+
             var searchResults = Program
                 .m_luceneTools
                 .SearchWithIngestionTime(start, end);
@@ -33,6 +37,8 @@ namespace Indexer.Querier.Controllers
         [Microsoft.AspNetCore.Mvc.HttpGet]
         public List<SearchModel> GetAll()
         {
+            Telemetry.Instance.TrackEvent("QueryController.GetAll");
+
             var searchResults = Program
                 .m_luceneTools
                 .GetAll();
@@ -43,7 +49,9 @@ namespace Indexer.Querier.Controllers
         [Microsoft.AspNetCore.Mvc.HttpDelete]
         public void Delete(int docId)
         {
-             Program
+            Telemetry.Instance.TrackEvent("QueryController.Delete");
+            
+            Program
                 .m_luceneTools
                 .Delete(docId);
         }
@@ -51,6 +59,8 @@ namespace Indexer.Querier.Controllers
         [Microsoft.AspNetCore.Mvc.ActionName("TagDocs")]
         public ActionResult<bool> TagDocs([Microsoft.AspNetCore.Mvc.FromBody]TagDocModel tagDocModel)
         {
+            Telemetry.Instance.TrackEvent("QueryController.TagDocs");
+
             System.Console.WriteLine(tagDocModel);
             foreach (var myId in tagDocModel.IndexAndDocId.Values)
             {

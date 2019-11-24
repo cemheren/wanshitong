@@ -56,6 +56,7 @@ namespace wanshitong
             Console.WriteLine("process exit");
             Telemetry.Instance.TrackEvent("ProgramExit");
             Telemetry.Instance.Flush();
+            System.Threading.Thread.Sleep(5000);
             
             System.Environment.Exit(0);
         }

@@ -7,6 +7,7 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Stripe;
 
 namespace wanshitong.backend
 {
@@ -40,8 +41,17 @@ namespace wanshitong.backend
 
         private static async Task<IActionResult> HandleNewKey(HttpRequest req)
         {
+            StripeConfiguration.ApiKey = "sk_test_Oir6aZatDyqBDcTg4n2smYB5001MmaUfRW";
+            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+            dynamic data = JsonConvert.DeserializeObject(requestBody);
 
-            
+            var options = new ChargeCreateOptions {
+                Source = data?.token
+            };
+
+            var service = new ChargeService();
+            Charge charge = service.Create(options);
+
             return (ActionResult)new OkObjectResult($"{Guid.NewGuid()}");
         }
 

@@ -26,7 +26,6 @@ namespace wanshitong
 {
     class Program
     {
-
         private static ConcurrentDictionary<int, string> processIdMap = new ConcurrentDictionary<int, string>();
 
         internal static LuceneTools m_luceneTools = new LuceneTools();
@@ -49,6 +48,7 @@ namespace wanshitong
         private static void Default_Unloading(AssemblyLoadContext obj)
         {
             Console.WriteLine("unload");
+            Storage.Instance.Dispose();
         }
 
         private static void CurrentDomain_ProcessExit(object sender, EventArgs e)
@@ -56,6 +56,9 @@ namespace wanshitong
             Console.WriteLine("process exit");
             Telemetry.Instance.TrackEvent("ProgramExit");
             Telemetry.Instance.Flush();
+
+            Storage.Instance.Dispose();
+
             System.Threading.Thread.Sleep(5000);
             
             System.Environment.Exit(0);
@@ -65,6 +68,7 @@ namespace wanshitong
         {
             _closing.Set();
             System.Environment.Exit(0);
+            Storage.Instance.Dispose();
         }
 
         private static void StartWebHost(string[] args)

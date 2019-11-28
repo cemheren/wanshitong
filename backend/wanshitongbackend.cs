@@ -8,11 +8,14 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Stripe;
+using wanshitong.backend.datalayer;
 
 namespace wanshitong.backend
 {
     public static class wanshitongbackend
     {
+        private static KeyDataLayer keyDataLayer = new KeyDataLayer();
+
         [FunctionName("wanshitongbackend")]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequest req,
@@ -25,7 +28,7 @@ namespace wanshitong.backend
             switch (api)
             {
                 case "newkey":
-                    return await HandleNewKey(req);
+                    return await HandleNewKey(req, log);
                 default:
                     return await HandleNotFound(api);
             }
@@ -39,20 +42,49 @@ namespace wanshitong.backend
                 : new BadRequestObjectResult("Please pass a name on the query string or in the request body");
         }
 
-        private static async Task<IActionResult> HandleNewKey(HttpRequest req)
+        private static async Task<IActionResult> HandleNewKey(HttpRequest req, ILogger log)
         {
-            StripeConfiguration.ApiKey = "sk_test_Oir6aZatDyqBDcTg4n2smYB5001MmaUfRW";
-            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            dynamic data = JsonConvert.DeserializeObject(requestBody);
+            string key;
+            try
+            {
+                key = await keyDataLayer.CreateNewValidKey("empty", log);
+            }
+            catch (System.Exception e)
+            {
+                log.LogError(e, "Key generation failed");
+                return (ActionResult)new BadRequestObjectResult(
+                    new ErrorModel{
+                        Message = "Key generation failed"
+                    });
+            }
 
-            var options = new ChargeCreateOptions {
-                Source = data?.token
-            };
+            try
+            {
+                StripeConfiguration.ApiKey = "sk_test_Oir6aZatDyqBDcTg4n2smYB5001MmaUfRW";
+                string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+                var data = JsonConvert.DeserializeObject<StripeTokenModel>(requestBody);
 
-            var service = new ChargeService();
-            Charge charge = service.Create(options);
+                var options = new ChargeCreateOptions {
+                    Source = data?.token,
+                    Currency = "USD",
+                    Amount = 4000
+                };
 
-            return (ActionResult)new OkObjectResult($"{Guid.NewGuid()}");
+                var service = new ChargeService();
+                Charge charge = service.Create(options);
+            }
+            catch (System.Exception e)
+            {
+                // todo: revert key to invalid here. 
+
+                log.LogError(e, "Stripe authorization failed");
+                return (ActionResult)new BadRequestObjectResult(
+                    new ErrorModel{
+                        Message = "Stripe authorization failed"
+                    });
+            }
+
+            return (ActionResult)new OkObjectResult($"{key}");
         }
 
         private static async Task<IActionResult> HandleNotFound(string route)

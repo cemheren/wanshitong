@@ -5,8 +5,8 @@ var handler = StripeCheckout.configure({
     token: function(token) {
       // Send the token in an AJAX request
       var xhr = new XMLHttpRequest();
-      xhr.open('POST', 'https://wanshitong.azurewebsites.net/api/wanshitongbackend?api=newkey');
-      xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+      xhr.open('POST', 'http://localhost:7071/api/wanshitongbackend?api=newkey');
+      xhr.setRequestHeader('Content-Type', "application/json;charset=UTF-8");
       xhr.onload = function() {
         if (xhr.status === 200) {
             //var resp = JSON.parse(xhr.responseText);

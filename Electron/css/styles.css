@@ -207,3 +207,7 @@ body{
     -ms-filter: contrast(4) invert(1);
     filter: contrast(4) invert(1);
 }
+
+.container{
+    padding: 10px;
+}

@@ -1,4 +1,4 @@
-var handler = StripeCheckout.configure({
+var stripeHandler = StripeCheckout.configure({
     key: 'pk_test_33HGY2nhmuWFI4uPzZkcCnzX00lMXpeSYU',
     image: 'https://stripe.com/img/documentation/checkout/marketplace.png',
     locale: 'auto',
@@ -21,17 +21,7 @@ var handler = StripeCheckout.configure({
     }
   });
   
-  document.getElementById('purchaseKey').addEventListener('click', function(e) {
-    // Open Checkout with further options:
-    handler.open({
-      name: 'Stripe.com',
-      description: 'Librarian One Time Purchase',
-      amount: 4000
-    });
-    e.preventDefault();
-  });
-  
   // Close Checkout on page navigation:
   window.addEventListener('popstate', function() {
-    handler.close();
+    stripeHandler.close();
   });

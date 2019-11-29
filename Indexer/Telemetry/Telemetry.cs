@@ -13,7 +13,7 @@ public static class Telemetry
             var id = GetInstanceId();
             var configuration = new TelemetryConfiguration("8aebb6ee-8f56-4661-8a41-6c025904e324");
             _instance = new TelemetryClient(configuration);
-            _instance.Context.Component.Version = "0.0.23";
+            _instance.Context.Component.Version = "0.0.24";
         
             _instance.Context.User.Id = id;
             _instance.Context.Session.Id = id;

@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Stripe;
 using wanshitong.backend.datalayer;
+using wanshitong.backend.datalayer.schema;
 
 namespace wanshitong.backend
 {
@@ -29,6 +30,8 @@ namespace wanshitong.backend
             {
                 case "newkey":
                     return await HandleNewKey(req, log);
+                case "validateKey":
+                    return await HandleValidateKey(req, log);   
                 default:
                     return await HandleNotFound(api);
             }
@@ -85,6 +88,25 @@ namespace wanshitong.backend
             }
 
             return (ActionResult)new OkObjectResult($"{key}");
+        }
+
+        private static async Task<IActionResult> HandleValidateKey(HttpRequest req, ILogger log)
+        {
+            KeysTableEntity key;
+            try
+            {
+                key = await keyDataLayer.GetKey(req.Query["key"], log);
+            }
+            catch (System.Exception e)
+            {
+                log.LogError(e, "Key validation failed");
+                return (ActionResult)new BadRequestObjectResult(
+                    new ErrorModel{
+                        Message = "Key validation failed"
+                    });
+            }
+
+            return (ActionResult)new OkObjectResult($"{key.Key}");
         }
 
         private static async Task<IActionResult> HandleNotFound(string route)

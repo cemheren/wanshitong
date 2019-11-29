@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Extensions.Logging;
@@ -47,6 +48,34 @@ namespace wanshitong.backend.datalayer
             catch (System.Exception e)
             {
                 log.LogError(e, "New key creation failed");
+                throw;
+            }
+        }
+
+        public async Task<KeysTableEntity> GetKey(string key, ILogger log)
+        {
+            try
+            {
+                var query = new TableQuery<KeysTableEntity>().Where(
+                    TableQuery.GenerateFilterCondition(
+                        "PartitionKey",
+                        QueryComparisons.Equal,
+                        key
+                    )
+                );
+
+                var results = this.tableReference.ExecuteQuery(query).ToList();
+
+                if(results.Count != 1)
+                {
+                    throw new Exception("The key was not found");
+                }
+
+                return results[0];
+            }
+            catch (System.Exception e)
+            {
+                log.LogError(e, $"key validation failed {key}");
                 throw;
             }
         }

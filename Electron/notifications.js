@@ -25,7 +25,12 @@ ipcRenderer.on('update_downloaded', () => {
 });
 
 ipcRenderer.on('screenshot', () => {
-    message.innerText = 'Screenshot taken.';
+    message.innerText = 'New document (from screenshot) is ready.';
+    notification.classList.remove('hidden');
+});
+
+ipcRenderer.on('screenshot_error', () => {
+    message.innerText = 'Screenshot was not successful :(.';
     notification.classList.remove('hidden');
 });
 

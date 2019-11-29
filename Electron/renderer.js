@@ -57,7 +57,7 @@ function CreateResultRow(docId, group, text, ingestionTime, category, highlighte
         `;
     }
     div.innerHTML += `
-        <div class="result_row_group">${moment(ingestionTime).fromNow()}</div>
+        <div class="result_row_group">${moment.utc(ingestionTime).local().fromNow()}</div>
         <div id="result_row_group" class="hidden">${ingestionTime}</div>
         <div class="result_row_id">${docId}</div>
     `
@@ -241,13 +241,3 @@ function StartTagSearch(element) {
 
 toggleOffElement.onclick = swapTextImage;
 toggleOnElement.onclick = swapTextImage;
-
-function http(method, theUrl, post) {
-    var xmlHttp = new XMLHttpRequest();
-    xmlHttp.open(method, theUrl, false); // false for synchronous request
-    xmlHttp.setRequestHeader('Content-type', "application/json");
-    xmlHttp.setRequestHeader('accept', "application/json")
-    xmlHttp.send(post);
-
-    return xmlHttp.responseText;
-}

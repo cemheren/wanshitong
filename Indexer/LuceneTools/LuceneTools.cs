@@ -211,7 +211,8 @@ namespace wanshitong.Common.Lucene
             if(wildcard)
             {
                 phrase = new WildcardQuery(new Term("text", s));
-            }else //if(s.Length > 1)
+            }
+            else 
             {
                 var parser = new QueryParser(LuceneVersion.LUCENE_48, "text", this.analyzer);
                 try
@@ -226,8 +227,21 @@ namespace wanshitong.Common.Lucene
 
             using (var reader = DirectoryReader.Open(this.dir))
             {
+                Storage.Instance.Store("maxdoc", reader.MaxDoc);
+
                 var searcher = new IndexSearcher(reader);
-                var hits = searcher.Search(phrase, 50).ScoreDocs;
+                ScoreDoc[] hits;
+                if (wildcard)
+                {
+                    SortField field = new SortField("ingestionTime", SortFieldType.STRING, true);
+                    Sort sort = new Sort(field);
+
+                    hits = searcher.Search(phrase, 50, sort).ScoreDocs;
+                }
+                else
+                {
+                    hits = searcher.Search(phrase, 50).ScoreDocs;                
+                }
 
                 var formatter = new SimpleHTMLFormatter("<span style=\"background:darkgoldenrod;\">","</span>");
                 var fragmenter = new SimpleFragmenter(250);

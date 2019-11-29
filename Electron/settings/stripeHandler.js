@@ -11,7 +11,9 @@ var stripeHandler = StripeCheckout.configure({
         if (xhr.status === 200) {
             //var resp = JSON.parse(xhr.responseText);
             console.log(xhr.responseText);
-            alert(xhr.responseText);
+            
+            var response = http("GET", "http://localhost:4153/actions/setpremiumkey/" + xhr.responseText);
+            alert("Premium key " + xhr.responseText + " is set.");
         }
         else if (xhr.status !== 200) {
             alert('Request failed. Returned status of ' + xhr.status);

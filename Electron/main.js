@@ -58,11 +58,14 @@ function createServerProcess() {
 
 function registerShortcuts() {
   var ret = globalShortcut.register('alt+a', () => {
-    mainWindow.webContents.send('screenshot');
+    
     request.get(
         "http://localhost:4153/actions/screenshot",
         function (error, response, body) {
             if (!error && response.statusCode == 200) {
+                mainWindow.webContents.send('screenshot');
+            }else{
+                mainWindow.webContents.send('screenshot_error');
             }
         }
     );

@@ -44,6 +44,20 @@ namespace Querier
                     constraints: new { httpMethod = new HttpMethodRouteConstraint(HttpMethod.Get.ToString()) });
 
                 routes.MapRoute(
+                    name: "GetPremiumKey",
+                    template: "actions/getpremiumkey",
+                    defaults: new { controller = "Actions", action = "GetPremiumKey" },
+                    constraints: new { httpMethod = new HttpMethodRouteConstraint(HttpMethod.Get.ToString()) });
+
+                routes.MapRoute(
+                    name: "SetPremiumKey",
+                    template: "actions/setpremiumkey/{key}",
+                    defaults: new { controller = "Actions", action = "SetPremiumKey" },
+                    constraints: new { httpMethod = new HttpMethodRouteConstraint(HttpMethod.Get.ToString()) });
+
+
+
+                routes.MapRoute(
                     name: "ExecuteQuery",
                     template: "query/{text}",
                     defaults: new { controller = "Query", action = "SearchText" },

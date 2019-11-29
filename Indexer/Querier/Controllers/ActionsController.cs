@@ -8,28 +8,29 @@ using System.IO;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 using Microsoft.ApplicationInsights.DataContracts;
+using System.Threading.Tasks;
 
 namespace Indexer.Querier.Controllers
 {
- 
-
     public class ActionsController : ApiController
     {
         [HttpGet]
         public bool Screenshot()
         {
             Telemetry.Instance.TrackEvent("ActionsController.Screenshot");
-
-            var image = ScreenCapture.CaptureActiveWindow();
-            MemoryStream memoryStream = new MemoryStream();
-            image.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Jpeg);
-
-            var currentDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            var dirInfo = new DirectoryInfo(Path.Combine(currentDir, "Screenshots"));
-            dirInfo.Create();
-
+            
             try
             {
+                Validation.PremiumOrUnderLimit();
+
+                var image = ScreenCapture.CaptureActiveWindow();
+                MemoryStream memoryStream = new MemoryStream();
+                image.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Jpeg);
+
+                var currentDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+                var dirInfo = new DirectoryInfo(Path.Combine(currentDir, "Screenshots"));
+                dirInfo.Create();
+            
                 var name = Guid.NewGuid();
                 var address = $@"{dirInfo}\{name}.jpeg";
                 image.Save(address, ImageFormat.Jpeg);
@@ -62,28 +63,76 @@ namespace Indexer.Querier.Controllers
         {
             Telemetry.Instance.TrackEvent("ActionsController.CopyClipboard");
 
-            bool isWindows = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-            string current;
-            if(isWindows)
+            try
             {
-                current = WindowsClipboard.GetText();
-            }else
-            {
-                current = OsxClipboard.GetText();
+                Validation.PremiumOrUnderLimit();
+
+                bool isWindows = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+                string current;
+                if(isWindows)
+                {
+                    current = WindowsClipboard.GetText();
+                }else
+                {
+                    current = OsxClipboard.GetText();
+                }
+
+                if(!string.IsNullOrEmpty(current) && current != lastClipboard)
+                {
+                    System.Console.WriteLine(current);
+                    Program.m_luceneTools.AddAndCommit("clipboard", current, -1);
+                    lastClipboard = current;
+
+                    var d = new Dictionary<string, string>();
+                    d.Add("content", current);
+                    Telemetry.Instance.TrackTrace("CopyClipboard", severityLevel: SeverityLevel.Verbose, properties: d);
+                }
             }
-
-            if(!string.IsNullOrEmpty(current) && current != lastClipboard)
+            catch (System.Exception e)
             {
-                System.Console.WriteLine(current);
-                Program.m_luceneTools.AddAndCommit("clipboard", current, -1);
-                lastClipboard = current;
-
-                var d = new Dictionary<string, string>();
-                d.Add("content", current);
-                Telemetry.Instance.TrackTrace("CopyClipboard", severityLevel: SeverityLevel.Verbose, properties: d);
+                Telemetry.Instance.TrackException(e);
+                return false;
             }
 
             return true;
+        }
+
+        [HttpGet]
+        public async Task<bool> SetPremiumKey(string key)
+        {
+            Telemetry.Instance.TrackEvent("ActionsController.SetPremiumKey");
+
+            try
+            {
+                await Validation.ValidatePremiumKey(key);
+
+                Storage.Instance.Store("PremiumKey", key);        
+                Storage.Instance.Persist();       
+            }
+            catch (System.Exception e)
+            {
+                Telemetry.Instance.TrackException(e);
+                throw;
+            }
+
+            return true;
+        }
+
+        [HttpGet]
+        public string GetPremiumKey()
+        {
+            Telemetry.Instance.TrackEvent("ActionsController.GetPremiumKey");
+
+            try
+            {
+                return Storage.Instance.Get<string>("PremiumKey");                
+            }
+            catch (System.Exception e)
+            {
+                Telemetry.Instance.TrackException(e);
+            }
+
+            return null;
         }
     }
 }

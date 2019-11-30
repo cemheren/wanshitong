@@ -5,6 +5,8 @@
   <link rel="stylesheet" href="./css/contextmenu.css">
   <link rel="stylesheet" href="./css/similarityrow.css">
   <link rel="stylesheet" href="./css/settings.css">
+  <link rel="stylesheet" href="./css/stories.css">
+
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/themes/nano.min.css"/> <!-- 'nano' theme -->
   <link href="https://fonts.googleapis.com/css?family=Material+Icons|Material+Icons+Outlined|Material+Icons+Two+Tone|Material+Icons+Round|Material+Icons+Sharp" rel="stylesheet">
 </head>
@@ -27,6 +29,7 @@
       <div id="leftpanel" class="left_panel">
         <div class="search_label">Search:</div>
         <input id="input" class="main_query"></input>
+        <i id="save_query" class="save material-icons icon">save</i>
         <div id="results" class="main_results"></div>
         <div id="bottombar" class="bottombar"></div>
       </div>
@@ -67,7 +70,16 @@
 
     </div>
     <div id="storiesView" class="hidden">
+      <div id="stories_leftpanel" class="left_panel">
+        <div id="stories_list_element" class=container>
+          
+        </div>
+      </div>
+      <div class="right_panel">
+        <div id="stories_rightpanel" class="container">
 
+        </div>
+      </div>
     </div>
 
     <div id="notification" class="hidden">
@@ -92,6 +104,8 @@
     <script src="https://checkout.stripe.com/checkout.js"></script>
     <script src="./settings/stripeHandler.js"></script>
     <script src="./settings/settings.js"></script>
+
+    <script src="./stories/storiesmain.js"></script>
 
     <!-- You can also require other files to run in this process -->
     <script>

@@ -1,7 +1,16 @@
 // don't add dependencies from any other file here. This file is loaded first.
 
+const indexerUrl = "http://localhost:4153";
+
 async function fetchHtmlAsText(url) {
     return await (await fetch(url)).text();
+}
+
+function RemoveAllChildren(node)
+{
+    while (node.firstChild) {
+        node.removeChild(node.firstChild);
+    }
 }
 
 function http(method, theUrl, post) {

@@ -17,3 +17,11 @@ settingsToggle.onclick = function (event) {
     storiesView.className = "hidden";
     searchView.className = "hidden";
 }
+
+storiesToggle.onclick = function (event) {
+    storiesView.classList.remove("hidden");
+    settingsView.className = "hidden";
+    searchView.className = "hidden";
+
+    StoriesOnLoad();
+}

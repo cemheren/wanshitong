@@ -44,7 +44,7 @@ body{
 .main_query{
     height: 17px;
     margin-top: 4px;
-    width: 85%;
+    width: 82%;
     font-size: x-large;
     font: message-box;
     background-color: #3e4348;
@@ -82,6 +82,10 @@ body{
 .result_row{
     cursor: pointer;
     margin-right: calc(-1 * (310px - 100%));
+}
+
+.result_row_id{
+    display: none;
 }
 
 .result_row_text{
@@ -178,10 +182,6 @@ body{
     float: left;
 }
 
-.result_row_id{
-    display: none;
-}
-
 .icon{
     padding: 5px;
     padding-top: 10px;
@@ -191,6 +191,13 @@ body{
 
 .delete{
     color: red;
+}
+
+.save{
+    padding: 0px;
+    top: 5px;
+    position: relative;
+    left: 4px;
 }
 
 #version{

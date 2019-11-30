@@ -45,3 +45,8 @@ function closeNotification() {
 function restartApp() {
     ipcRenderer.send('restart_app');
 }
+
+function saveCompleteNotification(params) {
+    message.innerText = 'Added query to the stories';
+    notification.classList.remove('hidden');
+}

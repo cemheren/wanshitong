@@ -55,8 +55,6 @@ namespace Querier
                     defaults: new { controller = "Actions", action = "SetPremiumKey" },
                     constraints: new { httpMethod = new HttpMethodRouteConstraint(HttpMethod.Get.ToString()) });
 
-
-
                 routes.MapRoute(
                     name: "ExecuteQuery",
                     template: "query/{text}",
@@ -98,6 +96,20 @@ namespace Querier
                     template: "addTag/{tag}/{color}",
                     defaults: new { controller = "Tags", action = "AddTag" },
                     constraints: new { httpMethod = new HttpMethodRouteConstraint(HttpMethod.Get.ToString()) });
+
+                    
+                routes.MapRoute(
+                    name: "AddSavedSearch",
+                    template: "savedsearch/add/{phrase}",
+                    defaults: new { controller = "SavedSearch", action = "AddSavedSearch" },
+                    constraints: new { httpMethod = new HttpMethodRouteConstraint(HttpMethod.Get.ToString()) });
+
+                routes.MapRoute(
+                    name: "GetSavedSearches",
+                    template: "savedsearch/get",
+                    defaults: new { controller = "SavedSearch", action = "GetSavedSearches" },
+                    constraints: new { httpMethod = new HttpMethodRouteConstraint(HttpMethod.Get.ToString()) });
+
             });
         }
     }

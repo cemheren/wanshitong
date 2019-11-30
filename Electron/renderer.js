@@ -10,6 +10,8 @@ var deleteElement = document.getElementById("delete");
 var toggleOffElement = document.getElementById("toggle-off");
 var toggleOnElement = document.getElementById("toggle-on");
 
+var saveButton = document.getElementById("save_query");
+
 const moment = require("moment");
 const DragSelect = require("dragselect");
 
@@ -194,13 +196,6 @@ function onElementSelect(element) {
     CreateContextMenu(element);
 }
 
-function RemoveAllChildren(node)
-{
-    while (node.firstChild) {
-        node.removeChild(node.firstChild);
-    }
-}
-
 var refreshList = function(event){
     var text = document.getElementById("input").value;
 
@@ -241,3 +236,11 @@ function StartTagSearch(element) {
 
 toggleOffElement.onclick = swapTextImage;
 toggleOnElement.onclick = swapTextImage;
+
+saveButton.onclick = function (e) {
+    var text = document.getElementById("input").value;
+
+    var response = http("GET", `${indexerUrl}/savedsearch/add/${encodeURIComponent(text)}`);
+
+    saveCompleteNotification();
+}

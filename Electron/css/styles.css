@@ -40,6 +40,11 @@ button[disabled=disabled], .row_button:disabled {
     width: 100%;
 }
 
+.white-box-shadow:hover
+{
+    box-shadow: 0px 7px 5px -4px rgba(255, 255, 255, 0.6)
+}
+
 #notification {
     position: fixed;
     bottom: 20px;
@@ -73,7 +78,7 @@ button[disabled=disabled], .row_button:disabled {
     width: 82%;
     font-size: x-large;
     font: message-box;
-    background-color: #3e4348;
+    background-color: #474a4d;
     padding: 8px;
     margin-left: 4px;
     color: aliceblue;
@@ -83,7 +88,7 @@ button[disabled=disabled], .row_button:disabled {
 .main_results{
     margin-top: 4px;
     margin-left: 5px;
-    width: 300px;
+    width: 310px;
     height: 85vh;
     font-size: normal;
     margin-top: 10px;
@@ -96,18 +101,22 @@ button[disabled=disabled], .row_button:disabled {
 }
 
 .result_row_group{
-    margin-top: 4px;
-    margin-bottom: 30px;
-    width: 90%;
+    margin-bottom: 10px;
+    width: 98%;
     font-size: x-small;
     font: menu;
-    border-bottom: inset;
     text-align: right;
+    padding-bottom: 2px;
 }
 
 .result_row{
     cursor: pointer;
+    border-radius: 2px;
+    padding-top: 2px;
     margin-right: calc(-1 * (310px - 100%));
+    width: 298px;
+    box-shadow: 6px 4px 5px 0px rgba(0, 0, 0, 0.2), 0px 5px 3px 0px rgba(0, 0, 0, 0.2); 
+    background-color: #3e4348;
 }
 
 .result_row_id{
@@ -139,7 +148,7 @@ button[disabled=disabled], .row_button:disabled {
 .result_row_img{
     margin-top: 4px;
     margin-bottom: 2px;
-    max-height: 100px;
+    width: 100%;
     font-size: x-small;
     font: menu;
     border-bottom: inset;
@@ -247,4 +256,17 @@ button[disabled=disabled], .row_button:disabled {
 
 .documentation{
     font-size: medium;
+}
+
+.crop {
+    width: 100%;
+    height: 130px;
+    overflow: hidden;
+    margin-top: 4px;
+}
+
+.crop img {
+    /* width: 400px; */
+    /* height: 300px; */
+    margin: -35px 0 0 0px;
 }

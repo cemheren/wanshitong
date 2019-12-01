@@ -33,6 +33,7 @@ namespace Indexer.Querier.Controllers
                 }
 
                 savedSearches.Add(new SavedSearchModel{ SearchPhrase = phrase });
+                savedSearches = savedSearches.ToHashSet().ToList();
 
                 Storage.Instance.Store("savedSearches", savedSearches);
                 Storage.Instance.Persist();

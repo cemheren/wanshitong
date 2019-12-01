@@ -44,7 +44,11 @@ function CreateResultRow(docId, group, text, ingestionTime, category, highlighte
     var textClass = "result_row_text";
     if(category == -10)
     {
-        div.innerHTML += `<img class="result_row_img" src="${group}">`;
+        div.innerHTML += `
+            <div class="crop">
+                <img class="result_row_img" src="${group}">
+            </div>
+            `;
         textClass = "result_row_short_text";
     }
 

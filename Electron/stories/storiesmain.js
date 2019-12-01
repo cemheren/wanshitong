@@ -1,5 +1,5 @@
 var storiesListElement = document.getElementById("stories_list_element");
-var storiesRightPanelElement = document.getElementById("stories_rightpanel");
+var storiesRightPanelElement = document.getElementById("stories_right_panel");
 
 function StoriesOnLoad() {
     
@@ -37,7 +37,12 @@ function CreateStoryItem(docId, group, text, ingestionTime, category, highlighte
     var textClass = "story_item_text";
     if(category == -10)
     {
-        div.innerHTML += `<img class="story_item_img" src="${group}">`;
+        div.innerHTML += `
+            <div class="crop">
+                <img class="story_item_img" src="${group}">
+            </div>
+            `;
+        
         textClass = "story_item_short_text";
     }
 

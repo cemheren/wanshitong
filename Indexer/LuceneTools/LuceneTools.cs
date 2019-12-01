@@ -205,6 +205,11 @@ namespace wanshitong.Common.Lucene
         public List<SearchModel> Search(string s)
         {
             var results = new List<SearchModel>();
+            if (s == null)
+            {
+                return results;
+            }
+
             var wildcard = s.Trim().Equals("*");
             
             Query phrase;

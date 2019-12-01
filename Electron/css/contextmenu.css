@@ -72,9 +72,11 @@
     color: aliceblue;
     border-radius: 15px;
 }
+
 .row_button:hover{
     box-shadow: 3px 2px 10px 3px rgba(0, 0, 0, 0.1);
 }
+
 .row_button[disabled=disabled], .row_button:disabled {
    box-shadow: none;
    cursor: default;

@@ -10,6 +10,32 @@ body{
     margin-left: 0px !important;
 }
 
+button{
+    text-align: center;
+    border: none;
+    background: none;
+    background-color: rgb(7, 148, 14);
+    /* width: 100%; */
+    cursor: pointer;
+    color: aliceblue;
+    border-radius: 15px;
+    margin: 2px;
+    padding-left: 12px;
+    padding-right: 12px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+}
+
+button:hover{
+    /* box-shadow: 3px 2px 10px 3px rgba(0, 0, 0, 0.1); */
+    box-shadow: 0px 0px 5px 2px rgba(255, 255, 255, 0.3);
+}
+
+button[disabled=disabled], .row_button:disabled {
+   box-shadow: none;
+   cursor: default;
+}
+
 #titlebar{
     width: 100%;
 }

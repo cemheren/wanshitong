@@ -124,7 +124,7 @@ namespace wanshitong.Common.Lucene
 
                 foreach (var tag in updatedDocument.Tags)
                 {
-                    doc.Add(new StringField("tags", tag, Field.Store.YES));
+                    doc.Add(new TextField("tags", tag, Field.Store.YES));
                 }
 
                 doc.Add(new StringField("ingestionTime",

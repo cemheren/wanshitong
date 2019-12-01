@@ -24,4 +24,16 @@ public static class Storage
 
         return _instance;
     } }
+
+    public static bool TryGet<T>(this LocalStorage instance, string key, out T result)
+    {
+        if (instance.Exists(key))
+        {
+            result = instance.Get<T>(key);
+            return true;
+        }
+        
+        result = default(T);
+        return false;
+    }
 }

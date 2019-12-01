@@ -35,6 +35,7 @@ namespace Indexer.Querier.Controllers
                 savedSearches.Add(new SavedSearchModel{ SearchPhrase = phrase });
 
                 Storage.Instance.Store("savedSearches", savedSearches);
+                Storage.Instance.Persist();
             }
             catch (System.Exception e)
             {

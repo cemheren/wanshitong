@@ -10,9 +10,7 @@ namespace Indexer.Querier
 
         public static void PremiumOrUnderLimit()
         {
-            var premiumKey = Storage.Instance.Get<string>("PremiumKey");
-
-            if (string.IsNullOrEmpty(premiumKey))
+            if (Storage.Instance.TryGet("PremiumKey", out string premiumKey) && !string.IsNullOrEmpty(premiumKey))
             {
                 // %20 percent of the time, go validate
                 if (RandomInstance.Next(10) < 2)

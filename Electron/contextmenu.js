@@ -1,11 +1,12 @@
 const Pickr = require("@simonwep/pickr");
 const randomWords = require("random-words");
 
-function CreateContextMenu(e) {
+// Show open button is a hack to handle opening the document on single click case
+function CreateContextMenu(elementArray, showOpenButton) {
     
     RemoveContextMenu();
 
-    var rect = e[e.length-1].getBoundingClientRect();
+    var rect = elementArray[elementArray.length-1].getBoundingClientRect();
 
     const div = document.createElement('div');
     div.className = 'context_menu';
@@ -19,6 +20,12 @@ function CreateContextMenu(e) {
 
     var nodes = ds.getSelection();
     if (nodes.length == 1) {
+
+        if(!showOpenButton){
+            openDocumentFromContextMenu();
+            return;
+        }
+
         div.innerHTML += `
          <button class="row_button context_menu_open" onClick="openDocumentFromContextMenu(this)">Open Document</button>
          <div class="divider"></div>
@@ -40,7 +47,7 @@ function CreateContextMenu(e) {
     return div;
 }
 
-function openDocumentFromContextMenu(element) {
+function openDocumentFromContextMenu() {
     var nodes = ds.getSelection();
     var current = nodes[0];
 

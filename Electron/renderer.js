@@ -84,6 +84,14 @@ function CreateRelatedRowElement(docId, group, text, ingestionTime, category, my
 
     var div = document.createElement('div');
     div.className = 'similarity_row_item';
+    li.oncontextmenu = function (event) {
+        // trick the dragselect into processing the left click event as a regular select.
+        var element = event.currentTarget;
+        var arr = [];
+        arr.push(element);
+        ds.setSelection(arr);
+        CreateContextMenu(arr, true);
+    };
 
     if (selectedElementMetadata.docId == docId) {
         div.innerHTML += `

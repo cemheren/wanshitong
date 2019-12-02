@@ -167,15 +167,12 @@ button[disabled=disabled], .row_button:disabled {
 .right_panel_text{
     color: whitesmoke;
     width: 97%;
-    height: 65vh;
+    height: calc(100% - 270px);
     overflow-y: scroll;
-    /* height: 400px; */
-    /* max-width: 1000px; */
     white-space: pre-wrap;
     font: message-box;
     margin-left: 30px;
     margin-top: 30px;
-    /* margin-right: calc(-1 * (97% - 100%)); */
 }
 .right_panel_text:hover{
     overflow-y: scroll;

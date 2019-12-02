@@ -3,35 +3,41 @@
     overflow-x: scroll;
     height: 24vh;
     overflow-y: hidden;
+    position: fixed;
+    bottom: 0px;
+    height: 230px;
+    background-color: #3e4348;
 }
 
 .similarity_row{
     width: 2000px;
     height: 90%;
+    padding-left: 10px;
 }
 
 .similarity_row_item_parent{
-    height: 96%;
+    height: 90%;
     width: 180px;
     float: left;
     display: block;
     overflow: hidden;
     cursor: pointer;
+    background-color: #5f6871;
+    margin-left: 10px;
+    margin-right: 10px;
+    border-radius: 2px;
+    padding-top: 2px;
+    box-shadow: 6px 4px 5px 0px rgba(0, 0, 0, 0.2), 0px 5px 3px 0px rgba(0, 0, 0, 0.2); 
     /* padding-left: 20px; */
 }
 
 .similarity_row_item{
-    height: calc(100% - 8px);
-    top: 8px;
-    width: 140px;
-    float: left;
+    width: 100%;
     display: block;
     overflow: hidden;
     cursor: pointer;
-    padding-left: 20px;
-    background-color: #3e4348;
-    position: relative;
 }
+
 .similarity_row_item_filler{
     width: 20px;
     float: left;
@@ -47,10 +53,15 @@
 
 .similarity_row_text{
     font-size: small;
+    margin-top: 10px;
+    margin-left: 5px;
+    width: 90%;
+    font: menu;
 }
 
 .similarity_row_time{
     font-size: x-small;
+    margin-left: 2px;
 }
 
 .similarity_row_item > .result_row_group{
@@ -59,6 +70,17 @@
 
 .similarity_select{
     float: left;
+}
+
+.similarity_row_crop {
+    width: 190px;
+    height: 80px;
+    overflow: hidden;
+    margin-top: 4px;
+}
+
+.similarity_row_crop img {
+    margin: -10px 0 0px -4px
 }
 
 .unselectable {

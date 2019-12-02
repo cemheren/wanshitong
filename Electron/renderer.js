@@ -97,7 +97,11 @@ function CreateRelatedRowElement(docId, group, text, ingestionTime, category, my
 
     if(category == -10)
     {
-        div.innerHTML += `<img class="result_row_img" src="${group}">`;
+        div.innerHTML += `
+            <div class="similarity_row_crop">
+                <img class="result_row_img" src="${group}">
+            </div>
+        `;
     }
 
     var textClass = "similarity_row_text";
@@ -112,7 +116,7 @@ function CreateRelatedRowElement(docId, group, text, ingestionTime, category, my
 
     div = document.createElement('div');
     div.className = "similarity_row_item_filler";
-    li.appendChild(div);
+    //li.appendChild(div);
 
     return li;
 }

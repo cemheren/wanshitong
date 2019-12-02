@@ -1,7 +1,8 @@
 
 
 .ds-selected{
-    background-color: #ffa5a5;
+    background-color: aliceblue !important;
+    color: black;
 }
 
 .context_menu{

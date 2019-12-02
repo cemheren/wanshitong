@@ -8,6 +8,10 @@ function CreateContextMenu(elementArray, showOpenButton) {
 
     var rect = elementArray[elementArray.length-1].getBoundingClientRect();
 
+    if (window.event.ctrlKey) {
+        showOpenButton = true;
+    }
+
     const div = document.createElement('div');
     div.className = 'context_menu';
     div.id = 'contextMenu';

@@ -66,6 +66,10 @@ function CreateStoryItem(docId, group, text, ingestionTime, category, highlighte
 }
 
 function executeStoryQuery(event) {
+
+    UnselectAllChildren(storiesListElement);
+    SelectElement(event.currentTarget);
+
     var text = event.currentTarget.querySelector('.phrase').textContent;
     var response = http("GET", "http://localhost:4153/query/" + encodeURIComponent(text));
 
@@ -88,7 +92,6 @@ function executeStoryQuery(event) {
                 e.tags));
     });
 }
-
 
 var refreshStories = function(event){
     

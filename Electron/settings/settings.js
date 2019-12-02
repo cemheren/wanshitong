@@ -7,6 +7,9 @@ instructions_settings.onclick = async function (event) {
     var instructionshtml = document.createElement('div');
     instructionshtml.innerHTML = await fetchHtmlAsText('pages/usage_instructions.html');
 
+    premium_settings.classList.remove("selected");
+    instructions_settings.classList.add("selected");
+
     RemoveAllChildren(settingsRightPanelElement);
     settingsRightPanelElement.appendChild(instructionshtml);
 }
@@ -16,6 +19,10 @@ premium_settings.onclick = function (event) {
     var response = http("GET", "http://localhost:4153/actions/getpremiumkey");
     
     var premiumsettingshtml = document.createElement('div');
+    
+    premium_settings.classList.add("selected");
+    instructions_settings.classList.remove("selected");
+
     premiumsettingshtml.innerHTML = `
         <div>
             <div id="currentKeyGuid">

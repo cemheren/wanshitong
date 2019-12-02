@@ -2,8 +2,13 @@
     cursor: pointer;
     height: 20px;
     padding: 5px;
+    border-radius: 1px;
 }
 
 .settings_left_panel_clickable_row:hover{
     background-color: dimgrey;
+}
+
+.settings_left_panel_clickable_row.selected{
+    background-color: rgb(128, 126, 126);
 }

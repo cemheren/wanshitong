@@ -13,6 +13,17 @@ function RemoveAllChildren(node)
     }
 }
 
+function SelectElement(node) {
+    node.classList.add("selected");
+}
+
+function UnselectAllChildren(node)
+{
+    for (const ch of node.children) {
+        ch.classList.remove("selected");
+    }
+}
+
 function http(method, theUrl, post) {
     var xmlHttp = new XMLHttpRequest();
     xmlHttp.open(method, theUrl, false); // false for synchronous request

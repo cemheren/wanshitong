@@ -2,10 +2,15 @@
     cursor: pointer;
     height: 20px;
     padding: 5px;
+    border-radius: 1px;
 }
 
 .stories_left_panel_clickable_row:hover{
     background-color: dimgrey;
+}
+
+.stories_left_panel_clickable_row.selected{
+    background-color: rgb(128, 126, 126);
 }
 
 .stories_right_panel{
@@ -20,6 +25,12 @@
     font: menu;
     text-align: right;
     padding-bottom: 2px;
+}
+
+.left_panel_short{
+    width: 35%;
+    max-width: 240px;
+    float: left;
 }
 
 .story_item{

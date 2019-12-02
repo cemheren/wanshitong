@@ -259,7 +259,7 @@ button[disabled=disabled], .row_button:disabled {
 }
 
 .crop {
-    width: 100%;
+    width: 303px;
     height: 130px;
     overflow: hidden;
     margin-top: 4px;
@@ -268,5 +268,5 @@ button[disabled=disabled], .row_button:disabled {
 .crop img {
     /* width: 400px; */
     /* height: 300px; */
-    margin: -35px 0 0 0px;
+    margin: -35px 0 0px -4px
 }

@@ -1,4 +1,5 @@
 const Pickr = require("@simonwep/pickr");
+const randomWords = require("random-words");
 
 function CreateContextMenu(e) {
     
@@ -12,9 +13,9 @@ function CreateContextMenu(e) {
     div.style['left'] = rect.right + "px";
     div.style['top'] = rect.top + "px";
 
-    div.innerHTML += `
-        <i class="material-icons context_menu_close" onClick="RemoveContextMenu(this)">close</i>
-    `;
+    // div.innerHTML += `
+    //     <i class="material-icons context_menu_close" onClick="RemoveContextMenu(this)">close</i>
+    // `;
 
     var nodes = ds.getSelection();
     if (nodes.length == 1) {
@@ -24,9 +25,11 @@ function CreateContextMenu(e) {
         `;
     }
 
+    var sampletag = randomWords({ exactly: 2, join: '_' })
+
     div.innerHTML += `
         <div class="context_menu_label">Add a tag:</div>
-        <input id="context_menu_input" type="text" class="context_menu_input"/>
+        <input id="context_menu_input" type="text" placeholder="${sampletag}" class="context_menu_input"/>
         <button id="context_menu_submit" class="row_button context_menu_submit" onClick="SubmitContextMenu(this)">Add tag</button>
     `;
 

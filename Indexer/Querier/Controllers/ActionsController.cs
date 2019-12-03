@@ -134,5 +134,32 @@ namespace Indexer.Querier.Controllers
 
             return null;
         }
+
+        [HttpPost]
+        public bool EditText(string myId, [Microsoft.AspNetCore.Mvc.FromBody]string newText)
+        {
+            Telemetry.Instance.TrackEvent("ActionsController.EditText");
+            try
+            {
+                
+                var currentDocument = Program
+                    .m_luceneTools
+                    .SearchWithMyId(myId);
+
+                currentDocument.Text = newText;
+
+                Program
+                    .m_luceneTools
+                    .UpdateDocument(currentDocument);
+
+            }
+            catch (System.Exception e)
+            {
+                Telemetry.Instance.TrackException(e);
+                return false;
+            }
+
+            return true;
+        }
     }
 }

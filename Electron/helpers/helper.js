@@ -2,6 +2,9 @@
 
 const indexerUrl = "http://localhost:4153";
 
+let typingTimer;              
+let doneTypingInterval = 3500;
+
 async function fetchHtmlAsText(url) {
     return await (await fetch(url)).text();
 }

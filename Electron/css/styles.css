@@ -189,6 +189,16 @@ button[disabled=disabled], .row_button:disabled {
     float: left;
 }
 
+#right_panel_text{
+    /* height: 400px;
+    background-color: #3e4348;
+    color: aliceblue; */
+}
+
+#right_panel_text:read-write:focus {
+    outline: none;
+}
+
 .sidebar{
     width: 35px;
     float: left;
@@ -231,6 +241,16 @@ button[disabled=disabled], .row_button:disabled {
     position: relative;
     left: 4px;
 }
+
+.saving{
+    animation: blinker 1s linear infinite;
+}
+
+@keyframes blinker {
+    50% {
+      opacity: 0;
+    }
+  }
 
 #version{
     position: absolute;

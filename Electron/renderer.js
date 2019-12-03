@@ -10,6 +10,9 @@ var deleteElement = document.getElementById("delete");
 var toggleOffElement = document.getElementById("toggle-off");
 var toggleOnElement = document.getElementById("toggle-on");
 
+var savingElement = document.getElementById("saving");
+var doneOnElement = document.getElementById("done");
+
 var saveButton = document.getElementById("save_query");
 
 const moment = require("moment");
@@ -24,7 +27,7 @@ var ds = new DragSelect({
 
 var selectedElementMetadata = {};
 
-function CreateResultRow(docId, group, text, ingestionTime, category, highlightedText, tags)
+function CreateResultRow(docId, group, text, ingestionTime, category, highlightedText, tags, myId)
 {
     const div = document.createElement('div');
     div.className = 'result_row';
@@ -66,6 +69,7 @@ function CreateResultRow(docId, group, text, ingestionTime, category, highlighte
         <div class="result_row_group">${moment.utc(ingestionTime).local().fromNow()}</div>
         <div id="result_row_group" class="hidden">${ingestionTime}</div>
         <div class="result_row_id">${docId}</div>
+        <div id="result_row_my_id" class="hidden">${myId}</div>
     `
 
     return div;
@@ -116,7 +120,7 @@ function CreateRelatedRowElement(docId, group, text, ingestionTime, category, my
     div.innerHTML += `
         <div id="textcontent" class="${textClass}">${text}</div>
         <div id="docId" class="result_row_id">${docId}</div>
-        <div id="myId" class="result_row_id">${myId}</div>
+        <div id="result_row_my_id" class="result_row_id">${myId}</div>
         <div id="result_row_group" class="hidden">${ingestionTime}</div>
     `;
 
@@ -160,11 +164,14 @@ function onRowTextClick(event)
     selectedElementMetadata.docId = event.currentTarget.querySelector('.result_row_id').textContent;
     selectedElementMetadata.text = event.currentTarget.querySelector('#textcontent').textContent;
     selectedElementMetadata.ingestionTime = event.currentTarget.querySelector('#result_row_group').textContent;
+    selectedElementMetadata.myId = event.currentTarget.querySelector('#result_row_my_id').textContent;
 
     RemoveAllChildren(rightPanelElement);
     RemoveContextMenu();
 
     var textDiv = document.createElement('div');
+    textDiv.contentEditable = true;
+    textDiv.onkeyup = onContentEdit;
     textDiv.textContent = selectedElementMetadata.text;
     textDiv.id = "right_panel_text";
     textDiv.className = "max_width";
@@ -232,10 +239,39 @@ var refreshList = function(event){
                 e.ingestionTime, 
                 e.processId, 
                 e.highlightedText,
-                e.tags));
+                e.tags,
+                e.myId));
     });
 }
 inputElement.onkeyup = refreshList;
+
+var onContentEdit = function(event){
+    var text = document.getElementById("right_panel_text").textContent;
+    clearTimeout(typingTimer);
+    savingElement.classList.remove("hidden");
+
+    var doneTyping = function () {
+        var newText = document.getElementById("right_panel_text").textContent;
+        var response = http("POST", "http://localhost:4153/actions/edittext/" + selectedElementMetadata.myId, JSON.stringify(newText));
+
+        if(response == "" || response == undefined){
+            return "No result found";
+        }
+
+        savingElement.classList.add("hidden");
+        doneOnElement.classList.remove("hidden");
+
+        setTimeout(() => {
+            doneOnElement.classList.add("hidden");
+        }, 4000);
+
+        refreshList();
+    }
+
+    if(text){
+        typingTimer = setTimeout(doneTyping, doneTypingInterval);
+    }
+}
 
 deleteElement.onclick = function(event){
     var response = http("DELETE", "http://localhost:4153/delete/" + selectedElementMetadata.docId);

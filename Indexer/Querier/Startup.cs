@@ -56,6 +56,12 @@ namespace Querier
                     constraints: new { httpMethod = new HttpMethodRouteConstraint(HttpMethod.Get.ToString()) });
 
                 routes.MapRoute(
+                    name: "EditText",
+                    template: "actions/edittext/{myId}",
+                    defaults: new { controller = "Actions", action = "EditText" },
+                    constraints: new { httpMethod = new HttpMethodRouteConstraint(HttpMethod.Post.ToString()) });
+
+                routes.MapRoute(
                     name: "ExecuteQuery",
                     template: "query/{text}",
                     defaults: new { controller = "Query", action = "SearchText" },

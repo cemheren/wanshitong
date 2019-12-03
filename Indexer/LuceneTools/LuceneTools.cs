@@ -110,8 +110,6 @@ namespace wanshitong.Common.Lucene
             {
                 var doc = new Document();
 
-                var isDeleted = writer.TryDeleteDocument(writer.GetReader(false), updatedDocument.DocId);
-                
                 updatedDocument.MyId = updatedDocument.MyId ?? Guid.NewGuid().ToString();
 
                 doc.Add(new StringField("type", updatedDocument.Type, Field.Store.YES));
@@ -131,6 +129,9 @@ namespace wanshitong.Common.Lucene
                      DateTools.DateToString(updatedDocument.IngestionTime, DateTools.Resolution.SECOND), Field.Store.YES));
 
                 writer.AddDocument(doc);
+
+                var isDeleted = writer.TryDeleteDocument(writer.GetReader(false), updatedDocument.DocId);
+                
                 writer.Commit();
                 writer.Flush(triggerMerge: false, applyAllDeletes: true);
             

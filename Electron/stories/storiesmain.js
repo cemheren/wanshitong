@@ -21,7 +21,7 @@ function CreateStoryRow(phrase)
 function CreateStoryItem(docId, group, text, ingestionTime, category, highlightedText, tags) {
     const div = document.createElement('div');
     div.className = 'story_item';
-    div.onclick = onRowTextClick;
+    div.onclick = enlargeStory;
 
     if(text.length > 100)
     {
@@ -49,11 +49,12 @@ function CreateStoryItem(docId, group, text, ingestionTime, category, highlighte
     if (highlightedText) {
         div.innerHTML += `
             <div class="${textClass}">${highlightedText}</div>
-            <div id="story_item_textcontent" class="hidden">${text}</div>
+            <div id="story_item_textcontent" class="story_item_full_text">${text}</div>
         `;
     }else{
         div.innerHTML += `
             <div id="story_item_textcontent" class="${textClass}">${text}</div>
+            <div id="bs" class="story_item_full_text">${text}</div>
         `;
     }
     div.innerHTML += `
@@ -109,4 +110,16 @@ var refreshStories = function(event){
             CreateStoryRow(
                e.searchPhrase));
     });
+}
+
+var enlargeStory = function (event) {
+    var selectedStory = event.currentTarget;
+
+    if(selectedStory.classList.contains("enlarged"))
+    {
+        RemoveClassFromChildren(selectedStory, "enlarged");
+    }else
+    {
+        AddClassToChildren(selectedStory, "enlarged");
+    }
 }

@@ -27,6 +27,24 @@ function UnselectAllChildren(node)
     }
 }
 
+function AddClassToChildren(node, classname)
+{
+    node.classList.add(classname);
+    for (const ch of node.children) {
+        ch.classList.add(classname);
+        AddClassToChildren(ch, classname);
+    }
+}
+
+function RemoveClassFromChildren(node, classname)
+{
+    node.classList.remove(classname);
+    for (const ch of node.children) {
+        ch.classList.remove(classname);
+        RemoveClassFromChildren(ch, classname);
+    }
+}
+
 function http(method, theUrl, post) {
     var xmlHttp = new XMLHttpRequest();
     xmlHttp.open(method, theUrl, false); // false for synchronous request

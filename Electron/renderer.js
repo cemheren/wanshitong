@@ -212,6 +212,18 @@ function onRowTextClick(event)
         var newElement = CreateRelatedRowElement(e.docId, e.group, e.text, e.ingestionTime, e.processId, e.myId);
         ds.addSelectables(newElement);
         similarityRowElement.appendChild(newElement);
+
+        newElement = CreateRelatedRowElement(e.docId, e.group, e.text, e.ingestionTime, e.processId, e.myId);
+        ds.addSelectables(newElement);
+        similarityRowElement.appendChild(newElement);
+
+        newElement = CreateRelatedRowElement(e.docId, e.group, e.text, e.ingestionTime, e.processId, e.myId);
+        ds.addSelectables(newElement);
+        similarityRowElement.appendChild(newElement);
+
+        newElement = CreateRelatedRowElement(e.docId, e.group, e.text, e.ingestionTime, e.processId, e.myId);
+        ds.addSelectables(newElement);
+        similarityRowElement.appendChild(newElement);
     });
 }
 

@@ -1,22 +1,26 @@
 .related_documents{
     width: 100%;
-    overflow-x: scroll;
+    overflow-x: hidden;
     height: 24vh;
     overflow-y: hidden;
-    position: fixed;
+    position: relative;
     bottom: 0px;
     height: 230px;
     background-color: #3e4348;
 }
 
+.similarity_title{
+    margin-left: 30px;
+}
+
 .similarity_row{
-    width: 2000px;
-    height: 90%;
-    padding-left: 10px;
+    width: max-content;
+    height: 200px;
+    padding-left: 20px;
 }
 
 .similarity_row_item_parent{
-    height: 90%;
+    height: calc(100% - 16px);
     width: 180px;
     float: left;
     display: block;
@@ -90,4 +94,9 @@
  
     -ms-user-select: none;
     user-select: none;
+ }
+
+ .vertical_scroll{
+     overflow-y: hidden;
+     overflow-x: scroll;
  }

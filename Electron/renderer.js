@@ -12,11 +12,15 @@ var toggleOnElement = document.getElementById("toggle-on");
 
 var savingElement = document.getElementById("saving");
 var doneOnElement = document.getElementById("done");
+var cropOnElement = document.getElementById("mycropbutton");
 
 var saveButton = document.getElementById("save_query");
 
 const moment = require("moment");
 const DragSelect = require("dragselect");
+const Cropper = require("cropperjs");
+
+var cropperInstance = undefined;
 
 var ds = new DragSelect({
     selectables: document.getElementsByClassName('similarity_row_item'),
@@ -177,6 +181,31 @@ function onRowTextClick(event)
     textDiv.className = "max_width";
     rightPanelElement.appendChild(textDiv);
 
+    function drawSimilarityRow() {
+        
+        var documentDateStart = new Date(Date.parse(selectedElementMetadata.ingestionTime));
+        var documentDateEnd = new Date(Date.parse(selectedElementMetadata.ingestionTime));
+        documentDateStart.setHours(documentDateStart.getHours() - 1);
+        documentDateEnd.setHours(documentDateEnd.getHours() + 1);
+
+        var response = http("GET", "http://localhost:4153/timerange/" +
+            documentDateStart.toISOString() + "/" + documentDateEnd.toISOString());
+
+        if(response == "" || response == undefined){
+            return "No result found";
+        }
+
+        RemoveAllChildren(similarityRowElement);
+        ds.clearSelection();
+
+        var json = JSON.parse(response);
+        json.forEach(e => {
+            var newElement = CreateRelatedRowElement(e.docId, e.group, e.text, e.ingestionTime, e.processId, e.myId);
+            ds.addSelectables(newElement);
+            similarityRowElement.appendChild(newElement);
+        });
+    }
+
     //create image
     var img = document.createElement('img');
     var imgElement = event.currentTarget.querySelector('.result_row_img');
@@ -185,46 +214,62 @@ function onRowTextClick(event)
         img.ondblclick = onImageDoubleClick;
         img.id = 'right_panel_image';
         img.className = 'right_panel_image';
-        rightPanelElement.appendChild(img);
+
+        var outerDiv = document.createElement('div');
+        outerDiv.className = "right_panel_image_container";
+        outerDiv.appendChild(img);
+        rightPanelElement.appendChild(outerDiv);
+        
+        var onCroppperReady = function (params) {
+            console.log("ready");
+        };
+
+        cropperInstance = new Cropper(img, {
+            ready: onCroppperReady,
+            dragMode: 'crop',
+            // aspectRatio: 16 / 9,
+            autoCropArea: 0.65,
+            restore: false,
+            autoCrop: false,
+            guides: false,
+            center: false,
+            highlight: false,
+            cropBoxMovable: false,
+            cropBoxResizable: false,
+            toggleDragModeOnDblclick: false
+          });
+
+        img.addEventListener('cropstart', (event) => {
+            cropOnElement.classList.remove('hidden');
+        });
+
+        cropOnElement.onclick = function (event) {
+            var imagedata = cropperInstance.getImageData();
+            var model = cropperInstance.getCropBoxData();
+            console.log("cropped");
+
+            var scaleX = imagedata.naturalWidth / imagedata.width;
+            var scaleY = imagedata.naturalHeight / imagedata.height;
+
+            model.left *= scaleX;
+            model.height *= scaleY;
+            model.top *= scaleY;
+            model.width *= scaleX;
+
+            var result = http("POST", indexerUrl + "/actions/ingestcroppeddocument/" + selectedElementMetadata.myId, JSON.stringify(model))
+
+            if(result)
+                //cropperInstance.clear();
+
+            drawSimilarityRow();
+        }
 
         toggleOnElement.classList.add("hidden");
         toggleOffElement.classList.remove("hidden");
         textDiv.className = "hidden";
     }
 
-    var documentDateStart = new Date(Date.parse(selectedElementMetadata.ingestionTime));
-    var documentDateEnd = new Date(Date.parse(selectedElementMetadata.ingestionTime));
-    documentDateStart.setHours(documentDateStart.getHours() - 1);
-    documentDateEnd.setHours(documentDateEnd.getHours() + 1);
-
-    var response = http("GET", "http://localhost:4153/timerange/" +
-        documentDateStart.toISOString() + "/" + documentDateEnd.toISOString());
-
-    if(response == "" || response == undefined){
-        return "No result found";
-    }
-
-    RemoveAllChildren(similarityRowElement);
-    ds.clearSelection();
-
-    var json = JSON.parse(response);
-    json.forEach(e => {
-        var newElement = CreateRelatedRowElement(e.docId, e.group, e.text, e.ingestionTime, e.processId, e.myId);
-        ds.addSelectables(newElement);
-        similarityRowElement.appendChild(newElement);
-
-        newElement = CreateRelatedRowElement(e.docId, e.group, e.text, e.ingestionTime, e.processId, e.myId);
-        ds.addSelectables(newElement);
-        similarityRowElement.appendChild(newElement);
-
-        newElement = CreateRelatedRowElement(e.docId, e.group, e.text, e.ingestionTime, e.processId, e.myId);
-        ds.addSelectables(newElement);
-        similarityRowElement.appendChild(newElement);
-
-        newElement = CreateRelatedRowElement(e.docId, e.group, e.text, e.ingestionTime, e.processId, e.myId);
-        ds.addSelectables(newElement);
-        similarityRowElement.appendChild(newElement);
-    });
+    drawSimilarityRow();
 }
 
 function onElementSelect(element) {

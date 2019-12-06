@@ -11,6 +11,11 @@ public class OcrResponse
     {
         var sb = new StringBuilder();
 
+        if (Regions == null)
+        {
+            return "";
+        }
+
         foreach (var region in Regions)
         {
             foreach (var line in region.Lines)

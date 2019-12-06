@@ -76,7 +76,7 @@ namespace Indexer.Querier.Controllers
 
                 Program
                     .m_luceneTools
-                    .UpdateDocument(currentDocument);
+                    .UpdateDocument(currentDocument, true);
             }
 
             return true;

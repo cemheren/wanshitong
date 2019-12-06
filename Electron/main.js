@@ -32,6 +32,10 @@ function createWindow () {
 
   autoUpdater.checkForUpdatesAndNotify();
 
+  setInterval(() => {
+    autoUpdater.checkForUpdatesAndNotify();
+  }, 1000 * 60 * 15);
+
   // Open the DevTools.
   // mainWindow.webContents.openDevTools()
 

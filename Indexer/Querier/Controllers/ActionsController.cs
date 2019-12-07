@@ -179,7 +179,7 @@ namespace Indexer.Querier.Controllers
                 var cropped = source.Crop(model);
                 
                 var currentDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-                var dirInfo = new DirectoryInfo(Path.Combine(currentDir, "Screenshots1"));
+                var dirInfo = new DirectoryInfo(Path.Combine(currentDir, "Screenshots"));
                 dirInfo.Create();
             
                 var name = Guid.NewGuid();
@@ -192,6 +192,7 @@ namespace Indexer.Querier.Controllers
                 currentDocument.Type = "CroppedDocument";
                 currentDocument.Text = str;
                 currentDocument.Group = address;
+                currentDocument.MyId = Guid.NewGuid().ToString();
 
                 Program
                     .m_luceneTools

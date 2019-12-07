@@ -83,13 +83,6 @@ function CreateRelatedRowElement(docId, group, text, ingestionTime, category, my
     const li = document.createElement('li');
     li.className = 'similarity_row_item_parent';
 
-    // const select = document.createElement('input');
-    // select.id = 'select';
-    // select.type = 'checkbox';
-    // select.className = 'similarity_select';
-
-    // li.appendChild(select);
-
     var div = document.createElement('div');
     div.className = 'similarity_row_item';
     li.oncontextmenu = function (event) {
@@ -163,6 +156,31 @@ function swapTextImage(event)
     }
 }
 
+function drawSimilarityRow() {
+        
+    var documentDateStart = new Date(Date.parse(selectedElementMetadata.ingestionTime));
+    var documentDateEnd = new Date(Date.parse(selectedElementMetadata.ingestionTime));
+    documentDateStart.setHours(documentDateStart.getHours() - 1);
+    documentDateEnd.setHours(documentDateEnd.getHours() + 1);
+
+    var response = http("GET", "http://localhost:4153/timerange/" +
+        documentDateStart.toISOString() + "/" + documentDateEnd.toISOString());
+
+    if(response == "" || response == undefined){
+        return "No result found";
+    }
+
+    RemoveAllChildren(similarityRowElement);
+    ds.clearSelection();
+
+    var json = JSON.parse(response);
+    json.forEach(e => {
+        var newElement = CreateRelatedRowElement(e.docId, e.group, e.text, e.ingestionTime, e.processId, e.myId);
+        ds.addSelectables(newElement);
+        similarityRowElement.appendChild(newElement);
+    });
+}
+
 function onRowTextClick(event)
 {
     selectedElementMetadata.docId = event.currentTarget.querySelector('.result_row_id').textContent;
@@ -173,6 +191,8 @@ function onRowTextClick(event)
     RemoveAllChildren(rightPanelElement);
     RemoveContextMenu();
 
+    cropOnElement.classList.add("hidden");
+
     var textDiv = document.createElement('div');
     textDiv.contentEditable = true;
     textDiv.onkeyup = onContentEdit;
@@ -180,31 +200,6 @@ function onRowTextClick(event)
     textDiv.id = "right_panel_text";
     textDiv.className = "max_width";
     rightPanelElement.appendChild(textDiv);
-
-    function drawSimilarityRow() {
-        
-        var documentDateStart = new Date(Date.parse(selectedElementMetadata.ingestionTime));
-        var documentDateEnd = new Date(Date.parse(selectedElementMetadata.ingestionTime));
-        documentDateStart.setHours(documentDateStart.getHours() - 1);
-        documentDateEnd.setHours(documentDateEnd.getHours() + 1);
-
-        var response = http("GET", "http://localhost:4153/timerange/" +
-            documentDateStart.toISOString() + "/" + documentDateEnd.toISOString());
-
-        if(response == "" || response == undefined){
-            return "No result found";
-        }
-
-        RemoveAllChildren(similarityRowElement);
-        ds.clearSelection();
-
-        var json = JSON.parse(response);
-        json.forEach(e => {
-            var newElement = CreateRelatedRowElement(e.docId, e.group, e.text, e.ingestionTime, e.processId, e.myId);
-            ds.addSelectables(newElement);
-            similarityRowElement.appendChild(newElement);
-        });
-    }
 
     //create image
     var img = document.createElement('img');
@@ -228,7 +223,6 @@ function onRowTextClick(event)
         cropperInstance = new Cropper(img, {
             ready: onCroppperReady,
             dragMode: 'crop',
-            // aspectRatio: 16 / 9,
             autoCropArea: 0.65,
             restore: false,
             autoCrop: false,
@@ -321,7 +315,7 @@ var onContentEdit = function(event){
     savingElement.classList.remove("hidden");
 
     var doneTyping = function () {
-        var newText = document.getElementById("right_panel_text").textContent;
+        var newText = document.getElementById("right_panel_text").innerText;
         var response = http("POST", "http://localhost:4153/actions/edittext/" + selectedElementMetadata.myId, JSON.stringify(newText));
 
         if(response == "" || response == undefined){
@@ -336,6 +330,7 @@ var onContentEdit = function(event){
         }, 4000);
 
         refreshList();
+        drawSimilarityRow();
     }
 
     if(text){

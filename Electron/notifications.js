@@ -50,3 +50,8 @@ function saveCompleteNotification(params) {
     message.innerText = 'Added query to the stories';
     notification.classList.remove('hidden');
 }
+
+function PopNotificationInfo(text) {
+    message.innerText = text;
+    notification.classList.remove('hidden');
+}

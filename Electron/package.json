@@ -1,6 +1,6 @@
 {
   "name": "librarian",
-  "version": "0.0.28",
+  "version": "0.0.29",
   "description": "wanshitong",
   "main": "main.js",
   "scripts": {
@@ -38,6 +38,7 @@
   },
   "dependencies": {
     "@simonwep/pickr": "^1.4.6",
+    "cropperjs": "^1.5.6",
     "dragselect": "^1.13.1",
     "electron-titlebar": "0.0.3",
     "electron-titlebar-windows": "^3.0.0",

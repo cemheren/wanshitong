@@ -1,6 +1,7 @@
 using System;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Runtime.InteropServices;
@@ -39,25 +40,10 @@ public class OCRClient
 
     public static byte[] BitmapToByteArray(Bitmap bitmap)
     {
-
-        BitmapData bmpdata = null;
-
-        try
+        using (var stream = new MemoryStream())
         {
-            bmpdata = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, bitmap.PixelFormat);
-            int numbytes = bmpdata.Stride * bitmap.Height;
-            byte[] bytedata = new byte[numbytes];
-            IntPtr ptr = bmpdata.Scan0;
-
-            Marshal.Copy(ptr, bytedata, 0, numbytes);
-
-            return bytedata;
+            bitmap.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
+            return stream.ToArray();
         }
-        finally
-        {
-            if (bmpdata != null)
-                bitmap.UnlockBits(bmpdata);
-        }
-
     }
 }

@@ -9,6 +9,7 @@ using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 using Microsoft.ApplicationInsights.DataContracts;
 using System.Threading.Tasks;
+using System.Drawing;
 
 namespace Indexer.Querier.Controllers
 {
@@ -150,7 +151,51 @@ namespace Indexer.Querier.Controllers
 
                 Program
                     .m_luceneTools
-                    .UpdateDocument(currentDocument);
+                    .UpdateDocument(currentDocument, true);
+
+            }
+            catch (System.Exception e)
+            {
+                Telemetry.Instance.TrackException(e);
+                return false;
+            }
+
+            return true;
+        }
+
+        [HttpPost]
+        public bool IngestCroppedDocument(string myId, [Microsoft.AspNetCore.Mvc.FromBody]CropImageModel model)
+        {
+            Telemetry.Instance.TrackEvent("ActionsController.IngestCroppedDocument");
+            try
+            {
+                var currentDocument = Program
+                    .m_luceneTools
+                    .SearchWithMyId(myId);
+
+                string fileName = currentDocument.Group;
+                var source = new Bitmap(fileName);
+
+                var cropped = source.Crop(model);
+                
+                var currentDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+                var dirInfo = new DirectoryInfo(Path.Combine(currentDir, "Screenshots1"));
+                dirInfo.Create();
+            
+                var name = Guid.NewGuid();
+                var address = $@"{dirInfo}\{name}.jpeg";
+                cropped.Save(address, ImageFormat.Jpeg);
+            
+                var result = OCRClient.MakeRequest(OCRClient.BitmapToByteArray(cropped)).Result;
+                var str = result.GetString();
+
+                currentDocument.Type = "CroppedDocument";
+                currentDocument.Text = str;
+                currentDocument.Group = address;
+
+                Program
+                    .m_luceneTools
+                    .UpdateDocument(currentDocument, false);
 
             }
             catch (System.Exception e)

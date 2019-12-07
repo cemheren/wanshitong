@@ -104,7 +104,7 @@ namespace wanshitong.Common.Lucene
             }
         }
 
-        public string UpdateDocument(SearchModel updatedDocument)
+        public string UpdateDocument(SearchModel updatedDocument, bool deleteOld)
         {
             using (var writer = new IndexWriter(dir, new IndexWriterConfig(appLuceneVersion, analyzer)))
             {
@@ -130,7 +130,10 @@ namespace wanshitong.Common.Lucene
 
                 writer.AddDocument(doc);
 
-                var isDeleted = writer.TryDeleteDocument(writer.GetReader(false), updatedDocument.DocId);
+                if (deleteOld)
+                {
+                    var isDeleted = writer.TryDeleteDocument(writer.GetReader(false), updatedDocument.DocId);
+                }
                 
                 writer.Commit();
                 writer.Flush(triggerMerge: false, applyAllDeletes: true);

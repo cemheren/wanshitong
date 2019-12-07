@@ -184,11 +184,17 @@ button[disabled=disabled], .row_button:disabled {
     width: 100%;
 }
 
+.right_panel_image_container{
+    /* width: 50%;
+    height: 50%; */
+}
+
 .right_panel_image{
     max-width: 100%;
-    max-height: 70vh;
+    /* max-height: 70vh;
     overflow: hidden;
-    float: left;
+    float: left; */
+    display: block;
 }
 
 #right_panel_text{

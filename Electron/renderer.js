@@ -144,7 +144,7 @@ function onImageDoubleClick(event) {
 function swapTextImage(event)
 {
     var rightPanelText = rightPanelElement.querySelector("#right_panel_text");
-    var rightPanelImage = rightPanelElement.querySelector("#right_panel_image");
+    var rightPanelImage = rightPanelElement.querySelector("#right_panel_image_container");
 
     if (rightPanelImage == null) {
         return;
@@ -216,6 +216,7 @@ function onRowTextClick(event)
         img.className = 'right_panel_image';
 
         var outerDiv = document.createElement('div');
+        outerDiv.id = "right_panel_image_container";
         outerDiv.className = "right_panel_image_container";
         outerDiv.appendChild(img);
         rightPanelElement.appendChild(outerDiv);
@@ -235,6 +236,8 @@ function onRowTextClick(event)
             center: false,
             highlight: false,
             cropBoxMovable: false,
+            background: false,
+            zoomable: false,
             cropBoxResizable: false,
             toggleDragModeOnDblclick: false
           });
@@ -244,6 +247,8 @@ function onRowTextClick(event)
         });
 
         cropOnElement.onclick = function (event) {
+            savingElement.classList.remove("hidden");
+
             var imagedata = cropperInstance.getImageData();
             var model = cropperInstance.getCropBoxData();
             console.log("cropped");
@@ -256,12 +261,20 @@ function onRowTextClick(event)
             model.top *= scaleY;
             model.width *= scaleX;
 
+            PopNotificationInfo("Saving new document from cropped image");
+
             var result = http("POST", indexerUrl + "/actions/ingestcroppeddocument/" + selectedElementMetadata.myId, JSON.stringify(model))
 
-            if(result)
-                //cropperInstance.clear();
-
-            drawSimilarityRow();
+            savingElement.classList.add("hidden");
+            if(result){
+                cropperInstance.clear();
+                PopNotificationInfo("New document from cropped image is ready.");
+                drawSimilarityRow();
+                cropOnElement.classList.add('hidden'); 
+            }else{
+                PopNotificationInfo("There was an error saving the new document.");
+                drawSimilarityRow();
+            }
         }
 
         toggleOnElement.classList.add("hidden");

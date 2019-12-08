@@ -15,6 +15,9 @@
   ],
   "build": {
     "appId": "librarian",
+    "mac":{
+      "icon": "./icon.png"
+    },
     "win": {
       "target": "NSIS",
       "icon": "./icon.ico"

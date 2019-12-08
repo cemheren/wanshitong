@@ -6,6 +6,8 @@ const { autoUpdater } = require('electron-updater');
 
 const request = require("request");
 
+let screen;
+
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow
@@ -23,6 +25,9 @@ function createWindow () {
     icon: __dirname + '/icon.ico',
     
   });
+
+  const electron = require('electron')
+  screen = electron.screen
 
   createServerProcess();
   registerShortcuts();
@@ -63,10 +68,12 @@ function createServerProcess() {
 function registerShortcuts() {
   var ret = globalShortcut.register('alt+a', () => {
     
+    const { width, height }  = screen.getPrimaryDisplay().workAreaSize;
+
     request.get(
         "http://localhost:4153/actions/screenshot",
         function (error, response, body) {
-            if (!error && response.statusCode == 200) {
+            if (!error && response.statusCode == 200 && response.body == "true") {
                 mainWindow.webContents.send('screenshot');
             }else{
                 mainWindow.webContents.send('screenshot_error');
@@ -80,11 +87,13 @@ function registerShortcuts() {
   }
 
   ret = globalShortcut.register('alt+c', () => {
-    mainWindow.webContents.send('clipboard');
     request.get(
         "http://localhost:4153/actions/clipboard",
         function (error, response, body) {
-            if (!error && response.statusCode == 200) {
+            if (!error && response.statusCode == 200 && response.body == "true") {
+              mainWindow.webContents.send('clipboard');
+            }else{
+              mainWindow.webContents.send('clipboard_error');
             }
         }
     );

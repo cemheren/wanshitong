@@ -24,19 +24,33 @@ namespace Indexer.Querier.Controllers
             {
                 Validation.PremiumOrUnderLimit();
 
-                var image = ScreenCapture.CaptureActiveWindow();
-                MemoryStream memoryStream = new MemoryStream();
-                image.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Jpeg);
-
+                bool isWindows = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+            
                 var currentDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-                var dirInfo = new DirectoryInfo(Path.Combine(currentDir, "Screenshots"));
+                var screenshotsPath = Path.Combine(currentDir, "Screenshots");
+                var dirInfo = new DirectoryInfo(screenshotsPath);
                 dirInfo.Create();
-            
                 var name = Guid.NewGuid();
-                var address = $@"{dirInfo}\{name}.jpeg";
-                image.Save(address, ImageFormat.Jpeg);
+                var address = Path.Combine(screenshotsPath, $"{name}.jpeg");
+                
+                OcrResponse result;
+                if(isWindows){
+                    var image = ScreenCapture.CaptureActiveWindow();
+                    
+                    MemoryStream memoryStream = new MemoryStream();
+                    image.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Jpeg);
+                    image.Save(address, ImageFormat.Jpeg);
+
+                    result = OCRClient.MakeRequest(memoryStream.ToArray()).Result;
+                }
+                else
+                {
+                    ScreenCapture.CaptureScreen(address);
+                    byte[] imgData = System.IO.File.ReadAllBytes(address);
+                
+                    result = OCRClient.MakeRequest(imgData).Result;
+                }
             
-                var result = OCRClient.MakeRequest(memoryStream.ToArray()).Result;
                 var str = result.GetString();
                 Program.m_luceneTools.AddAndCommit(address, str, -10);
                 System.Console.WriteLine("capture done...");
@@ -179,11 +193,12 @@ namespace Indexer.Querier.Controllers
                 var cropped = source.Crop(model);
                 
                 var currentDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-                var dirInfo = new DirectoryInfo(Path.Combine(currentDir, "Screenshots"));
+                var screenshotsPath = Path.Combine(currentDir, "Screenshots");
+                var dirInfo = new DirectoryInfo(screenshotsPath);
                 dirInfo.Create();
             
                 var name = Guid.NewGuid();
-                var address = $@"{dirInfo}\{name}.jpeg";
+                var address = Path.Combine(screenshotsPath, $"{name}.jpeg");
                 cropped.Save(address, ImageFormat.Jpeg);
             
                 var result = OCRClient.MakeRequest(OCRClient.BitmapToByteArray(cropped)).Result;

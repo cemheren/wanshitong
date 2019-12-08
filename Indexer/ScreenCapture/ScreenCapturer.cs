@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.Runtime.InteropServices;
 
@@ -33,6 +34,23 @@ public class ScreenCapture
     public static Bitmap CaptureActiveWindow()
     {
         return CaptureWindow(GetForegroundWindow());
+    }
+
+    public static void CaptureScreen(string path)
+    {
+        Process p = new Process();
+        // Redirect the output stream of the child process.
+        p.StartInfo.UseShellExecute = false;
+        p.StartInfo.RedirectStandardOutput = true;
+        p.StartInfo.FileName = "screencapture";
+        p.StartInfo.Arguments = $"{path}";
+        p.Start();
+        // Do not wait for the child process to exit before
+        // reading to the end of its redirected stream.
+        // p.WaitForExit();
+        // Read the output stream first and then wait.
+        string output = p.StandardOutput.ReadToEnd();
+        p.WaitForExit();
     }
 
     public static Bitmap CaptureWindow(IntPtr handle)

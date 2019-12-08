@@ -39,6 +39,11 @@ ipcRenderer.on('clipboard', () => {
     notification.classList.remove('hidden');
 });
 
+ipcRenderer.on('clipboard_error', () => {
+    message.innerText = 'Cound not copy clipboard.';
+    notification.classList.remove('hidden');
+});
+
 function closeNotification() {
     notification.classList.add('hidden');
 }

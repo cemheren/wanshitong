@@ -65,7 +65,7 @@ function createServerProcess() {
   }
   else
   {
-    serverPath = path.normalize(`${appPath}/../server/osx/Indexer`);
+    serverPath = path.normalize(`${appPath}/../../server/osx/Indexer`);
   }
   var serverProcess = child_process(serverPath, function(err, data) {
       if(err){

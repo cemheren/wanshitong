@@ -63,7 +63,7 @@ function createServerProcess() {
   }
   else
   {
-    serverPath = "../server/osx/Indexer";
+    serverPath = "..\\server\\osx\\Indexer";
   }
   var serverProcess = child_process(serverPath, function(err, data) {
       if(err){

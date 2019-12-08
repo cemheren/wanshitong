@@ -33,6 +33,7 @@ namespace wanshitong.Common.Lucene
             var currentDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
 
             var dirInfo = new DirectoryInfo(Path.Combine(currentDir, "Index"));
+            dirInfo.Create();
 
             System.Console.WriteLine($"Using index folder {dirInfo.FullName}");
 

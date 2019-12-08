@@ -16,6 +16,7 @@
   "build": {
     "appId": "librarian",
     "mac":{
+      "target": "DMG",
       "icon": "./icon.png"
     },
     "win": {

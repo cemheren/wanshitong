@@ -55,7 +55,9 @@ function createWindow () {
 
 function createServerProcess() {
   var isWin = process.platform === "win32";
-
+  
+  var appPath = app.getAppPath();
+  console.log(appPath);
   var serverPath;
   if(isWin)
   {
@@ -63,7 +65,7 @@ function createServerProcess() {
   }
   else
   {
-    serverPath = "..\\server\\osx\\Indexer";
+    serverPath = path.normalize(`${appPath}/../server/osx/Indexer`);
   }
   var serverProcess = child_process(serverPath, function(err, data) {
       if(err){

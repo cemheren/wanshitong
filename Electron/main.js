@@ -54,7 +54,17 @@ function createWindow () {
 }
 
 function createServerProcess() {
-  var serverPath = "server/indexer.exe";
+  var isWin = process.platform === "win32";
+
+  var serverPath;
+  if(isWin)
+  {
+    serverPath = "server/win/indexer.exe";
+  }
+  else
+  {
+    serverPath = "server/osx/indexer";
+  }
   var serverProcess = child_process(serverPath, function(err, data) {
       if(err){
         console.error(err);

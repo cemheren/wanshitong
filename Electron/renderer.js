@@ -255,18 +255,18 @@ function onRowTextClick(event)
             model.top *= scaleY;
             model.width *= scaleX;
 
-            PopNotificationInfo("Saving new document from cropped image");
+            PopNotificationInfo("Saving new document from cropped image.");
 
             var result = http("POST", indexerUrl + "/actions/ingestcroppeddocument/" + selectedElementMetadata.myId, JSON.stringify(model))
 
             savingElement.classList.add("hidden");
             if(result){
                 cropperInstance.clear();
-                PopNotificationInfo("New document from cropped image is ready.");
+                PopNotificationInfo("New document from cropped image is ready 🕶️.");
                 drawSimilarityRow();
                 cropOnElement.classList.add('hidden'); 
             }else{
-                PopNotificationInfo("There was an error saving the new document.");
+                PopNotificationInfo("There was an error saving the new document 😟. Please contact us at (760) 364-6209‬.");
                 drawSimilarityRow();
             }
         }

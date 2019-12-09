@@ -13,34 +13,34 @@ const message = document.getElementById('message');
 const restartButton = document.getElementById('restart-button');
     ipcRenderer.on('update_available', () => {
     ipcRenderer.removeAllListeners('update_available');
-    message.innerText = 'A new update is available. Downloading now...';
+    message.innerText = 'A new update is available 🎁. Downloading now...';
     notification.classList.remove('hidden');
 });
 
 ipcRenderer.on('update_downloaded', () => {
     ipcRenderer.removeAllListeners('update_downloaded');
-    message.innerText = 'Update Downloaded. It will be installed on restart. Restart now?';
+    message.innerText = 'Update downloaded. It will be installed on restart. Restart now?';
     restartButton.classList.remove('hidden');
     notification.classList.remove('hidden');
 });
 
 ipcRenderer.on('screenshot', () => {
-    message.innerText = 'New document (from screenshot) is ready.';
+    message.innerText = "New document is ready. Try searching for a keyword or type * (star) to see all docs.";
     notification.classList.remove('hidden');
 });
 
 ipcRenderer.on('screenshot_error', () => {
-    message.innerText = 'Screenshot was not successful :(.';
+    message.innerText = 'Screenshot was not successful 😭. Please contact us at (760) 364-6209‬.';
     notification.classList.remove('hidden');
 });
 
 ipcRenderer.on('clipboard', () => {
-    message.innerText = 'Clipboard copied.';
+    message.innerText = "Clipboard copied. Try searching for a keyword or type * (star) to see all docs.";
     notification.classList.remove('hidden');
 });
 
 ipcRenderer.on('clipboard_error', () => {
-    message.innerText = 'Cound not copy clipboard.';
+    message.innerText = 'Cound not copy clipboard. This rarely happens. Please contact us at (760) 364-6209‬.';
     notification.classList.remove('hidden');
 });
 
@@ -52,7 +52,7 @@ function restartApp() {
 }
 
 function saveCompleteNotification(params) {
-    message.innerText = 'Added query to the stories';
+    message.innerText = 'Added query to the stories 😎. Go to the stories tab to check it out.';
     notification.classList.remove('hidden');
 }
 

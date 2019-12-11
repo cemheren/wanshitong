@@ -9,6 +9,9 @@ exports.default = async function notarizing(context) {
   const appName = context.packager.appInfo.productFilename;
   console.log("appName: " + appName);
 
+  console.log("appleid:", process.env.APPLEID);
+  console.log("pass:", process.env.ITUNES_PASS);
+
   return await notarize({
     appBundleId: 'com.heren.librarian',
     appPath: `${appOutDir}/${appName}.app`,

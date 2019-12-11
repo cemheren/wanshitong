@@ -12,7 +12,7 @@ exports.default = async function notarizing(context) {
   return await notarize({
     appBundleId: 'com.heren.librarian',
     appPath: `${appOutDir}/${appName}.app`,
-    appleId: "cemheren@gmail.com", //process.env.APPLEID, 
-    appleIdPassword: "offl-rojz-xhxq-yujh" // "Patates55" // process.env.ITUNES_PASS
+    appleId: process.env.APPLEID, 
+    appleIdPassword: process.env.ITUNES_PASS
   });
 };

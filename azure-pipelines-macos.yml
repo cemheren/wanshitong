@@ -13,6 +13,16 @@ variables:
   buildConfiguration: 'Release'
 
 steps:
+- task: InstallAppleCertificate@2
+  inputs:
+    certSecureFile: 'devcert.p12'
+    certPwd: '$(Itunespass)'
+- task: InstallAppleProvisioningProfile@1
+  inputs:
+    provisioningProfileLocation: 'secureFiles'
+    provProfileSecureFile: 'devCert.developerprofile'
+    keychain: 'temp'
+
 - task: UseDotNet@2
   inputs:
     version: '3.0.x'

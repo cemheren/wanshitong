@@ -1,7 +1,7 @@
 {
   "name": "librarian",
-  "version": "0.0.30",
-  "description": "wanshitong",
+  "version": "0.0.31",
+  "description": "The app that let's you search your thoughts.",
   "main": "main.js",
   "scripts": {
     "postinstall": "install-app-deps",
@@ -17,8 +17,16 @@
     "appId": "librarian",
     "mac": {
       "target": "dmg",
-      "icon": "./icon512.png"
+      "icon": "./icon512.png",
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.plist"
     },
+    "dmg": {
+      "sign": false
+    },
+    "afterSign": "build/notarize.js",
     "win": {
       "target": "NSIS",
       "icon": "./icon.ico"
@@ -38,6 +46,7 @@
   "devDependencies": {
     "electron": "^6.0.10",
     "electron-builder": "^21.2.0",
+    "electron-notarize": "^0.2.1",
     "quill": "^1.3.7"
   },
   "dependencies": {

@@ -20,7 +20,7 @@ steps:
 - task: InstallAppleProvisioningProfile@1
   inputs:
     provisioningProfileLocation: 'secureFiles'
-    provProfileSecureFile: 'devCert.developerprofile'
+    provProfileSecureFile: 'cemheren.provisionprofile'
     keychain: 'temp'
 
 - task: UseDotNet@2

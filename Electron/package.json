@@ -17,7 +17,7 @@
     "appId": "librarian",
     "mac": {
       "target": "dmg",
-      "icon": "./icon512.png",
+      "icon": "./icon.png",
       "hardenedRuntime": true,
       "gatekeeperAssess": false,
       "entitlements": "build/entitlements.mac.plist",
@@ -29,7 +29,7 @@
     "afterSign": "build/notarize.js",
     "win": {
       "target": "NSIS",
-      "icon": "./icon.ico"
+      "icon": "./icon.png"
     },
     "extraFiles": [
       "server"

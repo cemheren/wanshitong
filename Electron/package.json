@@ -28,9 +28,6 @@
     },
     "afterSign": "build/notarize.js",
     "win": {
-      "publisherName": [
-        "Akif Heren"
-      ],
       "verifyUpdateCodeSignature": false,
       "target": "NSIS",
       "icon": "./icon.png"

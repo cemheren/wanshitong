@@ -3,8 +3,10 @@ const {app, BrowserWindow, ipcMain, globalShortcut} = require('electron')
 const path = require('path')
 const child_process = require('child_process').execFile;
 const { autoUpdater } = require('electron-updater');
-
 const request = require("request");
+
+autoUpdater.logger = require("electron-log");
+autoUpdater.logger.transports.file.level = "info";
 
 let screen;
 

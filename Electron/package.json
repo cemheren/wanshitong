@@ -1,6 +1,6 @@
 {
   "name": "librarian",
-  "version": "0.0.38",
+  "version": "0.0.39",
   "description": "The app that let's you search your thoughts.",
   "main": "main.js",
   "scripts": {
@@ -16,7 +16,7 @@
   "build": {
     "appId": "librarian",
     "mac": {
-      "target": "dmg",
+      "target": ["dmg", "zip"],
       "icon": "./icon.png",
       "hardenedRuntime": true,
       "gatekeeperAssess": false,

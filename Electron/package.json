@@ -1,6 +1,6 @@
 {
   "name": "librarian",
-  "version": "0.0.37",
+  "version": "0.0.38",
   "description": "The app that let's you search your thoughts.",
   "main": "main.js",
   "scripts": {

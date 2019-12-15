@@ -17,7 +17,8 @@
   "repository": "https://github.com/cemheren/wanshitong",
   "keywords": [
     "10000",
-    "Librarian"
+    "Librarian",
+    "Notes"
   ],
   "build": {
     "appId": "librarian",

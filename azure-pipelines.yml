@@ -48,6 +48,11 @@ steps:
     workingDir: 'Electron'
     customCommand: 'run dist'
 
+- task: CmdLine@2
+  inputs:
+    script: 'copy /B "librarian Setup*.exe" "latest.exe"'
+    workingDirectory: 'Electron'
+
 - task: PublishPipelineArtifact@1
   inputs:
     artifactName: 'Electron'

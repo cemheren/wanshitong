@@ -50,7 +50,7 @@ steps:
 
 - task: CmdLine@2
   inputs:
-    script: 'copy /B "librarian Setup*.exe" "latest.exe"'
+    script: 'copy /B "librarian Setup*.exe" "librarian.exe"'
     workingDirectory: 'Electron/dist'
 
 - task: PublishPipelineArtifact@1

@@ -1,6 +1,6 @@
 {
   "name": "librarian",
-  "version": "0.0.41",
+  "version": "0.0.42",
   "description": "The app that let's you search your thoughts.",
   "main": "main.js",
   "scripts": {
@@ -11,7 +11,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-push": "npm version patch --force -m 'Version update'"
+      "pre-push": "npm version patch && git add . && git commit -m 'version update'"
     }
   },
   "repository": "https://github.com/cemheren/wanshitong",

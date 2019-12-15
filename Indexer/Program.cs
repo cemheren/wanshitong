@@ -40,6 +40,7 @@ namespace wanshitong
 
             m_luceneTools.InitializeIndex();
             
+            Telemetry.Version = args.Length > 0 ? args[0] : Telemetry.Version;
             Telemetry.Instance.TrackEvent("ProgramStart");
 
             StartWebHost(args);

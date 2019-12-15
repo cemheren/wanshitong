@@ -4,9 +4,12 @@ const path = require('path')
 const child_process = require('child_process').execFile;
 const { autoUpdater } = require('electron-updater');
 const request = require("request");
+const electronLog = require("electron-log");
 
-autoUpdater.logger = require("electron-log");
+autoUpdater.logger = electronLog;
 autoUpdater.logger.transports.file.level = "info";
+
+Object.assign(console, electronLog.functions);
 
 let screen;
 
@@ -59,7 +62,11 @@ function createServerProcess() {
   var isWin = process.platform === "win32";
   
   var appPath = app.getAppPath();
+  var version = app.getVersion();
+  
   console.log(appPath);
+  console.log(version);
+  
   var serverPath;
   if(isWin)
   {
@@ -69,7 +76,7 @@ function createServerProcess() {
   {
     serverPath = path.normalize(`${appPath}/../../server/osx/Indexer`);
   }
-  var serverProcess = child_process(serverPath, function(err, data) {
+  var serverProcess = child_process(serverPath, [version], function(err, data) {
       if(err){
         console.error(err);
         return;

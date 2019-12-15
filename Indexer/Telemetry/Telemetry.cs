@@ -6,6 +6,8 @@ public static class Telemetry
 {
     private static TelemetryClient _instance;
 
+    public static string Version = "default_ver";
+
     public static TelemetryClient Instance { get {
 
         if (_instance == null)
@@ -13,7 +15,7 @@ public static class Telemetry
             var id = GetInstanceId();
             var configuration = new TelemetryConfiguration("8aebb6ee-8f56-4661-8a41-6c025904e324");
             _instance = new TelemetryClient(configuration);
-            _instance.Context.Component.Version = "0.0.33";
+            _instance.Context.Component.Version = Version;
         
             _instance.Context.User.Id = id;
             _instance.Context.Session.Id = id;

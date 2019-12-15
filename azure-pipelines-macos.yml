@@ -73,7 +73,7 @@ steps:
 
 - task: CmdLine@2
   inputs:
-    script: 'cp librarian*.dmg latest.dmg'
+    script: 'cp librarian*.dmg librarian.dmg'
     workingDirectory: 'Electron/dist'
 
 - task: PublishPipelineArtifact@1

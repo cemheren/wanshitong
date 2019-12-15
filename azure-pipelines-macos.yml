@@ -71,6 +71,11 @@ steps:
     workingDir: 'Electron'
     customCommand: 'run dist'
 
+- task: CmdLine@2
+  inputs:
+    script: 'cp librarian*.dmg latest.dmg'
+    workingDirectory: 'Electron/dist'
+
 - task: PublishPipelineArtifact@1
   inputs:
     artifactName: 'Electron'

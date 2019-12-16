@@ -1,5 +1,5 @@
 var stripeHandler = StripeCheckout.configure({
-    key: 'pk_test_33HGY2nhmuWFI4uPzZkcCnzX00lMXpeSYU',
+    key: 'pk_live_KowPRzdx02IRFfAfLvPygz0Q00a5LAJ0mz',
     image: 'https://stripe.com/img/documentation/checkout/marketplace.png',
     locale: 'auto',
     token: function(token) {

@@ -63,7 +63,7 @@ namespace wanshitong.backend
 
             try
             {
-                StripeConfiguration.ApiKey = "sk_test_Oir6aZatDyqBDcTg4n2smYB5001MmaUfRW";
+                StripeConfiguration.ApiKey = "sk_live_5IKtSEgAqNYqKxVX6Qm0ybgq00U8yyfqu0";
                 string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
                 var data = JsonConvert.DeserializeObject<StripeTokenModel>(requestBody);
 

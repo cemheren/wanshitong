@@ -8,6 +8,7 @@ body{
     font: menu;
     font-size: normal;
     margin-left: 0px !important;
+    overflow: hidden;
 }
 
 button{
@@ -281,6 +282,10 @@ button[disabled=disabled], .row_button:disabled {
 
 .documentation{
     font-size: medium;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    height: fit-content;
+    scroll-behavior: auto;
 }
 
 .crop {

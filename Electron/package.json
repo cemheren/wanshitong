@@ -11,7 +11,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-push": "npm version patch && git add . && git commit -m 'version update'"
+      "pre-push": ""
     }
   },
   "repository": "https://github.com/cemheren/wanshitong",

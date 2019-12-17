@@ -5,6 +5,8 @@ const indexerUrl = "http://localhost:4153";
 let typingTimer;              
 let doneTypingInterval = 3500;
 
+const delay = ms => new Promise(res => setTimeout(res, ms));
+
 async function fetchHtmlAsText(url) {
     return await (await fetch(url)).text();
 }

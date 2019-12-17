@@ -7,6 +7,9 @@ const path = require("path");
 const os = require("os");const Store = require('electron-store');
 const store = new Store({"cwd": path.join(os.homedir(), "Index")});
 
+// Add this to test loading delays
+// var response = http("GET", "http://localhost:4153/actions/getpremiumkey");
+
 // Handle first opening of the app
 if (store.get("isFirst", true)) {
     OpenSettings();

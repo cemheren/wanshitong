@@ -16,17 +16,18 @@ Object.assign(console, electronLog.functions);
 // Handle local storage
 const store = new Store({"cwd": path.join(os.homedir(), "Index")});
 
-let screen;
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow
+let loading
 
 function createWindow () {
-  // Create the browser window.
-  mainWindow = new BrowserWindow({
-    width: 1200,
-    height: 800,
+  // Create the loading window.
+  loading = new BrowserWindow({
+    width: 600,
+    height: 400,
     frame: false, 
+    show: false,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: true
@@ -34,31 +35,47 @@ function createWindow () {
     icon: __dirname + '/icon.ico'
   });
 
-  const electron = require('electron')
-  screen = electron.screen
+  loading.once('show', () => {
+    mainWindow = new BrowserWindow({
+      width: 1200,
+      height: 800,
+      frame: false, 
+      show: false,
+      webPreferences: {
+        preload: path.join(__dirname, 'preload.js'),
+        nodeIntegration: true
+      },
+      icon: __dirname + '/icon.ico'
+    });
+    mainWindow.webContents.once('did-finish-load', () => {
+      console.log('mainWindow loaded')
+      mainWindow.show()
+      loading.hide()
+      loading.close();
+      // Open the DevTools.
+      // mainWindow.webContents.openDevTools()
+    })
+    // long loading html
+    mainWindow.loadFile('index.html');
+    mainWindow.on('closed', function () {
+      // Dereference the window object, usually you would store windows
+      // in an array if your app supports multi windows, this is the time
+      // when you should delete the corresponding element.
+      mainWindow = null
+    })
+  })
+  loading.loadFile('loading.html')
+  loading.show();
+  console.log('mainWindow loaded')
 
   createServerProcess();
   registerShortcuts();
-
-  // and load the index.html of the app.
-  mainWindow.loadFile('index.html')
 
   autoUpdater.checkForUpdatesAndNotify();
 
   setInterval(() => {
     autoUpdater.checkForUpdatesAndNotify();
   }, 1000 * 60 * 15);
-
-  // Open the DevTools.
-  // mainWindow.webContents.openDevTools()
-
-  // Emitted when the window is closed.
-  mainWindow.on('closed', function () {
-    // Dereference the window object, usually you would store windows
-    // in an array if your app supports multi windows, this is the time
-    // when you should delete the corresponding element.
-    mainWindow = null
-  })
 }
 
 function createServerProcess() {
@@ -91,8 +108,6 @@ function createServerProcess() {
 
 function registerShortcuts() {
   var ret = globalShortcut.register('alt+a', () => {
-    
-    const { width, height }  = screen.getPrimaryDisplay().workAreaSize;
 
     request.get(
         "http://localhost:4153/actions/screenshot",

@@ -5,14 +5,18 @@ const child_process = require('child_process').execFile;
 const { autoUpdater } = require('electron-updater');
 const request = require("request");
 const electronLog = require("electron-log");
+const os = require("os");
+const Store = require('electron-store');
 
+// Handle logging
 autoUpdater.logger = electronLog;
 autoUpdater.logger.transports.file.level = "info";
-
 Object.assign(console, electronLog.functions);
 
-let screen;
+// Handle local storage
+const store = new Store({"cwd": path.join(os.homedir(), "Index")});
 
+let screen;
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow
@@ -27,8 +31,7 @@ function createWindow () {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: true
     },
-    icon: __dirname + '/icon.ico',
-    
+    icon: __dirname + '/icon.ico'
   });
 
   const electron = require('electron')

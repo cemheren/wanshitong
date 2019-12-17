@@ -20,6 +20,7 @@ const moment = require("moment");
 const DragSelect = require("dragselect");
 const Cropper = require("cropperjs");
 
+
 var cropperInstance = undefined;
 
 var ds = new DragSelect({

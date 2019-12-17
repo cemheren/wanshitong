@@ -12,11 +12,12 @@ searchToggle.onclick = function (event) {
     settingsView.className = "hidden";
 }
 
-settingsToggle.onclick = function (event) {
+function OpenSettings(event) {
     settingsView.classList.remove("hidden");
     storiesView.className = "hidden";
     searchView.className = "hidden";
 }
+settingsToggle.onclick = OpenSettings;
 
 storiesToggle.onclick = function (event) {
     storiesView.classList.remove("hidden");

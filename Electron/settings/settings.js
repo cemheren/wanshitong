@@ -3,7 +3,19 @@ var premium_settings = document.getElementById("premium_settings");
 
 var settingsRightPanelElement = document.getElementById("settings_rightpanel");
 
-instructions_settings.onclick = async function (event) {
+const path = require("path");
+const os = require("os");const Store = require('electron-store');
+const store = new Store({"cwd": path.join(os.homedir(), "Index")});
+
+// Handle first opening of the app
+if (store.get("isFirst", true)) {
+    OpenSettings();
+    OpenInstructions();
+
+    store.set("isFirst", false);
+}
+
+async function OpenInstructions(event) {
     var instructionshtml = document.createElement('div');
     instructionshtml.innerHTML = await fetchHtmlAsText('pages/usage_instructions.html');
 
@@ -13,6 +25,7 @@ instructions_settings.onclick = async function (event) {
     RemoveAllChildren(settingsRightPanelElement);
     settingsRightPanelElement.appendChild(instructionshtml);
 }
+instructions_settings.onclick = OpenInstructions;
 
 premium_settings.onclick = function (event) {
     

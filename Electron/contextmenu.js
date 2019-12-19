@@ -67,7 +67,7 @@ function SubmitContextMenu(element) {
 
     var i = 0;
     nodes.forEach(node => {
-        indexAndDocId[i] = node.querySelector('#myId').textContent
+        indexAndDocId[i] = node.querySelector('#result_row_my_id').textContent
         i++;
     });
 

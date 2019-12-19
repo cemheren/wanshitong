@@ -44,6 +44,12 @@ namespace Querier
                     constraints: new { httpMethod = new HttpMethodRouteConstraint(HttpMethod.Get.ToString()) });
 
                 routes.MapRoute(
+                    name: "GetStats",
+                    template: "actions/getstats",
+                    defaults: new { controller = "Actions", action = "GetStats" },
+                    constraints: new { httpMethod = new HttpMethodRouteConstraint(HttpMethod.Get.ToString()) });
+
+                routes.MapRoute(
                     name: "GetPremiumKey",
                     template: "actions/getpremiumkey",
                     defaults: new { controller = "Actions", action = "GetPremiumKey" },
@@ -66,7 +72,6 @@ namespace Querier
                     template: "actions/ingestcroppeddocument/{myId}",
                     defaults: new { controller = "Actions", action = "IngestCroppedDocument" },
                     constraints: new { httpMethod = new HttpMethodRouteConstraint(HttpMethod.Post.ToString()) });
-
 
                 routes.MapRoute(
                     name: "ExecuteQuery",

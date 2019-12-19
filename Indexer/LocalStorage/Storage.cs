@@ -36,4 +36,14 @@ public static class Storage
         result = default(T);
         return false;
     }
+
+    public static T GetOrDefault<T>(this LocalStorage instance, string key, T def)
+    {
+        if (instance.Exists(key))
+        {
+            return instance.Get<T>(key);
+        }
+
+        return def;
+    }
 }

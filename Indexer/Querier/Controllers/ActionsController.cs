@@ -150,6 +150,25 @@ namespace Indexer.Querier.Controllers
             return null;
         }
 
+        [HttpGet]
+        public dynamic GetStats()
+        {
+            Telemetry.Instance.TrackEvent("ActionsController.GetStats");
+
+            try
+            {
+                return new {
+                    docCount = Storage.Instance.GetOrDefault("maxdoc", 0)
+                };
+            }
+            catch (System.Exception e)
+            {
+                Telemetry.Instance.TrackException(e);
+            }
+
+            return null;
+        }
+
         [HttpPost]
         public bool EditText(string myId, [Microsoft.AspNetCore.Mvc.FromBody]string newText)
         {

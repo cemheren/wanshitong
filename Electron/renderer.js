@@ -261,7 +261,7 @@ function onRowTextClick(event)
             var result = http("POST", indexerUrl + "/actions/ingestcroppeddocument/" + selectedElementMetadata.myId, JSON.stringify(model))
 
             savingElement.classList.add("hidden");
-            if(result){
+            if(result && result == "true"){
                 cropperInstance.clear();
                 PopNotificationInfo("New document from cropped image is ready 🕶️.");
                 drawSimilarityRow();

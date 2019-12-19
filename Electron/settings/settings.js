@@ -32,7 +32,9 @@ instructions_settings.onclick = OpenInstructions;
 
 premium_settings.onclick = function (event) {
     
-    var response = http("GET", "http://localhost:4153/actions/getpremiumkey");
+    var premiumKey = http("GET", "http://localhost:4153/actions/getpremiumkey");
+    
+    var stats = JSON.parse(http("GET", "http://localhost:4153/actions/getstats"));
     
     var premiumsettingshtml = document.createElement('div');
     
@@ -43,9 +45,16 @@ premium_settings.onclick = function (event) {
         <div>
             <div id="currentKeyGuid">
                 <p>Current premium key:</p>
-                <p>${response}</p>
+                <p>${premiumKey}</p>
             </div>
             <button id="purchaseKey">Purchase a new key</button>
+        </div>
+        <p></p>
+        <div>
+            <div id="stats">
+                Number of documents:
+                <p>${stats.docCount}</p>
+            </div>
         </div>
     `;
 

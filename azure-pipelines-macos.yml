@@ -76,12 +76,6 @@ steps:
     script: 'cp librarian*.dmg librarian.dmg'
     workingDirectory: 'Electron/dist'
 
-- task: Npm@1
-  inputs:
-    command: 'custom'
-    workingDir: 'Electron'
-    customCommand: 'run zip'
-
 - task: PublishPipelineArtifact@1
   inputs:
     artifactName: 'Electron'

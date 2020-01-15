@@ -80,3 +80,7 @@ steps:
   inputs:
     artifactName: 'Electron'
     targetPath: 'Electron/dist'
+
+- task: CmdLine@2
+  inputs:
+    script: 'touch Electron/dist/librarian-$(node -p "require(''./package.json'').version")-mac.zip'

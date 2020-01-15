@@ -24,8 +24,7 @@
     "appId": "librarian",
     "mac": {
       "target": [
-        "dmg",
-        "zip"
+        "dmg"
       ],
       "icon": "./icon.png",
       "hardenedRuntime": true,

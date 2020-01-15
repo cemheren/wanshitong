@@ -7,7 +7,8 @@
     "postinstall": "install-app-deps",
     "start": "npm install && electron .",
     "pack": "electron-builder --dir --publish never",
-    "dist": "electron-builder --publish never"
+    "dist": "electron-builder --publish never",
+    "zip": "touch dist/librarian-$(node -p \"require('./package.json').version\")-mac.zip"
   },
   "husky": {
     "hooks": {

@@ -13,7 +13,7 @@ public class OcrResponse
 
         if (Regions == null)
         {
-            return "";
+            return "OCR failed";
         }
 
         foreach (var region in Regions)

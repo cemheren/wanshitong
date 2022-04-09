@@ -71,7 +71,7 @@
     "electron-titlebar": "0.0.3",
     "electron-titlebar-windows": "^3.0.0",
     "electron-updater": "^4.2.0",
-    "moment": "^2.24.0",
+    "moment": "^2.29.2",
     "random-words": "^1.1.0",
     "request": "^2.88.0"
   }

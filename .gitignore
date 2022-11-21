@@ -1,0 +1,16 @@
+obj/wanshitong.csproj.nuget.cache
+obj/wanshitong.csproj.nuget.g.props
+obj/wanshitong.csproj.nuget.g.targets
+obj/Debug/netcoreapp2.2/wanshitong.AssemblyInfoInputs.cache
+obj/Debug/netcoreapp2.2/wanshitong.assets.cache
+obj/Debug/netcoreapp2.2/wanshitong.csproj.CoreCompileInputs.cache
+obj/Debug/netcoreapp2.2/wanshitong.csprojAssemblyReference.cache
+keylogger
+obj
+bin
+Index
+Electron/librarian UI-darwin-x64
+out
+librarian-win32-x64.zip
+Indexer/Screenshots
+Electron/server/

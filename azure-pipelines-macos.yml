@@ -1,0 +1,82 @@
+# ASP.NET Core
+# Build and test ASP.NET Core projects targeting .NET Core.
+# Add steps that run tests, create a NuGet package, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
+
+trigger:
+- master
+
+pool:
+  vmImage: 'macOS-10.13'
+
+variables:
+  buildConfiguration: 'Release'
+
+steps:
+- task: InstallAppleCertificate@2
+  inputs:
+    certSecureFile: 'devcert.p12'
+    certPwd: '$(Itunespass)'
+- task: InstallAppleProvisioningProfile@1
+  inputs:
+    provisioningProfileLocation: 'secureFiles'
+    provProfileSecureFile: 'cemheren.provisionprofile'
+    keychain: 'temp'
+
+- task: UseDotNet@2
+  inputs:
+    version: '3.0.x'
+
+- task: NodeTool@0 
+  inputs:
+    versionSpec: '8.x'
+
+- task: NuGetToolInstaller@0
+
+- task: NuGetCommand@2
+  inputs:
+    restoreSolution: '$(solution)'
+
+- task: DotNetCoreCLI@2
+  inputs:
+    workingDirectory: Indexer
+    command: 'build'
+    feedsToUse: 'select'
+    versioningScheme: 'off'
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'publish'
+    publishWebProjects: false
+    arguments: '-c Release --framework netcoreapp3.0 --runtime osx-x64 --self-contained true --output "../Electron/server/osx"'
+    feedsToUse: 'select'
+    versioningScheme: 'byBuildNumber'
+    workingDirectory: 'Indexer'
+    zipAfterPublish: false
+
+- task: Npm@1
+  inputs:
+    command: 'install'
+    workingDir: 'Electron'
+
+- task: Npm@1
+  inputs:
+    command: 'custom'
+    workingDir: 'Electron'
+    customCommand: 'install electron-builder --dev'
+
+- task: Npm@1
+  inputs:
+    command: 'custom'
+    workingDir: 'Electron'
+    customCommand: 'run dist'
+
+- task: CmdLine@2
+  inputs:
+    script: 'cp librarian*.dmg librarian.dmg'
+    workingDirectory: 'Electron/dist'
+
+- task: PublishPipelineArtifact@1
+  inputs:
+    artifactName: 'Electron'
+    targetPath: 'Electron/dist'

@@ -1,0 +1,96 @@
+
+
+.ds-selected{
+    background-color: aliceblue !important;
+    color: black;
+}
+
+.context_menu{
+    position: absolute;
+    width: 240px;
+    height: 126px;
+    /* padding: 20px; */
+    padding-top:10px;
+    padding-bottom:10px;
+    border-radius: 5px;
+    background-color:#fdfdfd;
+    color: #1b1b1b;
+    box-shadow: 4px 4px 8px 4px rgba(0, 0, 0, 0.5);;
+ }
+ 
+ .context_menu_close{
+     position: relative;
+     top: 8px;
+     right: 2px;
+     padding-left: 230px;
+     cursor: pointer;
+ }
+
+ .context_menu_submit{
+    position: relative;
+    top: 8px;
+    height: 32px;
+}
+
+ .context_menu_label{
+    text-align: center;
+    padding-top: 2px;
+    padding-left: 4px;
+}
+
+.context_menu_input{
+    height: 17px;
+    margin-top: 4px;
+    width: 224px;
+    font-size: x-small;
+    font: message-box;
+    background-color: aliceblue;
+    padding: 8px;
+    /* margin-left: 4px; */
+    color: black;
+    border: none;
+}
+
+.context_menu_open{
+    /* position: relative; */
+    top: 8px;
+    height: 32px;
+    padding-bottom: 2px; 
+}
+
+.pickr{
+    top: 4px;
+    left: 4px;
+    position: relative;
+    overflow: visible;
+    transform: translateY(0);
+}
+
+.row_button{
+    text-align: center;
+    border: none;
+    background: none;
+    width: 100%;
+    cursor: pointer;
+    color: inherit;
+    margin: 0px;
+    border-radius: 0px;
+}
+
+.row_button:hover{
+    background-color: lightgray;
+    box-shadow: 3px 2px 10px 3px rgba(0, 0, 0, 0.1);
+}
+
+.row_button[disabled=disabled], .row_button:disabled {
+   box-shadow: none;
+   cursor: default;
+}
+
+.divider{
+    width: 100%;
+    border-bottom: solid;
+    color: gray;
+    /* box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 1); */
+    /* margin: 5px; */
+}

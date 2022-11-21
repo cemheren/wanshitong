@@ -1,0 +1,36 @@
+body{
+    width: auto !important;
+    height: auto !important;
+    padding: 0px;
+    background-color: #313333;
+    color: aliceblue;
+    font: menu;
+    font-size: normal;
+    margin-left: 0px !important;
+    border-radius: 25px;
+}
+
+.loading-text
+{
+    position: relative;
+    float: left;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.loading-img{
+    width: 90px;
+    position: relative;
+    height: auto;
+    display: block;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    margin-bottom: -40px;
+}
+
+.loading-span{
+    display: block;
+    line-height: 18px;
+}

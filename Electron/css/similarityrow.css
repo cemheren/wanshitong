@@ -1,0 +1,102 @@
+.related_documents{
+    width: 100%;
+    overflow-x: hidden;
+    height: 24vh;
+    overflow-y: hidden;
+    position: relative;
+    bottom: 0px;
+    height: 230px;
+    background-color: #3e4348;
+}
+
+.similarity_title{
+    margin-left: 30px;
+}
+
+.similarity_row{
+    width: max-content;
+    height: 200px;
+    padding-left: 20px;
+}
+
+.similarity_row_item_parent{
+    height: calc(100% - 16px);
+    width: 180px;
+    float: left;
+    display: block;
+    overflow: hidden;
+    cursor: pointer;
+    background-color: #5f6871;
+    margin-left: 10px;
+    margin-right: 10px;
+    border-radius: 2px;
+    padding-top: 2px;
+    box-shadow: 6px 4px 5px 0px rgba(0, 0, 0, 0.2), 0px 5px 3px 0px rgba(0, 0, 0, 0.2); 
+    /* padding-left: 20px; */
+}
+
+.similarity_row_item{
+    width: 100%;
+    display: block;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.similarity_row_item_filler{
+    width: 20px;
+    float: left;
+    height: calc(100% - 8px);
+    top: 8px;
+    display: block;
+    overflow: hidden;
+
+    background: linear-gradient(90deg, #3e4348 4px, transparent 1%) center, linear-gradient(#3e4348 4px, transparent 1%) center, #ccc;
+    background-size: 5px 5px;
+    position: relative;
+}
+
+.similarity_row_text{
+    font-size: small;
+    margin-top: 10px;
+    margin-left: 5px;
+    width: 90%;
+    font: menu;
+}
+
+.similarity_row_time{
+    font-size: x-small;
+    margin-left: 2px;
+}
+
+.similarity_row_item > .result_row_group{
+    display: none;
+}
+
+.similarity_select{
+    float: left;
+}
+
+.similarity_row_crop {
+    width: 190px;
+    height: 80px;
+    overflow: hidden;
+    margin-top: 4px;
+}
+
+.similarity_row_crop img {
+    margin: -10px 0 0px -4px
+}
+
+.unselectable {
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+ 
+    -ms-user-select: none;
+    user-select: none;
+ }
+
+ .vertical_scroll{
+     overflow-y: hidden;
+     overflow-x: scroll;
+ }

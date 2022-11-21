@@ -1,0 +1,59 @@
+trigger:
+- master
+
+pool:
+  vmImage: 'windows-latest'
+
+variables:
+  buildConfiguration: 'Release'
+
+steps:
+- task: NuGetToolInstaller@0
+
+- task: NuGetCommand@2
+  inputs:
+    restoreSolution: '$(solution)'
+
+- task: DotNetCoreCLI@2
+  inputs:
+    workingDirectory: Indexer
+    command: 'build'
+    feedsToUse: 'select'
+    versioningScheme: 'off'
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'publish'
+    publishWebProjects: false
+    arguments: '-c Release --framework netcoreapp3.0 --runtime win-x64 --self-contained true --output "../Electron/server/win"'
+    feedsToUse: 'select'
+    versioningScheme: 'byBuildNumber'
+    workingDirectory: 'Indexer'
+    zipAfterPublish: false
+
+- task: Npm@1
+  inputs:
+    command: 'install'
+    workingDir: 'Electron'
+
+- task: Npm@1
+  inputs:
+    command: 'custom'
+    workingDir: 'Electron'
+    customCommand: 'install electron-builder --dev'
+
+- task: Npm@1
+  inputs:
+    command: 'custom'
+    workingDir: 'Electron'
+    customCommand: 'run dist'
+
+- task: CmdLine@2
+  inputs:
+    script: 'copy /B "librarian Setup*.exe" "librarian.exe"'
+    workingDirectory: 'Electron/dist'
+
+- task: PublishPipelineArtifact@1
+  inputs:
+    artifactName: 'Electron'
+    targetPath: 'Electron/dist'

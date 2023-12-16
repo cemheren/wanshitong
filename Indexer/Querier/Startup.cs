@@ -1,3 +1,4 @@
+using System.Configuration;
 using System.Net.Http;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -5,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing.Constraints;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using OpenAI_API;
 
 namespace Querier
 {
@@ -20,6 +22,17 @@ namespace Querier
                     options.SerializerSettings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
                     options.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
                 });
+
+            var api = new OpenAI_API.OpenAIAPI(
+                new APIAuthentication(
+                    ConfigurationManager.AppSettings["openAI_key"], 
+                    ConfigurationManager.AppSettings["openAI_org"]));
+            var wrapper = new OpenAIWrapper(api);
+
+            var storage = new Storage();
+            services.AddSingleton<OpenAIWrapper>(wrapper);
+            services.AddSingleton<Storage>(storage);
+            services.AddSingleton<Telemetry>(new Telemetry(storage));
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)

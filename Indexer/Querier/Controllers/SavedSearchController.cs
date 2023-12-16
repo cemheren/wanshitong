@@ -14,18 +14,29 @@ namespace Indexer.Querier.Controllers
 {
     public class SavedSearchController : ApiController
     {
+        private readonly Storage storage;
+        private readonly Telemetry telemetry;
+
+
+        public SavedSearchController(Storage storage, Telemetry telemetry)
+        {
+            this.storage = storage;
+            this.telemetry = telemetry;
+
+        }
+
         [HttpGet]
         public bool AddSavedSearch(string phrase)
         {
-            Telemetry.Instance.TrackEvent("SavedSearchController.AddSavedSearch");
+            this.telemetry.client.TrackEvent("SavedSearchController.AddSavedSearch");
             
             try
             {
                 List<SavedSearchModel> savedSearches;
                 // for now just do simple storage. 
-                if (Storage.Instance.Exists("savedSearches"))
+                if (this.storage.Instance.Exists("savedSearches"))
                 {
-                    savedSearches = Storage.Instance.Get<List<SavedSearchModel>>("savedSearches");
+                    savedSearches = this.storage.Instance.Get<List<SavedSearchModel>>("savedSearches");
                 }
                 else
                 {
@@ -35,13 +46,13 @@ namespace Indexer.Querier.Controllers
                 savedSearches.Add(new SavedSearchModel{ SearchPhrase = phrase });
                 savedSearches = savedSearches.ToHashSet().ToList();
 
-                Storage.Instance.Store("savedSearches", savedSearches);
-                Storage.Instance.Persist();
+                this.storage.Instance.Store("savedSearches", savedSearches);
+                this.storage.Instance.Persist();
             }
             catch (System.Exception e)
             {
-                Telemetry.Instance.TrackTrace("SavedSearchController.AddSavedSearch.Error", SeverityLevel.Error);
-                Telemetry.Instance.TrackException(e);
+                this.telemetry.client.TrackTrace("SavedSearchController.AddSavedSearch.Error", SeverityLevel.Error);
+                this.telemetry.client.TrackException(e);
 
                 return false;
             }
@@ -52,15 +63,15 @@ namespace Indexer.Querier.Controllers
         [HttpGet]
         public List<SavedSearchModel> GetSavedSearches()
         {
-            Telemetry.Instance.TrackEvent("SavedSearchController.GetSavedSearches");
+            this.telemetry.client.TrackEvent("SavedSearchController.GetSavedSearches");
 
             List<SavedSearchModel> savedSearches;
             try
             {
                 // for now just do simple storage. 
-                if (Storage.Instance.Exists("savedSearches"))
+                if (this.storage.Instance.Exists("savedSearches"))
                 {
-                    savedSearches = Storage.Instance.Get<List<SavedSearchModel>>("savedSearches");
+                    savedSearches = this.storage.Instance.Get<List<SavedSearchModel>>("savedSearches");
                 }
                 else
                 {
@@ -69,8 +80,8 @@ namespace Indexer.Querier.Controllers
             }
             catch (System.Exception e)
             {
-                Telemetry.Instance.TrackTrace("SavedSearchController.AddSavedSearch.Error", SeverityLevel.Error);
-                Telemetry.Instance.TrackException(e);
+                this.telemetry.client.TrackTrace("SavedSearchController.AddSavedSearch.Error", SeverityLevel.Error);
+                this.telemetry.client.TrackException(e);
 
                 return null;
             }

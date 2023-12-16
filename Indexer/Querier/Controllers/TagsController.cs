@@ -10,10 +10,19 @@ namespace Indexer.Querier.Controllers
 {
     public class TagsController : ApiController
     {
+        private readonly Telemetry telemetry;
+
+
+        public TagsController(Telemetry telemetry)
+        {
+            this.telemetry = telemetry;
+
+        }
+
         [Microsoft.AspNetCore.Mvc.HttpGet]
         public List<TagModel> Search(string text)
         {
-            Telemetry.Instance.TrackEvent("TagsController.Search");
+            this.telemetry.client.TrackEvent("TagsController.Search");
             
             var searchResults = Program
                 .m_luceneTools
@@ -25,7 +34,7 @@ namespace Indexer.Querier.Controllers
         [Microsoft.AspNetCore.Mvc.HttpGet]
         public void AddTag(string tag, string color)
         {
-            Telemetry.Instance.TrackEvent("TagsController.AddTag");
+            this.telemetry.client.TrackEvent("TagsController.AddTag");
 
             Program
                 .m_luceneTools

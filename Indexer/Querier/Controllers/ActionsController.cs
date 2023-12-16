@@ -10,15 +10,40 @@ using System.Runtime.InteropServices;
 using Microsoft.ApplicationInsights.DataContracts;
 using System.Threading.Tasks;
 using System.Drawing;
+using System.Windows.Forms;
+using System.Configuration;
 
 namespace Indexer.Querier.Controllers
 {
     public class ActionsController : ApiController
     {
+        public ActionsController(Storage storage, Telemetry telemetry, OpenAIWrapper openAIWrapper)
+        {
+            this.storage = storage;
+            this.telemetry = telemetry;
+            this.openAIWrapper = openAIWrapper;
+
+        }
+
+        private static string ScreenshotDir {
+        get
+            {
+                var rootDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+                if(ConfigurationManager.AppSettings["rootFolderPath"] != null)
+                {
+                    rootDir = ConfigurationManager.AppSettings["rootFolderPath"];
+                }
+                var screenshotsPath = Path.Combine(rootDir, "Screenshots");
+                var dirInfo = new DirectoryInfo(screenshotsPath);
+                dirInfo.Create();
+                return screenshotsPath;
+            }
+        }
+
         [HttpGet]
         public bool Screenshot()
         {
-            Telemetry.Instance.TrackEvent("ActionsController.Screenshot");
+            this.telemetry.client.TrackEvent("ActionsController.Screenshot");
             
             try
             {
@@ -26,12 +51,8 @@ namespace Indexer.Querier.Controllers
 
                 bool isWindows = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
             
-                var currentDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-                var screenshotsPath = Path.Combine(currentDir, "Screenshots");
-                var dirInfo = new DirectoryInfo(screenshotsPath);
-                dirInfo.Create();
                 var name = Guid.NewGuid();
-                var address = Path.Combine(screenshotsPath, $"{name}.jpeg");
+                var address = Path.Combine(ScreenshotDir, $"{name}.jpeg");
                 
                 OcrResponse result;
                 if(isWindows){
@@ -41,7 +62,10 @@ namespace Indexer.Querier.Controllers
                     image.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Jpeg);
                     image.Save(address, ImageFormat.Jpeg);
 
-                    result = OCRClient.MakeRequest(memoryStream.ToArray()).Result;
+                    var imageBytes = memoryStream.ToArray();
+                    this.openAIWrapper.TestVision(imageBytes).Wait();
+
+                    result = OCRClient.MakeRequest(imageBytes).Result;
                 }
                 else
                 {
@@ -55,15 +79,15 @@ namespace Indexer.Querier.Controllers
                 Program.m_luceneTools.AddAndCommit(address, str, -10);
                 System.Console.WriteLine("capture done...");
 
-                Telemetry.Instance.TrackTrace("Capture.Success", SeverityLevel.Verbose);
+                this.telemetry.client.TrackTrace("Capture.Success", SeverityLevel.Verbose);
             }
             catch (System.Exception e)
             {
                 System.Console.WriteLine("capture failed...");
                 System.Console.WriteLine(e.Message);
 
-                Telemetry.Instance.TrackTrace("Capture.Error", SeverityLevel.Error);
-                Telemetry.Instance.TrackException(e);
+                this.telemetry.client.TrackTrace("Capture.Error", SeverityLevel.Error);
+                this.telemetry.client.TrackException(e);
 
                 return false;
             }
@@ -72,11 +96,15 @@ namespace Indexer.Querier.Controllers
         }
 
         private static string lastClipboard;
+        private readonly Storage storage;
+        private readonly Telemetry telemetry;
+        private readonly OpenAIWrapper openAIWrapper;
+
 
         [HttpGet]
         public bool CopyClipboard()
         {
-            Telemetry.Instance.TrackEvent("ActionsController.CopyClipboard");
+            this.telemetry.client.TrackEvent("ActionsController.CopyClipboard");
 
             try
             {
@@ -100,12 +128,12 @@ namespace Indexer.Querier.Controllers
 
                     var d = new Dictionary<string, string>();
                     d.Add("content", current);
-                    Telemetry.Instance.TrackTrace("CopyClipboard", severityLevel: SeverityLevel.Verbose, properties: d);
+                    this.telemetry.client.TrackTrace("CopyClipboard", severityLevel: SeverityLevel.Verbose, properties: d);
                 }
             }
             catch (System.Exception e)
             {
-                Telemetry.Instance.TrackException(e);
+                this.telemetry.client.TrackException(e);
                 return false;
             }
 
@@ -115,18 +143,18 @@ namespace Indexer.Querier.Controllers
         [HttpGet]
         public async Task<bool> SetPremiumKey(string key)
         {
-            Telemetry.Instance.TrackEvent("ActionsController.SetPremiumKey");
+            this.telemetry.client.TrackEvent("ActionsController.SetPremiumKey");
 
             try
             {
-                await Validation.ValidatePremiumKey(key);
+                // await Validation.ValidatePremiumKey(key);
 
-                Storage.Instance.Store("PremiumKey", key);        
-                Storage.Instance.Persist();       
+                this.storage.Instance.Store("PremiumKey", key);        
+                this.storage.Instance.Persist();       
             }
             catch (System.Exception e)
             {
-                Telemetry.Instance.TrackException(e);
+                this.telemetry.client.TrackException(e);
                 throw;
             }
 
@@ -136,15 +164,15 @@ namespace Indexer.Querier.Controllers
         [HttpGet]
         public string GetPremiumKey()
         {
-            Telemetry.Instance.TrackEvent("ActionsController.GetPremiumKey");
+            this.telemetry.client.TrackEvent("ActionsController.GetPremiumKey");
 
             try
             {
-                return Storage.Instance.Get<string>("PremiumKey");                
+                return this.storage.Instance.Get<string>("PremiumKey");                
             }
             catch (System.Exception e)
             {
-                Telemetry.Instance.TrackException(e);
+                this.telemetry.client.TrackException(e);
             }
 
             return null;
@@ -153,17 +181,17 @@ namespace Indexer.Querier.Controllers
         [HttpGet]
         public dynamic GetStats()
         {
-            Telemetry.Instance.TrackEvent("ActionsController.GetStats");
+            this.telemetry.client.TrackEvent("ActionsController.GetStats");
 
             try
             {
                 return new {
-                    docCount = Storage.Instance.GetOrDefault("maxdoc", 0)
+                    docCount = this.storage.GetOrDefault("maxdoc", 0)
                 };
             }
             catch (System.Exception e)
             {
-                Telemetry.Instance.TrackException(e);
+                this.telemetry.client.TrackException(e);
             }
 
             return null;
@@ -172,7 +200,7 @@ namespace Indexer.Querier.Controllers
         [HttpPost]
         public bool EditText(string myId, [Microsoft.AspNetCore.Mvc.FromBody]string newText)
         {
-            Telemetry.Instance.TrackEvent("ActionsController.EditText");
+            this.telemetry.client.TrackEvent("ActionsController.EditText");
             try
             {
                 
@@ -189,7 +217,7 @@ namespace Indexer.Querier.Controllers
             }
             catch (System.Exception e)
             {
-                Telemetry.Instance.TrackException(e);
+                this.telemetry.client.TrackException(e);
                 return false;
             }
 
@@ -199,7 +227,7 @@ namespace Indexer.Querier.Controllers
         [HttpPost]
         public bool IngestCroppedDocument(string myId, [Microsoft.AspNetCore.Mvc.FromBody]CropImageModel model)
         {
-            Telemetry.Instance.TrackEvent("ActionsController.IngestCroppedDocument");
+            this.telemetry.client.TrackEvent("ActionsController.IngestCroppedDocument");
             try
             {
                 var currentDocument = Program
@@ -211,13 +239,8 @@ namespace Indexer.Querier.Controllers
 
                 var cropped = source.Crop(model);
                 
-                var currentDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-                var screenshotsPath = Path.Combine(currentDir, "Screenshots");
-                var dirInfo = new DirectoryInfo(screenshotsPath);
-                dirInfo.Create();
-            
                 var name = Guid.NewGuid();
-                var address = Path.Combine(screenshotsPath, $"{name}.jpeg");
+                var address = Path.Combine(ScreenshotDir, $"{name}.jpeg");
                 cropped.Save(address, ImageFormat.Jpeg);
             
                 var result = OCRClient.MakeRequest(OCRClient.BitmapToByteArray(cropped)).Result;
@@ -235,7 +258,7 @@ namespace Indexer.Querier.Controllers
             }
             catch (System.Exception e)
             {
-                Telemetry.Instance.TrackException(e);
+                this.telemetry.client.TrackException(e);
                 return false;
             }
 

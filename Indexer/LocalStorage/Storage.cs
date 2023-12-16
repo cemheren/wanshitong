@@ -1,35 +1,35 @@
 using System;
+using System.Configuration;
 using System.IO;
 using Hanssens.Net;
 
-public static class Storage
+public class Storage : IDisposable
 {
-    private static LocalStorage _instance;
+    public LocalStorage Instance;
 
-    public static LocalStorage Instance { get {
-
-        if (_instance == null)
+    public Storage()
+    {
+        var rootDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+        if(ConfigurationManager.AppSettings["rootFolderPath"] != null)
         {
-            var currentDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-
-            var dirInfo = new DirectoryInfo(Path.Combine(currentDir, "Index"));
-
-            var config = new LocalStorageConfiguration()
-            {
-                Filename = dirInfo + "/.localstorage"
-            };
-
-            _instance = new LocalStorage(config);
+            rootDir = ConfigurationManager.AppSettings["rootFolderPath"];
         }
 
-        return _instance;
-    } }
+        var dirInfo = new DirectoryInfo(rootDir);
 
-    public static bool TryGet<T>(this LocalStorage instance, string key, out T result)
-    {
-        if (instance.Exists(key))
+        var config = new LocalStorageConfiguration()
         {
-            result = instance.Get<T>(key);
+            Filename = dirInfo + "/.localstorage"
+        };
+
+        Instance = new LocalStorage(config);
+    }
+
+    public bool TryGet<T>(string key, out T result)
+    {
+        if (Instance.Exists(key))
+        {
+            result = Instance.Get<T>(key);
             return true;
         }
         
@@ -37,13 +37,19 @@ public static class Storage
         return false;
     }
 
-    public static T GetOrDefault<T>(this LocalStorage instance, string key, T def)
+    public T GetOrDefault<T>(string key, T def)
     {
-        if (instance.Exists(key))
+        if (Instance.Exists(key))
         {
-            return instance.Get<T>(key);
+            return Instance.Get<T>(key);
         }
 
         return def;
     }
+
+    public void Dispose()
+    {
+        Instance.Dispose();
+    }
+
 }

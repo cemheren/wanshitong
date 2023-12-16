@@ -19,6 +19,8 @@ using System.IO;
 using System.Runtime.Loader;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Console;
+using System.Configuration;
+using OpenAI_API;
 
 //using System.Windows.Forms;
 
@@ -28,7 +30,7 @@ namespace wanshitong
     {
         private static ConcurrentDictionary<int, string> processIdMap = new ConcurrentDictionary<int, string>();
 
-        internal static LuceneTools m_luceneTools = new LuceneTools();
+        internal static LuceneTools m_luceneTools;
 
         private static readonly AutoResetEvent _closing = new AutoResetEvent(false);
 
@@ -37,18 +39,23 @@ namespace wanshitong
             AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
             Console.CancelKeyPress += CurrentDomain_ProcessExit;
             AssemblyLoadContext.Default.Unloading += Default_Unloading;
+            
+            var rootDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            if(ConfigurationManager.AppSettings["rootFolderPath"] != null)
+            {
+                rootDir = ConfigurationManager.AppSettings["rootFolderPath"];
+            }
+
+            var dirInfo = new DirectoryInfo(Path.Combine(rootDir, "Index"));
+            dirInfo.Create();
+            System.Console.WriteLine($"Using index folder {dirInfo.FullName}");
+
+            m_luceneTools = new LuceneTools(dirInfo);
 
             m_luceneTools.InitializeIndex();
             
-            if(args.Length != 2)
-            {
-                throw new ArgumentException("Indexer needs two arguments; app version string and Azure OCR key");
-            }
-
-            Telemetry.Version = args.Length > 0 ? args[0] : Telemetry.Version;
-            Telemetry.Instance.TrackEvent("ProgramStart");
-
-            OCRClient.OcpKey = args.Length > 0 ? args[1] : "";
+            OCRClient.OcpKey = ConfigurationManager.AppSettings["ocrKey"];
+            Telemetry.Version = args.Length > 0 ? args[0] : ConfigurationManager.AppSettings["version"];
 
             StartWebHost(args);
         }
@@ -56,19 +63,13 @@ namespace wanshitong
         private static void Default_Unloading(AssemblyLoadContext obj)
         {
             Console.WriteLine("unload");
-            Storage.Instance.Dispose();
         }
 
         private static void CurrentDomain_ProcessExit(object sender, EventArgs e)
         {
             Console.WriteLine("process exit");
-            Telemetry.Instance.TrackEvent("ProgramExit");
-            Telemetry.Instance.Flush();
-
-            Storage.Instance.Dispose();
-
-            System.Threading.Thread.Sleep(5000);
             
+            System.Threading.Thread.Sleep(1000);
             System.Environment.Exit(0);
         }
 
@@ -76,7 +77,6 @@ namespace wanshitong
         {
             _closing.Set();
             System.Environment.Exit(0);
-            Storage.Instance.Dispose();
         }
 
         private static void StartWebHost(string[] args)

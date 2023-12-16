@@ -2,42 +2,48 @@ using System;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.Extensibility;
 
-public static class Telemetry
+public class Telemetry : IDisposable
 {
-    private static TelemetryClient _instance;
-
     public static string Version = "default_ver";
 
-    public static TelemetryClient Instance { get {
+    public Telemetry(Storage storage)
+    {
+        this.storage = storage;
 
-        if (_instance == null)
-        {
-            var id = GetInstanceId();
-            var configuration = new TelemetryConfiguration("8aebb6ee-8f56-4661-8a41-6c025904e324");
-            _instance = new TelemetryClient(configuration);
-            _instance.Context.Component.Version = Version;
-        
-            _instance.Context.User.Id = id;
-            _instance.Context.Session.Id = id;
-        }
+        var id = GetInstanceId();
+        var configuration = new TelemetryConfiguration("8aebb6ee-8f56-4661-8a41-6c025904e324");
+        client = new TelemetryClient(configuration);
+        client.Context.Component.Version = Version;
+    
+        client.Context.User.Id = id;
+        client.Context.Session.Id = id;
+    }
 
-        return _instance;
-    } }
+    public TelemetryClient client;
 
-    private static string GetInstanceId()
+    private readonly Storage storage;
+
+    private string GetInstanceId()
     {
         string instanceId;
-        if(Storage.Instance.Exists("instanceId"))
+        if(this.storage.Instance.Exists("instanceId"))
         {
-            instanceId = Storage.Instance.Get<string>("instanceId");
+            instanceId = this.storage.Instance.Get<string>("instanceId");
         }
         else
         {
             instanceId = Guid.NewGuid().ToString();
-            Storage.Instance.Store("instanceId", instanceId);
-            Storage.Instance.Persist();
+            this.storage.Instance.Store("instanceId", instanceId);
+            this.storage.Instance.Persist();
         }
 
         return instanceId;
     }
+
+    public void Dispose()
+    {
+        client.TrackEvent("ProgramExit");
+        client.Flush();
+    }
+
 }

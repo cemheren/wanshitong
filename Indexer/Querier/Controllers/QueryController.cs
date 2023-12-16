@@ -10,10 +10,19 @@ namespace Indexer.Querier.Controllers
 {
     public class QueryController : ApiController
     {
+        private readonly Telemetry telemetry;
+
+
+        public QueryController(Telemetry telemetry)
+        {
+            this.telemetry = telemetry;
+
+        }
+
         [Microsoft.AspNetCore.Mvc.HttpGet]
         public List<SearchModel> SearchText(string text)
         {
-            Telemetry.Instance.TrackEvent("QueryController.SearchText");
+            this.telemetry.client.TrackEvent("QueryController.SearchText");
 
             var searchResults = Program
                 .m_luceneTools
@@ -25,7 +34,7 @@ namespace Indexer.Querier.Controllers
         [Microsoft.AspNetCore.Mvc.HttpGet]
         public List<SearchModel> SearchWithDates(DateTime start, DateTime end)
         {
-            Telemetry.Instance.TrackEvent("QueryController.SearchWithDates");
+            this.telemetry.client.TrackEvent("QueryController.SearchWithDates");
 
             var searchResults = Program
                 .m_luceneTools
@@ -37,7 +46,7 @@ namespace Indexer.Querier.Controllers
         [Microsoft.AspNetCore.Mvc.HttpGet]
         public List<SearchModel> GetAll()
         {
-            Telemetry.Instance.TrackEvent("QueryController.GetAll");
+            this.telemetry.client.TrackEvent("QueryController.GetAll");
 
             var searchResults = Program
                 .m_luceneTools
@@ -49,7 +58,7 @@ namespace Indexer.Querier.Controllers
         [Microsoft.AspNetCore.Mvc.HttpDelete]
         public void Delete(int docId)
         {
-            Telemetry.Instance.TrackEvent("QueryController.Delete");
+            this.telemetry.client.TrackEvent("QueryController.Delete");
             
             Program
                 .m_luceneTools
@@ -59,7 +68,7 @@ namespace Indexer.Querier.Controllers
         [Microsoft.AspNetCore.Mvc.ActionName("TagDocs")]
         public ActionResult<bool> TagDocs([Microsoft.AspNetCore.Mvc.FromBody]TagDocModel tagDocModel)
         {
-            Telemetry.Instance.TrackEvent("QueryController.TagDocs");
+            this.telemetry.client.TrackEvent("QueryController.TagDocs");
 
             System.Console.WriteLine(tagDocModel);
             foreach (var myId in tagDocModel.IndexAndDocId.Values)

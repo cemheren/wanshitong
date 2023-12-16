@@ -6,11 +6,18 @@ namespace Indexer.Querier
 {
     public class Validation
     {
-        public static Random RandomInstance = new Random();
-
-        public static void PremiumOrUnderLimit()
+        public Validation(Storage storage)
         {
-            if (Storage.Instance.TryGet("PremiumKey", out string premiumKey) && !string.IsNullOrEmpty(premiumKey))
+            this.storage = storage;
+        }
+
+        public static Random RandomInstance = new Random();
+        private readonly Storage storage;
+
+
+        public void PremiumOrUnderLimit()
+        {
+            if (this.storage.TryGet("PremiumKey", out string premiumKey) && !string.IsNullOrEmpty(premiumKey))
             {
                 // %20 percent of the time, go validate
                 if (RandomInstance.Next(10) < 2)
@@ -21,12 +28,12 @@ namespace Indexer.Querier
                 return;
             }
 
-            if (!Storage.Instance.Exists("maxdoc"))
+            if (!this.storage.Instance.Exists("maxdoc"))
             {
                 return;
             }
 
-            var maxdocNow = Storage.Instance.Get<int>("maxdoc");
+            var maxdocNow = this.storage.Instance.Get<int>("maxdoc");
 
             if (maxdocNow < 130)
             {
@@ -36,7 +43,7 @@ namespace Indexer.Querier
             throw new System.Exception("Indexed document count is over 100 for non-premium plan");
         } 
 
-        public static async Task ValidatePremiumKey(string key)
+        public async Task ValidatePremiumKey(string key)
         {
             var client = new HttpClient();
 
@@ -47,8 +54,8 @@ namespace Indexer.Querier
                 return;
             }
 
-            Storage.Instance.Store<string>("PremiumKey", null);
-            Storage.Instance.Persist();
+            this.storage.Instance.Store<string>("PremiumKey", null);
+            this.storage.Instance.Persist();
 
             throw new Exception("Key validation failed");
         }

@@ -21,23 +21,18 @@ namespace wanshitong.Common.Lucene
         private FSDirectory dir;
         private CodeAwareAnalyzer analyzer;
         private LuceneVersion appLuceneVersion;
+        private readonly DirectoryInfo rootDirectory;
 
-        public LuceneTools()
+        public LuceneTools(DirectoryInfo rootDirectory)
         {
+            this.rootDirectory = rootDirectory;
         }
 
         public void InitializeIndex()
         {
             this.appLuceneVersion = LuceneVersion.LUCENE_48;
             
-            var currentDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-
-            var dirInfo = new DirectoryInfo(Path.Combine(currentDir, "Index"));
-            dirInfo.Create();
-
-            System.Console.WriteLine($"Using index folder {dirInfo.FullName}");
-
-            this.dir = FSDirectory.Open(dirInfo);
+            this.dir = FSDirectory.Open(this.rootDirectory);
 
             //create an analyzer to process the text
             this.analyzer = new CodeAwareAnalyzer(appLuceneVersion);
@@ -237,8 +232,6 @@ namespace wanshitong.Common.Lucene
 
             using (var reader = DirectoryReader.Open(this.dir))
             {
-                Storage.Instance.Store("maxdoc", reader.MaxDoc);
-
                 var searcher = new IndexSearcher(reader);
                 ScoreDoc[] hits;
                 if (wildcard)

@@ -96,7 +96,7 @@ function createServerProcess() {
   {
     serverPath = path.normalize(`${appPath}/../../server/osx/Indexer`);
   }
-  var serverProcess = child_process(serverPath, [version, "d9707c0b9f544cb1b974caff2041a589"], function(err, data) {
+  var serverProcess = child_process(serverPath, [version], function(err, data) {
       if(err){
         console.error(err);
         return;

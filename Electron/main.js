@@ -109,6 +109,8 @@ function createServerProcess() {
 function registerShortcuts() {
   var ret = globalShortcut.register('alt+a', () => {
 
+    mainWindow.webContents.send('start_capture');
+
     request.get(
         "http://localhost:4153/actions/screenshot",
         function (error, response, body) {
@@ -126,6 +128,9 @@ function registerShortcuts() {
   }
 
   ret = globalShortcut.register('alt+c', () => {
+    
+    mainWindow.webContents.send('start_capture');
+    
     request.get(
         "http://localhost:4153/actions/clipboard",
         function (error, response, body) {

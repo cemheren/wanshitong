@@ -284,7 +284,7 @@ function onElementSelect(element) {
     CreateContextMenu(element);
 }
 
-var refreshList = function(event){
+refreshList = function(event){
     var text = document.getElementById("input").value;
 
     RemoveAllChildren(resultsElement);

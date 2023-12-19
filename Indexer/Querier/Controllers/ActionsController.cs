@@ -16,13 +16,22 @@ namespace Indexer.Querier.Controllers
 {
     public class ActionsController : ApiController
     {
-        public ActionsController(Storage storage, Telemetry telemetry, OpenAIWrapper openAIWrapper, LuceneClient luceneClient)
+        private static string lastClipboard;
+        private readonly Storage storage;
+        private readonly Telemetry telemetry;
+        private readonly OpenAIWrapper openAIWrapper;
+        private readonly wanshitong.Common.Lucene.LuceneClient luceneClient;
+        private readonly OCRClient OCRClient;
+
+        private readonly string screenShotDir;
+
+        public ActionsController(Storage storage, Telemetry telemetry, OpenAIWrapper openAIWrapper, LuceneClient luceneClient, OCRClient OCRClient)
         {
             this.storage = storage;
             this.telemetry = telemetry;
             this.openAIWrapper = openAIWrapper;
             this.luceneClient = luceneClient;
-
+            this.OCRClient = OCRClient;
             this.screenShotDir = Path.Combine((string)storage.Instance.Get("rootFolderPath"), "Screenshots");
         }
 
@@ -52,7 +61,7 @@ namespace Indexer.Querier.Controllers
                     var imageBytes = memoryStream.ToArray();
                     openAIModel = this.openAIWrapper.ExamineScreenShot(imageBytes).Result;
 
-                    result = OCRClient.MakeRequest(imageBytes).Result;
+                    result = this.OCRClient.MakeRequest(imageBytes).Result;
                 }
                 else
                 {
@@ -60,7 +69,7 @@ namespace Indexer.Querier.Controllers
                     byte[] imgData = System.IO.File.ReadAllBytes(address);
                 
                     openAIModel = this.openAIWrapper.ExamineScreenShot(imgData).Result;
-                    result = OCRClient.MakeRequest(imgData).Result;
+                    result = this.OCRClient.MakeRequest(imgData).Result;
                 }
             
                 var str = $"{openAIModel?.Description}\n\n{result.GetString()}";;
@@ -83,14 +92,6 @@ namespace Indexer.Querier.Controllers
 
             return true;
         }
-
-        private static string lastClipboard;
-        private readonly Storage storage;
-        private readonly Telemetry telemetry;
-        private readonly OpenAIWrapper openAIWrapper;
-        private readonly wanshitong.Common.Lucene.LuceneClient luceneClient;
-        private readonly string screenShotDir;
-
 
         [HttpGet]
         public bool CopyClipboard()
@@ -235,8 +236,8 @@ namespace Indexer.Querier.Controllers
                 var address = Path.Combine(this.screenShotDir, $"{name}.jpeg");
                 cropped.Save(address, ImageFormat.Jpeg);
             
-                var byteArray = OCRClient.BitmapToByteArray(cropped);
-                var result = OCRClient.MakeRequest(byteArray).Result;
+                var byteArray = this.OCRClient.BitmapToByteArray(cropped);
+                var result = this.OCRClient.MakeRequest(byteArray).Result;
                 var openAIModel = this.openAIWrapper.ExamineScreenShot(byteArray).Result;
                 
                 var str = $"{openAIModel?.Description}\n\n{result.GetString()}";;

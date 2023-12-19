@@ -38,7 +38,6 @@ namespace wanshitong
             Console.CancelKeyPress += CurrentDomain_ProcessExit;
             AssemblyLoadContext.Default.Unloading += Default_Unloading;
             
-            OCRClient.OcpKey = ConfigurationManager.AppSettings["ocrKey"];
             Telemetry.Version = args.Length > 0 ? args[0] : ConfigurationManager.AppSettings["version"];
 
             StartWebHost(args);

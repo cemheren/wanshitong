@@ -11,9 +11,14 @@ using System.Web;
 
 public class OCRClient
 {
-    public static string OcpKey;
+    public string OcpKey;
 
-    public static async Task<OcrResponse> MakeRequest(byte[] byteData)
+    public OCRClient(string OcpKey)
+    {
+        this.OcpKey = OcpKey;
+    }
+
+    public async Task<OcrResponse> MakeRequest(byte[] byteData)
     {
         var client = new HttpClient();
         var queryString = HttpUtility.ParseQueryString(string.Empty);
@@ -40,7 +45,7 @@ public class OCRClient
         return await response.Content.ReadAsAsync<OcrResponse>();
     }
 
-    public static byte[] BitmapToByteArray(Bitmap bitmap)
+    public byte[] BitmapToByteArray(Bitmap bitmap)
     {
         using (var stream = new MemoryStream())
         {

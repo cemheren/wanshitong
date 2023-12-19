@@ -52,10 +52,13 @@ namespace Querier
                     storage.GetOrDefault("openAI_org", string.Empty)));
             var wrapper = new OpenAIWrapper(api, storage);
 
+            var ocrClient = new OCRClient(storage.Instance.Get("ocrKey").ToString());
+
             services.AddSingleton<OpenAIWrapper>(wrapper);
             services.AddSingleton<Storage>(storage);
             services.AddSingleton<Telemetry>(new Telemetry(storage));
             services.AddSingleton<LuceneClient>(luceneClient);
+            services.AddSingleton<OCRClient>(ocrClient);
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)

@@ -24,8 +24,14 @@ ipcRenderer.on('update_downloaded', () => {
     notification.classList.remove('hidden');
 });
 
+ipcRenderer.on('start_capture', () => {
+    message.innerText = "Started capturing and indexing a new document.";
+    notification.classList.remove('hidden');
+});
+
 ipcRenderer.on('screenshot', () => {
     message.innerText = "New document is ready. Try searching for a keyword or type * (star) to see all docs.";
+    refreshList(null);
     notification.classList.remove('hidden');
 });
 
@@ -36,6 +42,7 @@ ipcRenderer.on('screenshot_error', () => {
 
 ipcRenderer.on('clipboard', () => {
     message.innerText = "Clipboard copied. Try searching for a keyword or type * (star) to see all docs.";
+    refreshList(null);
     notification.classList.remove('hidden');
 });
 

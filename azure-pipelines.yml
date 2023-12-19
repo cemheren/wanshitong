@@ -25,7 +25,7 @@ steps:
   inputs:
     command: 'publish'
     publishWebProjects: false
-    arguments: '-c Release --framework netcoreapp3.0 --runtime win-x64 --self-contained true --output "../Electron/server/win"'
+    arguments: '-c Release --framework net8-windows --runtime win-x64 --self-contained true --output "../Electron/server/win"'
     feedsToUse: 'select'
     versioningScheme: 'byBuildNumber'
     workingDirectory: 'Indexer'

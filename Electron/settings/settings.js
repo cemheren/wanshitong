@@ -4,7 +4,9 @@ var premium_settings = document.getElementById("premium_settings");
 var settingsRightPanelElement = document.getElementById("settings_rightpanel");
 
 const path = require("path");
-const os = require("os");const Store = require('electron-store');
+const os = require("os");
+const Store = require('electron-store');
+
 const store = new Store({"cwd": path.join(os.homedir(), "Index")});
 
 // Add this to test loading delays
@@ -16,6 +18,13 @@ if (store.get("isFirst", true)) {
     OpenInstructions();
 
     store.set("isFirst", false);
+}else
+{
+    var inputElement = document.getElementById("input");
+    if(inputElement.textContent == ""){
+        inputElement.value = "*";
+        refreshList();
+    }
 }
 
 async function OpenInstructions(event) {

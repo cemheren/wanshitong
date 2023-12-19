@@ -1,4 +1,6 @@
+using System;
 using System.Configuration;
+using System.IO;
 using System.Net.Http;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -7,6 +9,7 @@ using Microsoft.AspNetCore.Routing.Constraints;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using OpenAI_API;
+using wanshitong.Common.Lucene;
 
 namespace Querier
 {
@@ -14,6 +17,9 @@ namespace Querier
     {
         public void ConfigureServices(IServiceCollection services)
         {
+            var storage = new Storage();
+            this.ReconcileStorageWithConfig(storage);
+
             services
                 .AddMvc()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
@@ -23,16 +29,33 @@ namespace Querier
                     options.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
                 });
 
+            var rootDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            if(storage.TryGet("rootFolderPath", out string path))
+            {
+                rootDir = path;
+            }
+
+            var dirInfo = new DirectoryInfo(Path.Combine(rootDir, "Index"));
+            dirInfo.Create();
+            System.Console.WriteLine($"Using index folder {dirInfo.FullName}");
+            
+            var luceneClient = new LuceneClient(dirInfo);
+            luceneClient.InitializeIndex();
+
+            dirInfo = new DirectoryInfo(Path.Combine(rootDir, "Screenshots"));
+            dirInfo.Create();
+            System.Console.WriteLine($"Using screenshots folder {dirInfo.FullName}");
+
             var api = new OpenAI_API.OpenAIAPI(
                 new APIAuthentication(
-                    ConfigurationManager.AppSettings["openAI_key"], 
-                    ConfigurationManager.AppSettings["openAI_org"]));
-            var wrapper = new OpenAIWrapper(api);
+                    storage.GetOrDefault("openAI_key", string.Empty), 
+                    storage.GetOrDefault("openAI_org", string.Empty)));
+            var wrapper = new OpenAIWrapper(api, storage);
 
-            var storage = new Storage();
             services.AddSingleton<OpenAIWrapper>(wrapper);
             services.AddSingleton<Storage>(storage);
             services.AddSingleton<Telemetry>(new Telemetry(storage));
+            services.AddSingleton<LuceneClient>(luceneClient);
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
@@ -142,6 +165,19 @@ namespace Querier
                     constraints: new { httpMethod = new HttpMethodRouteConstraint(HttpMethod.Get.ToString()) });
 
             });
+        }
+    
+        private void ReconcileStorageWithConfig(Storage storage)
+        {
+            foreach (var key in ConfigurationManager.AppSettings.AllKeys)
+            {
+                if (!storage.Instance.Exists(key))
+                {
+                    storage.Instance.Store(key, ConfigurationManager.AppSettings[key]);
+                }
+            }
+
+            storage.Instance.Persist();
         }
     }
 }

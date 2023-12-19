@@ -9,13 +9,9 @@ public class Storage : IDisposable
 
     public Storage()
     {
-        var rootDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-        if(ConfigurationManager.AppSettings["rootFolderPath"] != null)
-        {
-            rootDir = ConfigurationManager.AppSettings["rootFolderPath"];
-        }
-
+        var rootDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Wanshitong");
         var dirInfo = new DirectoryInfo(rootDir);
+        dirInfo.Create();
 
         var config = new LocalStorageConfiguration()
         {
@@ -23,6 +19,11 @@ public class Storage : IDisposable
         };
 
         Instance = new LocalStorage(config);
+
+        if (Instance.Exists("rootFolderPath") == false)
+        {
+            Instance.Store<string>("rootFolderPath", rootDir);
+        }
     }
 
     public bool TryGet<T>(string key, out T result)

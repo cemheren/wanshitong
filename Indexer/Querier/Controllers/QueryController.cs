@@ -5,18 +5,19 @@ using System.Linq;
 using Indexer.LuceneTools;
 using System;
 using Microsoft.AspNetCore.Mvc;
+using wanshitong.Common.Lucene;
 
 namespace Indexer.Querier.Controllers
 {
     public class QueryController : ApiController
     {
         private readonly Telemetry telemetry;
+        private readonly LuceneClient luceneClient;
 
-
-        public QueryController(Telemetry telemetry)
+        public QueryController(Telemetry telemetry, LuceneClient luceneClient)
         {
             this.telemetry = telemetry;
-
+            this.luceneClient = luceneClient;
         }
 
         [Microsoft.AspNetCore.Mvc.HttpGet]
@@ -24,10 +25,7 @@ namespace Indexer.Querier.Controllers
         {
             this.telemetry.client.TrackEvent("QueryController.SearchText");
 
-            var searchResults = Program
-                .m_luceneTools
-                .Search(text);
-
+            var searchResults = this.luceneClient.Search(text);
             return searchResults;            
         }
 
@@ -36,9 +34,7 @@ namespace Indexer.Querier.Controllers
         {
             this.telemetry.client.TrackEvent("QueryController.SearchWithDates");
 
-            var searchResults = Program
-                .m_luceneTools
-                .SearchWithIngestionTime(start, end);
+            var searchResults = this.luceneClient.SearchWithIngestionTime(start, end);
 
             return searchResults;            
         }
@@ -48,9 +44,7 @@ namespace Indexer.Querier.Controllers
         {
             this.telemetry.client.TrackEvent("QueryController.GetAll");
 
-            var searchResults = Program
-                .m_luceneTools
-                .GetAll();
+            var searchResults = this.luceneClient.GetAll();
 
             return searchResults;  
         }
@@ -60,12 +54,10 @@ namespace Indexer.Querier.Controllers
         {
             this.telemetry.client.TrackEvent("QueryController.Delete");
             
-            Program
-                .m_luceneTools
-                .Delete(docId);
+            this.luceneClient.Delete(docId);
         }
 
-        [Microsoft.AspNetCore.Mvc.ActionName("TagDocs")]
+        [Microsoft.AspNetCore.Mvc.ActionName("CF")]
         public ActionResult<bool> TagDocs([Microsoft.AspNetCore.Mvc.FromBody]TagDocModel tagDocModel)
         {
             this.telemetry.client.TrackEvent("QueryController.TagDocs");
@@ -73,9 +65,7 @@ namespace Indexer.Querier.Controllers
             System.Console.WriteLine(tagDocModel);
             foreach (var myId in tagDocModel.IndexAndDocId.Values)
             {
-                var currentDocument = Program
-                    .m_luceneTools
-                    .SearchWithMyId(myId);
+                var currentDocument = this.luceneClient.SearchWithMyId(myId);
 
                 var hs = currentDocument.Tags.ToHashSet();
                 hs.Add(tagDocModel.Tag);
@@ -83,9 +73,7 @@ namespace Indexer.Querier.Controllers
                 currentDocument.Tags = hs.ToArray();
                 currentDocument.Metadata.TagOrders = tagDocModel.IndexAndDocId;
 
-                Program
-                    .m_luceneTools
-                    .UpdateDocument(currentDocument, true);
+                this.luceneClient.UpdateDocument(currentDocument, true);
             }
 
             return true;

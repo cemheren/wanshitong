@@ -1,8 +1,5 @@
 using System.Web.Http;
 using System.Collections.Generic;
-using wanshitong;
-using System.Linq;
-using Indexer.LuceneTools;
 using System;
 using System.IO;
 using System.Drawing.Imaging;
@@ -12,32 +9,21 @@ using System.Threading.Tasks;
 using System.Drawing;
 using System.Windows.Forms;
 using System.Configuration;
+using wanshitong.Common.Lucene;
+using System.Linq;
 
 namespace Indexer.Querier.Controllers
 {
     public class ActionsController : ApiController
     {
-        public ActionsController(Storage storage, Telemetry telemetry, OpenAIWrapper openAIWrapper)
+        public ActionsController(Storage storage, Telemetry telemetry, OpenAIWrapper openAIWrapper, LuceneClient luceneClient)
         {
             this.storage = storage;
             this.telemetry = telemetry;
             this.openAIWrapper = openAIWrapper;
+            this.luceneClient = luceneClient;
 
-        }
-
-        private static string ScreenshotDir {
-        get
-            {
-                var rootDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-                if(ConfigurationManager.AppSettings["rootFolderPath"] != null)
-                {
-                    rootDir = ConfigurationManager.AppSettings["rootFolderPath"];
-                }
-                var screenshotsPath = Path.Combine(rootDir, "Screenshots");
-                var dirInfo = new DirectoryInfo(screenshotsPath);
-                dirInfo.Create();
-                return screenshotsPath;
-            }
+            this.screenShotDir = Path.Combine((string)storage.Instance.Get("rootFolderPath"), "Screenshots");
         }
 
         [HttpGet]
@@ -52,8 +38,9 @@ namespace Indexer.Querier.Controllers
                 bool isWindows = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
             
                 var name = Guid.NewGuid();
-                var address = Path.Combine(ScreenshotDir, $"{name}.jpeg");
+                var address = Path.Combine(this.screenShotDir, $"{name}.jpeg");
                 
+                OpenAIModel openAIModel = null;
                 OcrResponse result;
                 if(isWindows){
                     var image = ScreenCapture.CaptureActiveWindow();
@@ -63,7 +50,7 @@ namespace Indexer.Querier.Controllers
                     image.Save(address, ImageFormat.Jpeg);
 
                     var imageBytes = memoryStream.ToArray();
-                    this.openAIWrapper.TestVision(imageBytes).Wait();
+                    openAIModel = this.openAIWrapper.ExamineScreenShot(imageBytes).Result;
 
                     result = OCRClient.MakeRequest(imageBytes).Result;
                 }
@@ -72,11 +59,13 @@ namespace Indexer.Querier.Controllers
                     ScreenCapture.CaptureScreen(address);
                     byte[] imgData = System.IO.File.ReadAllBytes(address);
                 
+                    openAIModel = this.openAIWrapper.ExamineScreenShot(imgData).Result;
                     result = OCRClient.MakeRequest(imgData).Result;
                 }
             
-                var str = result.GetString();
-                Program.m_luceneTools.AddAndCommit(address, str, -10);
+                var str = $"{openAIModel?.Description}\n\n{result.GetString()}";;
+                var tags = openAIModel.Classification;
+                this.luceneClient.AddAndCommit(address, str, -10, tags: [tags]);
                 System.Console.WriteLine("capture done...");
 
                 this.telemetry.client.TrackTrace("Capture.Success", SeverityLevel.Verbose);
@@ -99,6 +88,8 @@ namespace Indexer.Querier.Controllers
         private readonly Storage storage;
         private readonly Telemetry telemetry;
         private readonly OpenAIWrapper openAIWrapper;
+        private readonly wanshitong.Common.Lucene.LuceneClient luceneClient;
+        private readonly string screenShotDir;
 
 
         [HttpGet]
@@ -123,11 +114,19 @@ namespace Indexer.Querier.Controllers
                 if(!string.IsNullOrEmpty(current) && current != lastClipboard)
                 {
                     System.Console.WriteLine(current);
-                    Program.m_luceneTools.AddAndCommit("clipboard", current, -1);
+
+                    var openAiResponse = this.openAIWrapper.ExamineStringContent(current).Result;
+
+                    var str = $"{openAiResponse.Description}\n{current}";
+                    var tags = openAiResponse.Classification;
+
+                    this.luceneClient.AddAndCommit("clipboard", str, -1, [tags]);
                     lastClipboard = current;
 
-                    var d = new Dictionary<string, string>();
-                    d.Add("content", current);
+                    var d = new Dictionary<string, string>
+                    {
+                        { "content", current }
+                    };
                     this.telemetry.client.TrackTrace("CopyClipboard", severityLevel: SeverityLevel.Verbose, properties: d);
                 }
             }
@@ -204,15 +203,10 @@ namespace Indexer.Querier.Controllers
             try
             {
                 
-                var currentDocument = Program
-                    .m_luceneTools
-                    .SearchWithMyId(myId);
-
+                var currentDocument = this.luceneClient.SearchWithMyId(myId);
                 currentDocument.Text = newText;
-
-                Program
-                    .m_luceneTools
-                    .UpdateDocument(currentDocument, true);
+                
+                this.luceneClient.UpdateDocument(currentDocument, true);
 
             }
             catch (System.Exception e)
@@ -230,9 +224,7 @@ namespace Indexer.Querier.Controllers
             this.telemetry.client.TrackEvent("ActionsController.IngestCroppedDocument");
             try
             {
-                var currentDocument = Program
-                    .m_luceneTools
-                    .SearchWithMyId(myId);
+                var currentDocument = this.luceneClient.SearchWithMyId(myId);
 
                 string fileName = currentDocument.Group;
                 var source = new Bitmap(fileName);
@@ -240,20 +232,27 @@ namespace Indexer.Querier.Controllers
                 var cropped = source.Crop(model);
                 
                 var name = Guid.NewGuid();
-                var address = Path.Combine(ScreenshotDir, $"{name}.jpeg");
+                var address = Path.Combine(this.screenShotDir, $"{name}.jpeg");
                 cropped.Save(address, ImageFormat.Jpeg);
             
-                var result = OCRClient.MakeRequest(OCRClient.BitmapToByteArray(cropped)).Result;
-                var str = result.GetString();
+                var byteArray = OCRClient.BitmapToByteArray(cropped);
+                var result = OCRClient.MakeRequest(byteArray).Result;
+                var openAIModel = this.openAIWrapper.ExamineScreenShot(byteArray).Result;
+                
+                var str = $"{openAIModel?.Description}\n\n{result.GetString()}";;
+                var tags = openAIModel.Classification;
+                this.luceneClient.AddAndCommit(address, str, -10, tags: [tags]);
 
+                var existingTags = new HashSet<string>(currentDocument.Tags);
+                existingTags.Add(tags);
+
+                currentDocument.Tags = existingTags.ToArray();
                 currentDocument.Type = "CroppedDocument";
                 currentDocument.Text = str;
                 currentDocument.Group = address;
                 currentDocument.MyId = Guid.NewGuid().ToString();
 
-                Program
-                    .m_luceneTools
-                    .UpdateDocument(currentDocument, false);
+                this.luceneClient.UpdateDocument(currentDocument, false);
 
             }
             catch (System.Exception e)

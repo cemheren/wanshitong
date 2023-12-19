@@ -30,8 +30,6 @@ namespace wanshitong
     {
         private static ConcurrentDictionary<int, string> processIdMap = new ConcurrentDictionary<int, string>();
 
-        internal static LuceneTools m_luceneTools;
-
         private static readonly AutoResetEvent _closing = new AutoResetEvent(false);
 
         static void Main(string[] args)
@@ -39,20 +37,6 @@ namespace wanshitong
             AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
             Console.CancelKeyPress += CurrentDomain_ProcessExit;
             AssemblyLoadContext.Default.Unloading += Default_Unloading;
-            
-            var rootDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            if(ConfigurationManager.AppSettings["rootFolderPath"] != null)
-            {
-                rootDir = ConfigurationManager.AppSettings["rootFolderPath"];
-            }
-
-            var dirInfo = new DirectoryInfo(Path.Combine(rootDir, "Index"));
-            dirInfo.Create();
-            System.Console.WriteLine($"Using index folder {dirInfo.FullName}");
-
-            m_luceneTools = new LuceneTools(dirInfo);
-
-            m_luceneTools.InitializeIndex();
             
             OCRClient.OcpKey = ConfigurationManager.AppSettings["ocrKey"];
             Telemetry.Version = args.Length > 0 ? args[0] : ConfigurationManager.AppSettings["version"];

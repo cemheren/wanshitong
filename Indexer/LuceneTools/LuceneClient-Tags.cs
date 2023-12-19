@@ -16,7 +16,7 @@ using Newtonsoft.Json;
 
 namespace wanshitong.Common.Lucene
 {
-    public partial class LuceneTools
+    public partial class LuceneClient
     {
         public void AddTag(string tag, string color)
         {

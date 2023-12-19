@@ -5,18 +5,19 @@ using System.Linq;
 using Indexer.LuceneTools;
 using System;
 using Microsoft.AspNetCore.Mvc;
+using wanshitong.Common.Lucene;
 
 namespace Indexer.Querier.Controllers
 {
     public class TagsController : ApiController
     {
         private readonly Telemetry telemetry;
+        private readonly LuceneClient luceneClient;
 
-
-        public TagsController(Telemetry telemetry)
+        public TagsController(Telemetry telemetry, LuceneClient luceneClient)
         {
             this.telemetry = telemetry;
-
+            this.luceneClient = luceneClient;
         }
 
         [Microsoft.AspNetCore.Mvc.HttpGet]
@@ -24,9 +25,7 @@ namespace Indexer.Querier.Controllers
         {
             this.telemetry.client.TrackEvent("TagsController.Search");
             
-            var searchResults = Program
-                .m_luceneTools
-                .SearchTag(text);
+            var searchResults = this.luceneClient.SearchTag(text);
 
             return searchResults;            
         }
@@ -36,9 +35,7 @@ namespace Indexer.Querier.Controllers
         {
             this.telemetry.client.TrackEvent("TagsController.AddTag");
 
-            Program
-                .m_luceneTools
-                .AddTag(tag, color);
+            this.luceneClient.AddTag(tag, color);
         }
     } 
 }

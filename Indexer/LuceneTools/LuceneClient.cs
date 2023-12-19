@@ -16,14 +16,14 @@ using Newtonsoft.Json;
 
 namespace wanshitong.Common.Lucene
 {
-    public partial class LuceneTools
+    public partial class LuceneClient
     {
         private FSDirectory dir;
         private CodeAwareAnalyzer analyzer;
         private LuceneVersion appLuceneVersion;
         private readonly DirectoryInfo rootDirectory;
 
-        public LuceneTools(DirectoryInfo rootDirectory)
+        public LuceneClient(DirectoryInfo rootDirectory)
         {
             this.rootDirectory = rootDirectory;
         }
@@ -38,7 +38,7 @@ namespace wanshitong.Common.Lucene
             this.analyzer = new CodeAwareAnalyzer(appLuceneVersion);
         }
 
-        public void AddAndCommit(string group, string text, int processId)
+        public void AddAndCommit(string group, string text, int processId, string[] tags = null)
         {
             using (var writer = new IndexWriter(dir, new IndexWriterConfig(appLuceneVersion, analyzer)))
             {
@@ -51,6 +51,11 @@ namespace wanshitong.Common.Lucene
                 doc.Add(new TextField("text", text, Field.Store.YES));
 
                 // add a non-searchable metadata field
+
+                foreach (var tag in tags.Coalesce())
+                {
+                    doc.Add(new TextField("tags", tag, Field.Store.YES));
+                }
 
                 doc.Add(new StringField("ingestionTime",
                      DateTools.DateToString(DateTime.UtcNow, DateTools.Resolution.SECOND), Field.Store.YES));

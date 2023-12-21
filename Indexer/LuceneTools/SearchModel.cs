@@ -60,5 +60,7 @@ namespace Indexer.LuceneTools
         public string HighlightedText { get; set; }
         
         public Metadata Metadata { get; set; }
+
+        public int GroupingNumber { get; set; }
     }
 }

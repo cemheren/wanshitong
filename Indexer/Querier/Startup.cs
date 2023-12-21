@@ -114,9 +114,9 @@ namespace Querier
 
                 routes.MapRoute(
                     name: "ExecuteQuery",
-                    template: "query/{text}",
+                    template: "query",
                     defaults: new { controller = "Query", action = "SearchText" },
-                    constraints: new { httpMethod = new HttpMethodRouteConstraint(HttpMethod.Get.ToString()) });
+                    constraints: new { httpMethod = new HttpMethodRouteConstraint(HttpMethod.Post.ToString()) });
 
                 routes.MapRoute(
                     name: "ExecuteQuery",

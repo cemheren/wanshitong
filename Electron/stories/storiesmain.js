@@ -1,9 +1,14 @@
 var storiesListElement = document.getElementById("stories_list_element");
+var storiesGroupingTagElement = document.getElementById("stories_grouping_tag");
 var storiesRightPanelElement = document.getElementById("stories_right_panel");
+
+var currentGroupingTag = null;
+var currentStory = null;
 
 function StoriesOnLoad() {
     
     refreshStories();
+    var currentStory = null;
 }
 
 function CreateStoryRow(phrase)
@@ -30,7 +35,7 @@ function CreateStoryItem(docId, group, text, ingestionTime, category, highlighte
 
     if (tags) {
         tags.forEach(tag => {
-            div.innerHTML += `<button class="story_item_tag" onClick="StartTagSearch(this)">${tag}</button>`;
+            div.innerHTML += `<button class="story_item_tag" onClick="setTagAsGrouping(this)">${tag}</button>`;
         });
     }
 
@@ -66,13 +71,25 @@ function CreateStoryItem(docId, group, text, ingestionTime, category, highlighte
     return div;
 }
 
-function executeStoryQuery(event) {
+function CreateStoryGroup(groupName)
+{
+    const div = document.createElement('div');
+    div.className = 'story_group';
+    div.innerHTML = `<div id="story_group_id" class="story_group_id">${groupName}</div>`;
+    return div;
+}
 
+function executeStoryQuery(event) {
     UnselectAllChildren(storiesListElement);
     SelectElement(event.currentTarget);
+    currentStory = event.currentTarget;
+    redrawStory(currentStory);
+}
 
-    var text = event.currentTarget.querySelector('.phrase').textContent;
-    var response = http("GET", "http://localhost:4153/query/" + encodeURIComponent(text));
+function redrawStory(currentStory)
+{
+    var text = currentStory.querySelector('.phrase').textContent;
+    var response = http("POST", "http://localhost:4153/query/", JSON.stringify({"SearchPhrase" : text, "GroupingPhrase" : currentGroupingTag}));
 
     if(response == "" || response == undefined){
         return "No result found";
@@ -80,9 +97,22 @@ function executeStoryQuery(event) {
 
     RemoveAllChildren(storiesRightPanelElement);
 
+    var allGroups = {};
+
     var json = JSON.parse(response);
     json.forEach(e => {
-        storiesRightPanelElement.appendChild(
+
+        var assignedGroup = e.groupingNumber == null ? "none" : e.groupingNumber;
+
+        var storyGroup = null;
+        if (allGroups[assignedGroup] == null) {
+            storyGroup = CreateStoryGroup(assignedGroup);
+            allGroups[assignedGroup] = storyGroup;
+        }else{
+            storyGroup = allGroups[assignedGroup]
+        }
+
+        storyGroup.appendChild(
             CreateStoryItem(
                 e.docId, 
                 e.group, 
@@ -92,6 +122,22 @@ function executeStoryQuery(event) {
                 e.highlightedText,
                 e.tags));
     });
+
+    for (let i = 0; i < Object.keys(allGroups).length + 1; i++) {
+
+        if (allGroups[i] == null) {
+            continue;
+        }
+
+        storiesRightPanelElement.appendChild(allGroups[i]);
+    }
+}
+
+function setTagAsGrouping(element)
+{
+    currentGroupingTag = element.innerText;
+    storiesGroupingTagElement.innerHTML = `<div class="text">Grouping by: ${currentGroupingTag}</div>`;
+    redrawStory(currentStory);
 }
 
 var refreshStories = function(event){

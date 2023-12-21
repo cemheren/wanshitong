@@ -242,8 +242,7 @@ namespace Indexer.Querier.Controllers
                 
                 var str = $"{openAIModel?.Description}\n\n{result.GetString()}";;
                 var tags = openAIModel.Classification;
-                this.luceneClient.AddAndCommit(address, str, -10, tags: [tags]);
-
+                
                 var existingTags = new HashSet<string>(currentDocument.Tags);
                 existingTags.Add(tags);
 

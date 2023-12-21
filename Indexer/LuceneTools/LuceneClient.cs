@@ -13,6 +13,8 @@ using Lucene.Net.Search.Highlight;
 using Lucene.Net.Util;
 using Lucene.Net.Facet;
 using Newtonsoft.Json;
+using Lucene.Net.Search.Grouping;
+using Lucene.Net.Facet.Taxonomy;
 
 namespace wanshitong.Common.Lucene
 {

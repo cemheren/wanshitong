@@ -18,6 +18,24 @@
     height: 100%;
 }
 
+.story_group_id{
+    width: 98%;
+    font-size: x-small;
+    font: menu;
+    text-align: right;
+    padding-top: 4px;
+}
+
+.story_group{
+    margin-top: 10px;
+    width: 100%;
+    font-size: x-small;
+    font: menu;
+    text-align: left;
+    background-color: rgb(107, 107, 107);
+    box-shadow: 6px 4px 5px 0px rgba(0, 0, 0, 0.2), 0px 5px 3px 0px rgba(0, 0, 0, 0.2);
+}
+
 .story_item_group{
     margin-bottom: 10px;
     width: 98%;

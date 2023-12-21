@@ -20,12 +20,22 @@ namespace Indexer.Querier.Controllers
             this.luceneClient = luceneClient;
         }
 
-        [Microsoft.AspNetCore.Mvc.HttpGet]
-        public List<SearchModel> SearchText(string text)
+        [Microsoft.AspNetCore.Mvc.HttpPost]
+        public List<SearchModel> SearchText([Microsoft.AspNetCore.Mvc.FromBody]SavedSearchModel searchModel)
         {
             this.telemetry.client.TrackEvent("QueryController.SearchText");
 
-            var searchResults = this.luceneClient.Search(text);
+            var searchResults = this.luceneClient.Search(searchModel.SearchPhrase);
+
+            // Hacky way to group results, eventually can migrate to lucene.
+            if (searchModel.GroupingPhrase != null)
+            {
+                foreach (var searchResult in searchResults)
+                {
+                    searchResult.GroupingNumber = searchResult.Tags.Contains(searchModel.GroupingPhrase, StringComparer.OrdinalIgnoreCase) ? 0 : 1;
+                }
+            }
+
             return searchResults;            
         }
 
@@ -57,7 +67,7 @@ namespace Indexer.Querier.Controllers
             this.luceneClient.Delete(docId);
         }
 
-        [Microsoft.AspNetCore.Mvc.ActionName("CF")]
+        [Microsoft.AspNetCore.Mvc.ActionName("TagDocs")]
         public ActionResult<bool> TagDocs([Microsoft.AspNetCore.Mvc.FromBody]TagDocModel tagDocModel)
         {
             this.telemetry.client.TrackEvent("QueryController.TagDocs");

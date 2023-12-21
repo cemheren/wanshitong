@@ -246,6 +246,14 @@ function onRowTextClick(event)
 
             var imagedata = cropperInstance.getImageData();
             var model = cropperInstance.getCropBoxData();
+
+            // Normalize canvas interactions with the actual image. 
+            var canvas = cropperInstance.getCanvasData();
+            model.left = model.left - canvas.left;
+            model.top = model.top - canvas.top;
+            model.left = model.left < 0 ? 0 : model.left; 
+            model.top = model.top < 0 ? 0 : model.top; 
+
             console.log("cropped");
 
             var scaleX = imagedata.naturalWidth / imagedata.width;
@@ -263,11 +271,11 @@ function onRowTextClick(event)
             savingElement.classList.add("hidden");
             if(result && result == "true"){
                 cropperInstance.clear();
-                PopNotificationInfo("New document from cropped image is ready 🕶️.");
+                PopNotificationInfo("New document from cropped image is ready.");
                 drawSimilarityRow();
                 cropOnElement.classList.add('hidden'); 
             }else{
-                PopNotificationInfo("There was an error saving the new document 😟. Please contact us at (760) 364-6209‬.");
+                PopNotificationInfo("There was an error saving the new document. Please contact us at (760) 364-6209‬.");
                 drawSimilarityRow();
             }
         }
@@ -288,7 +296,7 @@ refreshList = function(event){
     var text = document.getElementById("input").value;
 
     RemoveAllChildren(resultsElement);
-    var response = http("GET", "http://localhost:4153/query/" + encodeURIComponent(text));
+    var response = http("POST", "http://localhost:4153/query/", JSON.stringify({"SearchPhrase" : text}));
 
     if(response == "" || response == undefined){
         return "No result found";

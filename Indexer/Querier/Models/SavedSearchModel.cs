@@ -10,6 +10,8 @@ public class SavedSearchModel
     [Required]
     public string SearchPhrase {get; set;}
 
+    public string GroupingPhrase {get; set;}
+
     public override bool Equals(object other)
     {
         return this.SearchPhrase.Equals(((SavedSearchModel)other).SearchPhrase, StringComparison.OrdinalIgnoreCase);

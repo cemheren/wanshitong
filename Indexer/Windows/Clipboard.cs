@@ -1,8 +1,10 @@
 using System;
 using System.ComponentModel;
+using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
+using System.Windows.Forms;
 
 static class WindowsClipboard
 {
@@ -75,6 +77,15 @@ static class WindowsClipboard
         }
     }
 
+    public static Image? GetImage()
+    {
+        var image = Clipboard.GetImage();
+
+        var dataOb = Clipboard.GetData("2");
+
+        return image;
+    }
+
     public static string GetText()
     {
         if (!IsClipboardFormatAvailable(cfUnicodeText))
@@ -118,6 +129,8 @@ static class WindowsClipboard
     }
 
     const uint cfUnicodeText = 13;
+
+    const uint cfBitmap = 2;
 
     static void ThrowWin32()
     {

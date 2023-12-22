@@ -11,6 +11,7 @@ using System.Windows.Forms;
 using System.Configuration;
 using wanshitong.Common.Lucene;
 using System.Linq;
+using System.Threading;
 
 namespace Indexer.Querier.Controllers
 {
@@ -130,6 +131,14 @@ namespace Indexer.Querier.Controllers
                     };
                     this.telemetry.client.TrackTrace("CopyClipboard", severityLevel: SeverityLevel.Verbose, properties: d);
                 }
+
+                // this is a hack to access the clipboard from an STA thread vs a background thread from the console app. 
+                // Seems to work.
+                Thread t = new Thread(CaptureImage);
+                t.SetApartmentState(ApartmentState.STA);
+                t.Start();
+
+                t.Join();
             }
             catch (System.Exception e)
             {
@@ -138,6 +147,34 @@ namespace Indexer.Querier.Controllers
             }
 
             return true;
+        }
+
+        private void CaptureImage()
+        {
+            var image = WindowsClipboard.GetImage();
+
+            if (image != null)
+            {
+                var name = Guid.NewGuid();
+                var address = Path.Combine(this.screenShotDir, $"{name}.jpeg");
+            
+                MemoryStream memoryStream = new MemoryStream();
+                
+                image.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Jpeg);
+                image.Save(address, ImageFormat.Jpeg);
+
+                var imageBytes = memoryStream.ToArray();
+
+                var openAIModel = this.openAIWrapper.ExamineScreenShot(imageBytes).Result;
+                var result = this.OCRClient.MakeRequest(imageBytes).Result;
+
+                var str = $"{openAIModel?.Description}\n\n{result.GetString()}";;
+                var tags = openAIModel.Classification;
+                this.luceneClient.AddAndCommit(address, str, -10, tags: [tags]);
+                System.Console.WriteLine("capturing clipboard done...");
+
+                this.telemetry.client.TrackTrace("CopyClipboard.Capture", SeverityLevel.Verbose);
+            }
         }
 
         [HttpGet]

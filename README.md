@@ -1,9 +1,11 @@
 [![Build Status](https://dev.azure.com/akifheren/wanshitong/_apis/build/status/cemheren.wanshitong.windows?branchName=master)](https://dev.azure.com/akifheren/wanshitong/_build/latest?definitionId=1&branchName=master)
 
 # wanshitong
-I'm open sourcing an earlier pet project of mine, I believed this to be a great way of indexing one's workflow. 
+Open source Scribe alternative. I believed this to be a great way of indexing one's workflow, however decluttering becomes an issue once there are too much information. 
 
 This project aims to help create a new type of workflow around note taking and documentation creating. We focus on capturing information quickly and indexing it for later use. 
+
+Newly integrated with Open AI chat GPT APIs to get better performance on indexing and auto organizing.  
 
 ## Whys
 
@@ -18,6 +20,7 @@ This project aims to help create a new type of workflow around note taking and d
 * Pivoting: Create saved searches around common search terms or interesting queries. Saved searches are updated with any new document created that matches the criteria
 * Timeline: When you click open a document, a timeline view appears underneath; allowing access to any other documents that were captured around that time. This way we can search for documents that doesn't contain the keywords we are looking for and capture contextual clues. 
 * Tagging: When keyword searches aren't enough, right click a document to add a tag. Tags go through a completely new index and they are searchable with a special syntax `tags:test`
+* Automatically categorize and tag documents using chat GPT. 
 
 ## Latest release
 Latest Windows release and installer can be found here: 
@@ -28,19 +31,17 @@ You can manually build and run the tool.
 
 ## How to build and run locally
 
-To run locally you need an OCR key from Azure. It's free and can be obtained from Azure portal like this: 
-![](Screenshots/AzureOCR.png)
+To run locally you need to fill up connectionString settings in `user/Wanshitong/.localstorage`. 
+![](Screenshots/fd1d16ae-ddd1-4316-b7d1-9e1f2ce85977.jpeg)
 
-By default the app uses a limited free OCR key. But this key might hit throttling limits since it's shared. 
+By default connection strings are empty and the indexer will not function. 
 
 ### Server
-Indexer is a dotnet project so you need `dotnet core 3` to build and run it. 
-
-Link to the installer: https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/sdk-3.1.425-windows-x64-installer
+Indexer is a dotnet project so you need `dotnet core 8` to build and run it. 
 
 ```
 cd Indexer
-dotnet run "0.0.1" <your OCR key>
+dotnet run
 ```
 
 The indexer should be running by default at ` http://localhost:4153`
@@ -64,9 +65,9 @@ If you manage to run both the Electron UX project and the indexer you can start 
 
 ## Where is the data
 
-Wanshitong will only save your information locally in two folders. 
+Wanshitong will only save your information locally in two folders. Alternatively you can set the root folder in `user/Wanshitong/.localstorage` to point to any other directory. You can point to dropbox or any other alternative cloud file system to back your index up online. (Or share with teammates)
 
-Screenshots in `user\Screenshots` and the index in `user\index`: 
+Screenshots in `user/Wanshitong/Screenshots` and the index in `user/Wanshitong/index`: 
 
 ![](Screenshots/1b567bd2-fb82-4efc-9406-34eaecbaa2ba.jpeg)
 ![](Screenshots/98297b38-f150-40e5-aa35-aff70cc67865.jpeg)
